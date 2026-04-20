@@ -272,6 +272,7 @@
   tbody td {
     padding: 12px 16px; font-size: 14px;
     border-bottom: 1px solid var(--border-subtle); vertical-align: middle;
+    position: relative;
   }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover { background: var(--bg); }
@@ -296,6 +297,44 @@
     background: var(--surface); color: var(--text);
     border: 1px solid var(--border); font-weight: 500;
   }
+  /* Colored role tags — soft backgrounds + matching text + border */
+  .role-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 4px;
+    font-size: 12px; font-weight: 500; white-space: nowrap;
+    border: 1px solid transparent;
+  }
+  .role-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+  .role-super   { background: #FDECEC; color: #9F1A0F; border-color: #F7C9C3; }
+  .role-super::before   { background: #9F1A0F; }
+  .role-owner   { background: #F0EBFB; color: #5B21B6; border-color: #DCCEF3; }
+  .role-owner::before   { background: #5B21B6; }
+  .role-admin   { background: #E8EEF8; color: #1F4E9E; border-color: #C8D6EC; }
+  .role-admin::before   { background: #1F4E9E; }
+  .role-operator{ background: #E1F2E8; color: #047048; border-color: #B9E0C9; }
+  .role-operator::before{ background: #047048; }
+  .role-tech    { background: #FCEEDC; color: #8A3A05; border-color: #F3D4A8; }
+  .role-tech::before    { background: #8A3A05; }
+  .role-viewer  { background: #F2F4F7; color: #4B5563; border-color: #D8DEE5; }
+  .role-viewer::before  { background: #6B7280; }
+
+  /* Row kebab menu */
+  .row-menu {
+    position: absolute; right: 16px; min-width: 180px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: var(--shadow-md);
+    padding: 4px; z-index: 60;
+  }
+  .row-menu button {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 8px 10px; font-size: 13.5px; color: var(--text);
+    border-radius: 5px; text-align: left;
+  }
+  .row-menu button:hover { background: var(--bg-hover); }
+  .row-menu button.danger { color: var(--danger); }
+  .row-menu button.danger:hover { background: var(--danger-soft); }
+  .row-menu .sep { height: 1px; background: var(--border-subtle); margin: 4px 0; }
+  .row-menu button svg { width: 14px; height: 14px; flex-shrink: 0; opacity: .8; }
 
   .row-actions {
     display: flex; gap: 2px; opacity: 0; transition: opacity .12s;
@@ -980,6 +1019,20 @@ function statusChip(s) {
     pending: '<span class="chip chip-pending"><span class="dot"></span>Pending</span>'
   })[s];
 }
+function roleTag(role) {
+  const map = {
+    'Super Admin': 'role-super',
+    'Owner': 'role-owner',
+    'Administrator': 'role-admin',
+    'Admin': 'role-admin',
+    'Plant Operator': 'role-operator',
+    'Maintenance Tech': 'role-tech',
+    'Maintenance Technician': 'role-tech',
+    'Viewer': 'role-viewer'
+  };
+  const cls = map[role] || 'role-viewer';
+  return `<span class="role-tag ${cls}">${role}</span>`;
+}
 
 const STATUS_LABELS = { active: 'Active', inactive: 'Inactive', pending: 'Pending' };
 const userFilters = { search: '', role: new Set(), status: new Set(), tenant: new Set() };
@@ -1003,20 +1056,23 @@ function renderUsers() {
   if (clearBtn) clearBtn.style.display = userFilters.search ? 'inline-block' : 'none';
 
   const list = filteredUsers();
-  const rows = list.map((u, i) => `
+  const rows = list.map((u) => {
+    const idx = users.indexOf(u);
+    return `
     <tr>
       <td><input type="checkbox" class="check" onchange="rowSelect()" /></td>
       <td><div class="cell-user"><div class="avatar avatar-28">${u.init}</div><div><div class="cell-user-name">${u.name}</div><div class="cell-user-sub">${u.email}</div></div></div></td>
-      <td><span class="chip chip-role">${u.role}</span></td>
+      <td>${roleTag(u.role)}</td>
       <td style="color:var(--text-muted)">${u.tenant}</td>
       <td>${statusChip(u.status)}</td>
       <td style="color:var(--text-muted)">${u.last}</td>
       <td><div class="row-actions">
-        <button class="icon-btn" onclick="openUserDrawer()">${SVG.edit}</button>
-        <button class="icon-btn">${SVG.dots}</button>
+        <button class="icon-btn" title="Edit" onclick="openUserDrawer(${idx})">${SVG.edit}</button>
+        <button class="icon-btn" title="More" onclick="openRowMenu(event, ${idx})">${SVG.dots}</button>
       </div></td>
     </tr>
-  `).join('');
+    `;
+  }).join('');
   const tbody = document.getElementById('userRows');
   tbody.innerHTML = list.length
     ? rows
@@ -1114,7 +1170,76 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.filter-wrap')) {
     document.querySelectorAll('.filter-pop.open').forEach(p => p.classList.remove('open'));
   }
+  if (!e.target.closest('.row-menu') && !e.target.closest('[onclick*="openRowMenu"]')) {
+    document.querySelectorAll('.row-menu').forEach(m => m.remove());
+  }
 });
+
+/* ==== Row kebab menu ==== */
+function openRowMenu(evt, idx) {
+  evt.stopPropagation();
+  document.querySelectorAll('.row-menu').forEach(m => m.remove());
+  const u = users[idx];
+  const isActive = u.status === 'active';
+  const menu = document.createElement('div');
+  menu.className = 'row-menu';
+  menu.innerHTML = `
+    <button onclick="openUserDrawer(${idx})">${SVG.edit} Edit user</button>
+    <button onclick="resetPassword(${idx})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Reset password</button>
+    <button onclick="viewSessions(${idx})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> View sessions</button>
+    <div class="sep"></div>
+    <button onclick="toggleStatus(${idx})">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><path d="M12 2v10"/></svg>
+      ${isActive ? 'Deactivate' : 'Activate'}
+    </button>
+    <button class="danger" onclick="deleteUser(${idx})">${SVG.trash} Delete user</button>
+  `;
+  const btn = evt.currentTarget;
+  const cell = btn.closest('td');
+  cell.appendChild(menu);
+  const rect = menu.getBoundingClientRect();
+  if (rect.bottom > window.innerHeight - 10) {
+    menu.style.top = 'auto';
+    menu.style.bottom = 'calc(100% + 4px)';
+  }
+}
+
+function openUserDrawer(idx) {
+  document.querySelectorAll('.row-menu').forEach(m => m.remove());
+  const sel = document.getElementById('inviteRole');
+  sel.innerHTML = state.roles.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+  document.getElementById('userDrawer').classList.add('open');
+  document.getElementById('userDrawerBackdrop').classList.add('open');
+}
+
+function resetPassword(idx) {
+  document.querySelectorAll('.row-menu').forEach(m => m.remove());
+  toast('Password reset link sent to ' + users[idx].email, 'success');
+}
+function viewSessions(idx) {
+  document.querySelectorAll('.row-menu').forEach(m => m.remove());
+  toast('Opening sessions for ' + users[idx].name);
+}
+function toggleStatus(idx) {
+  document.querySelectorAll('.row-menu').forEach(m => m.remove());
+  const u = users[idx];
+  if (u.status === 'active') { u.status = 'inactive'; toast(u.name + ' deactivated'); }
+  else { u.status = 'active'; toast(u.name + ' activated', 'success'); }
+  renderUsers();
+}
+function deleteUser(idx) {
+  document.querySelectorAll('.row-menu').forEach(m => m.remove());
+  const u = users[idx];
+  confirmDialog(
+    `Delete ${u.name}?`,
+    `This permanently removes the user and revokes all their access. This action cannot be undone.`,
+    () => {
+      users.splice(idx, 1);
+      renderUsers();
+      toast('User deleted', 'danger');
+    }
+  );
+}
 function rowSelect() {
   const n = document.querySelectorAll('#userRows input[type=checkbox]:checked').length;
   document.getElementById('bulkBar').classList.toggle('show', n > 0);
@@ -1337,12 +1462,6 @@ function revokeAll() {
 /* ============================================================
    Drawers
    ============================================================ */
-function openUserDrawer() {
-  const sel = document.getElementById('inviteRole');
-  sel.innerHTML = state.roles.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-  document.getElementById('userDrawer').classList.add('open');
-  document.getElementById('userDrawerBackdrop').classList.add('open');
-}
 function closeUserDrawer() {
   document.getElementById('userDrawer').classList.remove('open');
   document.getElementById('userDrawerBackdrop').classList.remove('open');
