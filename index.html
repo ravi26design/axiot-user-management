@@ -514,10 +514,13 @@
     border-bottom: 1px solid var(--border-subtle); font-size: 13.5px;
   }
   .matrix-table td.first { text-align: left; padding-left: 18px; }
-  .matrix-table tr.group td.first { font-weight: 600; cursor: pointer; user-select: none; }
-  .matrix-table tr.group td.first:hover { color: var(--primary); }
-  .matrix-table tr.sub td.first {
-    padding-left: 44px; color: var(--text-muted); font-size: 13px; font-weight: 400;
+  .res-cell { display: flex; align-items: center; gap: 10px; }
+  .res-cell-sub { padding-left: 26px; }
+  .res-label { flex: 1; }
+  .matrix-table tr.group .res-label { font-weight: 600; cursor: pointer; user-select: none; }
+  .matrix-table tr.group .res-label:hover { color: var(--primary); }
+  .matrix-table tr.sub .res-label {
+    color: var(--text-muted); font-size: 13px; font-weight: 400;
   }
   .matrix-table tr:last-child td { border-bottom: none; }
   .matrix-foot {
@@ -1351,6 +1354,24 @@ function checkbox(resourceKey, action, disabled) {
   const v = state.dirtyPerms[resourceKey][action];
   return `<input type="checkbox" class="check" ${v ? 'checked' : ''} ${disabled ? 'disabled' : ''} onclick="togglePerm('${resourceKey}','${action}')" />`;
 }
+function rowToggle(resourceKey, disabled) {
+  const p = state.dirtyPerms[resourceKey];
+  const acts = ['view','create','edit','delete'];
+  const on = acts.filter(a => p[a]).length;
+  const s = on === 0 ? 'none' : (on === acts.length ? 'all' : 'some');
+  const checked = s === 'all' ? 'checked' : '';
+  const indet = s === 'some' ? 'data-indet="1"' : '';
+  return `<input type="checkbox" class="check row-check" ${checked} ${indet} ${disabled?'disabled':''} onchange="toggleRow('${resourceKey}')" onclick="event.stopPropagation()" />`;
+}
+function toggleRow(resourceKey) {
+  const r = selectedRole();
+  if (r.system) { toast('System roles cannot be modified', 'danger'); return; }
+  const p = state.dirtyPerms[resourceKey];
+  const acts = ['view','create','edit','delete'];
+  const allOn = acts.every(a => p[a]);
+  acts.forEach(a => p[a] = !allOn);
+  renderMatrix();
+}
 function colHeader(action, label, disabled) {
   const keys = Object.keys(state.dirtyPerms);
   const total = keys.length;
@@ -1384,7 +1405,12 @@ function renderMatrix() {
 
     let html = `
       <tr class="group">
-        <td class="first" onclick="${hasChildren ? `toggleGroup('${res.key}')` : ''}">${chev}${res.label}</td>
+        <td class="first">
+          <div class="res-cell">
+            ${rowToggle(res.key, isSystem)}
+            <span class="res-label" onclick="${hasChildren ? `toggleGroup('${res.key}')` : ''}">${chev}${res.label}</span>
+          </div>
+        </td>
         <td>${checkbox(res.key, 'view', isSystem)}</td>
         <td>${checkbox(res.key, 'create', isSystem)}</td>
         <td>${checkbox(res.key, 'edit', isSystem)}</td>
@@ -1394,7 +1420,12 @@ function renderMatrix() {
     if (hasChildren && isOpen) {
       html += res.children.map(c => `
         <tr class="sub">
-          <td class="first">${c.label}</td>
+          <td class="first">
+            <div class="res-cell res-cell-sub">
+              ${rowToggle(c.key, isSystem)}
+              <span class="res-label">${c.label}</span>
+            </div>
+          </td>
           <td>${checkbox(c.key, 'view', isSystem)}</td>
           <td>${checkbox(c.key, 'create', isSystem)}</td>
           <td>${checkbox(c.key, 'edit', isSystem)}</td>
@@ -1445,8 +1476,8 @@ function renderMatrix() {
       </div>
     </div>
   `;
-  // Apply indeterminate state to column header checkboxes
-  document.querySelectorAll('.col-check[data-indet="1"]').forEach(el => el.indeterminate = true);
+  // Apply indeterminate state
+  document.querySelectorAll('.col-check[data-indet="1"], .row-check[data-indet="1"]').forEach(el => el.indeterminate = true);
 }
 
 function grantAll() {
