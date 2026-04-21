@@ -52,11 +52,39 @@
   .screen { display: none; min-height: 100vh; }
   .screen.active { display: block; }
 
-  .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+  .app {
+    display: grid;
+    grid-template-columns: 232px 1fr;
+    min-height: 100vh;
+    transition: grid-template-columns .2s ease;
+  }
+  body.sidebar-collapsed .app { grid-template-columns: 64px 1fr; }
   .sidebar {
     background: var(--sidebar-bg); border-right: 1px solid var(--border);
-    padding: 16px 12px; display: flex; flex-direction: column; gap: 2px;
+    padding: 16px 12px;
+    display: flex; flex-direction: column; gap: 2px;
+    position: relative;
+    transition: padding .2s;
   }
+  body.sidebar-collapsed .sidebar { padding: 14px 8px; }
+  body.sidebar-collapsed .brand { justify-content: center; padding: 6px 0 16px; }
+  body.sidebar-collapsed .brand > div:last-child { display: none; }
+  body.sidebar-collapsed .nav-section { display: none; }
+  body.sidebar-collapsed .nav-item { justify-content: center; padding: 10px 0; gap: 0; }
+  body.sidebar-collapsed .nav-item > *:not(.ico) { display: none; }
+  body.sidebar-collapsed .nav-item.active { padding: 9px 0; }
+
+  .sidebar-collapse {
+    position: absolute; top: 18px; right: -12px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    display: grid; place-items: center;
+    color: var(--text-muted); cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    z-index: 20; transition: transform .2s;
+  }
+  .sidebar-collapse:hover { color: var(--text); border-color: var(--border-strong); }
+  body.sidebar-collapsed .sidebar-collapse { transform: rotate(180deg); }
   .brand {
     display: flex; align-items: center; gap: 10px;
     padding: 6px 10px 20px;
@@ -960,6 +988,9 @@ const users = [
    ============================================================ */
 function renderSidebar(activeScreen) {
   const html = `
+    <button class="sidebar-collapse" onclick="toggleSidebar()" title="Collapse sidebar" aria-label="Toggle sidebar">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
     <div class="brand">
       <div class="brand-mark">AX</div>
       <div>AXIoT<div class="brand-sub">Acme Industries</div></div>
@@ -969,15 +1000,22 @@ function renderSidebar(activeScreen) {
       const isActive = item.screen === activeScreen;
       const clickable = item.screen ? `onclick="switchScreen('${item.screen}')"` : '';
       const badge = item.badge ? `<span class="nav-badge ${item.badgeClass || ''}">${item.badge}</span>` : '';
-      return `<a class="nav-item ${isActive ? 'active' : ''}" ${clickable}><span class="ico">${item.ico}</span>${item.label}${badge}</a>`;
+      return `<a class="nav-item ${isActive ? 'active' : ''}" ${clickable} title="${item.label}"><span class="ico">${item.ico}</span><span class="nav-label">${item.label}</span>${badge}</a>`;
     }).join('')}
     <div style="flex:1"></div>
-    <a class="nav-item"><span class="ico">${SVG.help}</span>Help & docs</a>
+    <a class="nav-item" title="Help & docs"><span class="ico">${SVG.help}</span><span class="nav-label">Help & docs</span></a>
   `;
   document.querySelectorAll('[data-sidebar]').forEach(el => {
     if (el.closest('.screen').id === 'screen-' + activeScreen) el.innerHTML = html;
   });
 }
+
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-collapsed');
+  try { localStorage.setItem('axiot-sidebar-collapsed', document.body.classList.contains('sidebar-collapsed') ? '1' : '0'); } catch (e) {}
+}
+// Restore preference
+try { if (localStorage.getItem('axiot-sidebar-collapsed') === '1') document.body.classList.add('sidebar-collapsed'); } catch (e) {}
 
 function renderTopbar() {
   const html = `
