@@ -498,6 +498,13 @@
     border-bottom: 1px solid var(--border);
   }
   .matrix-table th.first { text-align: left; padding-left: 18px; width: 42%; }
+  .matrix-table th:not(.first) { width: 96px; }
+  .col-hdr {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    user-select: none;
+  }
+  .col-hdr .col-label { line-height: 1; }
+  .col-hdr .col-check { margin: 0; }
   .matrix-table td {
     padding: 11px 8px; text-align: center;
     border-bottom: 1px solid var(--border-subtle); font-size: 13.5px;
@@ -1344,12 +1351,12 @@ function colHeader(action, label, disabled) {
   const keys = Object.keys(state.dirtyPerms);
   const total = keys.length;
   const on = keys.filter(k => state.dirtyPerms[k][action]).length;
-  const state_ = on === 0 ? 'none' : (on === total ? 'all' : 'some');
-  const checked = state_ === 'all' ? 'checked' : '';
-  const indet = state_ === 'some' ? 'data-indet="1"' : '';
-  return `<label style="display:inline-flex;align-items:center;gap:6px;cursor:${disabled?'not-allowed':'pointer'};justify-content:center;width:100%">
-    <input type="checkbox" class="check col-check" ${checked} ${indet} ${disabled?'disabled':''} onclick="toggleColumn('${action}')" />
-    <span>${label}</span>
+  const s = on === 0 ? 'none' : (on === total ? 'all' : 'some');
+  const checked = s === 'all' ? 'checked' : '';
+  const indet = s === 'some' ? 'data-indet="1"' : '';
+  return `<label class="col-hdr" style="cursor:${disabled?'not-allowed':'pointer'}">
+    <span class="col-label">${label}</span>
+    <input type="checkbox" class="check col-check" ${checked} ${indet} ${disabled?'disabled':''} onchange="toggleColumn('${action}')" />
   </label>`;
 }
 function toggleColumn(action) {
