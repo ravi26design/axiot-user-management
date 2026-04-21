@@ -3,958 +3,689 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AXIoT — Operator Certification</title>
+<title>Little Learners — Quiz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --primary: #1F4E9E;
-    --primary-hover: #173F82;
-    --primary-soft: #E8EEF8;
-    --text-base: 11, 18, 32;
-    --text: rgba(var(--text-base), 1);
-    --text-muted: rgba(var(--text-base), 0.72);
-    --text-subtle: rgba(var(--text-base), 0.52);
-    --border: #D8DEE5;
-    --border-strong: #B8C0CC;
-    --border-subtle: #E8EBEF;
-    --bg: #F5F7FA;
-    --bg-hover: #EEF1F5;
-    --surface: #FFFFFF;
-    --success: #047048;
-    --success-soft: #E1F2E8;
-    --danger: #9F1A0F;
-    --danger-soft: #FBE3E0;
-    --warn: #8A3A05;
-    --warn-soft: #FCEEDC;
-    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
-    --shadow-md: 0 4px 14px rgba(16, 24, 40, 0.06);
-    --shadow-lg: 0 16px 40px rgba(16, 24, 40, 0.1);
-    --radius: 6px;
-    --radius-lg: 10px;
+    --ink: #4A2E1E;
+    --ink-soft: #5F3F2C;
+    --ink-muted: rgba(74, 46, 30, 0.68);
+    --ink-subtle: rgba(74, 46, 30, 0.45);
+    --bg: #F7EFE2;
+    --bg-deep: #F2E6D1;
+    --surface: #FFFCF6;
+    --border: rgba(74, 46, 30, 0.12);
+    --border-soft: rgba(74, 46, 30, 0.06);
+
+    --coral: #E08963;          /* default option */
+    --coral-hover: #CE7751;
+    --coral-deep: #B76443;
+    --green: #4C9A6C;          /* correct */
+    --green-deep: #3E7F58;
+    --red: #D4574F;            /* wrong */
+    --amber: #E0A24A;
+
+    --radius: 14px;
+    --radius-lg: 22px;
+    --shadow-sm: 0 1px 2px rgba(74, 46, 30, 0.06);
+    --shadow-md: 0 8px 24px rgba(74, 46, 30, 0.08);
+    --shadow-lg: 0 20px 50px rgba(74, 46, 30, 0.18);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 14px; line-height: 1.5;
-    color: var(--text); background: var(--bg);
+    font-size: 15px; line-height: 1.5;
+    color: var(--ink); background: var(--bg);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    display: flex; justify-content: center;
   }
   button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-  input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
-  a { color: inherit; text-decoration: none; }
+  input { font-family: inherit; font-size: inherit; color: inherit; }
 
-  /* ===== Layout ===== */
-  .quiz-shell {
+  /* Decorative background waves */
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(224, 137, 99, 0.08) 0, transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(76, 154, 108, 0.06) 0, transparent 40%);
+  }
+
+  /* ========== Shell (phone) ========== */
+  .shell {
+    width: 100%; max-width: 460px;
     min-height: 100vh;
+    background: var(--bg);
     display: flex; flex-direction: column;
-    max-width: 880px; margin: 0 auto; padding: 0 24px;
+    position: relative; z-index: 1;
   }
-  .quiz-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 0; gap: 20px;
-    border-bottom: 1px solid var(--border);
+  @media (min-width: 500px) {
+    body { padding: 24px 0; }
+    .shell { border-radius: 36px; min-height: calc(100vh - 48px); box-shadow: var(--shadow-lg); overflow: hidden; max-width: 420px; }
   }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
-  .brand-mark {
-    width: 28px; height: 28px; border-radius: 6px; background: var(--text);
-    display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 12px;
-  }
-  .brand-sub { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-  .meta {
-    display: flex; align-items: center; gap: 18px;
-    font-size: 13px; color: var(--text-muted);
-  }
-  .meta .timer {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-weight: 500;
-  }
-  .meta .timer svg { color: var(--text-subtle); }
 
-  .progress-bar {
-    height: 4px; background: var(--border-subtle);
-    border-radius: 999px; margin: 20px 0 0; overflow: hidden;
+  /* Subtle paper-like texture via SVG pattern layer */
+  .shell::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 40% at 80% 20%, rgba(224, 162, 74, 0.08), transparent),
+      radial-gradient(ellipse 70% 30% at 20% 80%, rgba(76, 154, 108, 0.06), transparent);
+    z-index: 0;
   }
-  .progress-bar .fill {
-    height: 100%; background: var(--primary);
-    width: 0; transition: width .3s cubic-bezier(.4,0,.2,1);
+  .shell > * { position: relative; z-index: 1; }
+
+  /* ========== Top bar ========== */
+  .topbar {
+    display: grid; grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+    padding: 18px 18px 6px;
+  }
+  .back-btn, .skip-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: var(--ink); transition: background .15s;
+  }
+  .back-btn:hover { background: rgba(74, 46, 30, 0.06); }
+  .skip-btn {
+    width: auto; padding: 6px 4px; border-radius: 6px;
+    color: var(--coral); font-weight: 600; font-size: 15px;
+    justify-self: end;
+  }
+  .skip-btn:hover { color: var(--coral-deep); }
+  .topbar-title {
+    font-weight: 700; font-size: 17px; text-align: center;
+    letter-spacing: -0.3px;
+  }
+
+  /* ========== Progress ========== */
+  .progress-wrap { padding: 10px 22px 6px; }
+  .progress-track {
+    height: 6px; background: var(--bg-deep);
+    border-radius: 999px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--green);
     border-radius: 999px;
+    width: 0%; transition: width .4s cubic-bezier(.4,0,.2,1);
   }
   .progress-text {
-    display: flex; justify-content: space-between;
-    margin-top: 10px; font-size: 12.5px; color: var(--text-muted);
-    font-weight: 500;
+    margin-top: 8px; font-size: 14px; font-weight: 600;
+  }
+  .progress-text .done { color: var(--green); }
+  .progress-text .total { color: var(--ink-subtle); }
+
+  /* ========== Age selector ========== */
+  .age-bar {
+    display: flex; gap: 6px; padding: 8px 18px 2px;
+    justify-content: center;
+  }
+  .age-chip {
+    padding: 6px 14px; border-radius: 999px;
+    background: transparent; border: 1.5px solid var(--border);
+    font-size: 13px; font-weight: 600; color: var(--ink-muted);
+    transition: all .15s;
+  }
+  .age-chip:hover { border-color: var(--ink-subtle); color: var(--ink); }
+  .age-chip.active {
+    background: var(--ink); color: var(--surface);
+    border-color: var(--ink);
   }
 
-  .quiz-body { flex: 1; padding: 40px 0; }
-  .quiz-footer {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px 0; border-top: 1px solid var(--border);
-    gap: 12px;
+  /* ========== Body ========== */
+  .body {
+    flex: 1; padding: 18px 22px 8px;
+    display: flex; flex-direction: column; gap: 22px;
   }
-  .quiz-footer .hint { font-size: 12.5px; color: var(--text-subtle); }
 
-  /* ===== Buttons ===== */
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 9px 18px; font-size: 14px; font-weight: 500;
-    border-radius: 6px; border: 1px solid transparent;
-    transition: background .12s;
+  /* Question */
+  .q-title {
+    font-size: 26px; font-weight: 800; line-height: 1.25;
+    letter-spacing: -0.5px; color: var(--ink);
+    padding: 8px 2px 0;
   }
-  .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-  .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
-  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
-  .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
-  .btn-secondary:hover { background: var(--bg); }
-  .btn-ghost { color: var(--text-muted); }
-  .btn-ghost:hover { background: var(--bg-hover); color: var(--text); }
-  .btn-lg { padding: 11px 22px; font-size: 15px; }
 
-  /* ===== Intro screen ===== */
-  .intro {
-    max-width: 520px; margin: 60px auto; text-align: center;
-  }
-  .intro .badge {
-    display: inline-block; padding: 4px 12px;
-    background: var(--primary-soft); color: var(--primary);
-    font-size: 12px; font-weight: 600; letter-spacing: 0.4px;
-    text-transform: uppercase; border-radius: 999px;
-    margin-bottom: 16px;
-  }
-  .intro h1 {
-    font-size: 34px; font-weight: 600; letter-spacing: -0.8px;
-    line-height: 1.15; margin-bottom: 12px;
-  }
-  .intro p {
-    font-size: 15px; color: var(--text-muted); line-height: 1.6;
-    max-width: 440px; margin: 0 auto 28px;
-  }
-  .intro-stats {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 14px; margin-bottom: 32px;
-  }
-  .intro-stat {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 18px 14px;
-  }
-  .intro-stat .val { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
-  .intro-stat .lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  /* ========== Option pills (full-width stacked) ========== */
+  .options { display: flex; flex-direction: column; gap: 12px; }
 
-  /* ===== Question card ===== */
-  .q-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 32px 32px 28px;
+  .opt {
+    position: relative;
+    background: var(--coral); color: #fff;
+    border: none; border-radius: var(--radius-lg);
+    padding: 18px 22px;
+    font-weight: 700; font-size: 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    cursor: pointer; text-align: left;
+    transition: background .15s, transform .15s, box-shadow .15s;
     box-shadow: var(--shadow-sm);
   }
-  .q-num {
-    display: inline-block; padding: 3px 10px;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 4px; font-size: 11.5px; font-weight: 600;
-    color: var(--text-muted); letter-spacing: 0.5px;
-    text-transform: uppercase; margin-bottom: 14px;
+  .opt:hover:not(.locked):not(.correct):not(.wrong) {
+    background: var(--coral-hover); transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
   }
-  .q-title {
-    font-size: 22px; font-weight: 600; letter-spacing: -0.4px;
-    line-height: 1.3; margin-bottom: 8px;
+  .opt:active:not(.locked) { transform: translateY(0); }
+  .opt .opt-text { flex: 1; }
+  .opt .chev {
+    display: grid; place-items: center; opacity: 0.85;
   }
-  .q-desc {
-    font-size: 14px; color: var(--text-muted); margin-bottom: 24px;
-    line-height: 1.55;
-  }
+  .opt .chev svg { width: 18px; height: 18px; }
 
-  /* ===== Option: image tile ===== */
-  .img-grid {
-    display: grid; gap: 14px;
+  .opt.correct {
+    background: var(--green); cursor: default;
+    animation: pop .35s cubic-bezier(.2,1.2,.3,1);
   }
-  .img-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
-  .img-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 680px) {
-    .img-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .opt.correct::before {
+    content: ''; position: absolute; top: -6px; left: 22px;
+    width: 18px; height: 18px;
+    background:
+      linear-gradient(45deg, transparent 45%, var(--green) 45%, var(--green) 55%, transparent 55%) no-repeat,
+      linear-gradient(-45deg, transparent 45%, var(--green) 45%, var(--green) 55%, transparent 55%) no-repeat,
+      linear-gradient(90deg, transparent 45%, var(--green) 45%, var(--green) 55%, transparent 55%) no-repeat;
+    background-size: 10px 10px, 10px 10px, 14px 2px;
+    background-position: 0 0, 8px 0, 4px 8px;
+    opacity: 0.85;
   }
-  .img-tile {
-    background: var(--surface); border: 2px solid var(--border);
-    border-radius: var(--radius-lg); overflow: hidden;
-    cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s;
-    display: flex; flex-direction: column;
-    position: relative;
-  }
-  .img-tile:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-  .img-tile.selected {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(31, 78, 158, 0.15);
-  }
-  .img-tile .check-mark {
-    position: absolute; top: 10px; right: 10px;
-    width: 24px; height: 24px; border-radius: 50%;
-    background: var(--primary); color: #fff;
+  .opt.correct .chev { display: none; }
+  .opt.correct .tick-circle {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
     display: grid; place-items: center;
-    opacity: 0; transform: scale(.8); transition: opacity .15s, transform .15s;
   }
-  .img-tile.selected .check-mark { opacity: 1; transform: scale(1); }
-  .img-tile .art {
-    aspect-ratio: 16/11;
+
+  .opt.wrong {
+    background: var(--red); cursor: default;
+  }
+  .opt.wrong .chev { display: none; }
+  .opt.wrong .x-circle {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
     display: grid; place-items: center;
-    background: linear-gradient(135deg, var(--bg), var(--bg-hover));
-    border-bottom: 1px solid var(--border);
-    position: relative; overflow: hidden;
-  }
-  .img-tile .art svg { width: 52%; height: 52%; color: var(--text); opacity: .85; }
-  .img-grid.cols-2 .img-tile .art { aspect-ratio: 4/3; }
-  .img-tile .label {
-    padding: 12px 14px; text-align: left;
-    font-weight: 500; font-size: 14px;
-  }
-  .img-tile .sub {
-    padding: 0 14px 12px; font-size: 12px; color: var(--text-muted);
-    margin-top: -2px;
   }
 
-  /* Artful tinted backgrounds for image tiles */
-  .art-blue    { background: linear-gradient(135deg, #E8EEF8, #C8D6EC) !important; }
-  .art-green   { background: linear-gradient(135deg, #E1F2E8, #B9E0C9) !important; }
-  .art-amber   { background: linear-gradient(135deg, #FCEEDC, #F3D4A8) !important; }
-  .art-red     { background: linear-gradient(135deg, #FDECEC, #F7C9C3) !important; }
-  .art-purple  { background: linear-gradient(135deg, #F0EBFB, #DCCEF3) !important; }
-  .art-teal    { background: linear-gradient(135deg, #E0F2F1, #B2DFDC) !important; }
-  .art-slate   { background: linear-gradient(135deg, #EEF1F5, #D8DEE5) !important; }
-  .art-yellow  { background: linear-gradient(135deg, #FEF3C7, #FDE68A) !important; }
+  .opt.dim { opacity: 0.55; }
 
-  /* ===== Option: radio list ===== */
-  .opt-list { display: flex; flex-direction: column; gap: 10px; }
-  .opt-row {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 14px 16px;
-    background: var(--surface); border: 2px solid var(--border);
-    border-radius: var(--radius-lg);
-    cursor: pointer; transition: border-color .12s, background .12s;
-  }
-  .opt-row:hover { border-color: var(--border-strong); background: var(--bg); }
-  .opt-row.selected { border-color: var(--primary); background: var(--primary-soft); }
-  .opt-row .bullet {
-    width: 20px; height: 20px; border-radius: 50%;
-    border: 2px solid var(--border-strong); background: var(--surface);
-    flex-shrink: 0; display: grid; place-items: center; margin-top: 1px;
-    transition: border-color .12s;
-  }
-  .opt-row.selected .bullet { border-color: var(--primary); background: var(--primary); }
-  .opt-row.selected .bullet::after {
-    content: ''; width: 8px; height: 8px; background: #fff; border-radius: 50%;
-  }
-  .opt-row .opt-text { flex: 1; }
-  .opt-row .opt-title { font-weight: 500; font-size: 14.5px; }
-  .opt-row .opt-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
-
-  /* Checkbox variant */
-  .opt-row.multi .bullet {
-    border-radius: 4px;
-  }
-  .opt-row.multi.selected .bullet::after {
-    content: ''; width: 10px; height: 6px;
-    border-left: 2px solid #fff; border-bottom: 2px solid #fff;
-    transform: rotate(-45deg) translate(1px, -2px);
-    background: none; border-radius: 0;
-  }
-
-  /* ===== True/False ===== */
-  .tf-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
-  }
-  .tf-btn {
-    padding: 22px 18px; background: var(--surface);
-    border: 2px solid var(--border); border-radius: var(--radius-lg);
-    cursor: pointer; transition: border-color .12s, background .12s;
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
-  }
-  .tf-btn:hover { border-color: var(--border-strong); background: var(--bg); }
-  .tf-btn.selected { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
-  .tf-btn .ico {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: var(--bg); display: grid; place-items: center;
-    border: 1px solid var(--border);
-  }
-  .tf-btn.selected .ico { background: var(--primary); color: #fff; border-color: var(--primary); }
-  .tf-btn .label { font-weight: 600; font-size: 16px; }
-
-  /* ===== Rating scale ===== */
-  .rating {
-    display: flex; gap: 8px; justify-content: center;
-    margin: 20px 0 10px;
-  }
-  .rating-btn {
-    width: 56px; height: 56px; border-radius: 10px;
-    background: var(--surface); border: 2px solid var(--border);
-    font-size: 18px; font-weight: 600; color: var(--text-muted);
-    cursor: pointer; transition: border-color .12s, background .12s, color .12s;
-  }
-  .rating-btn:hover { border-color: var(--border-strong); }
-  .rating-btn.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
-  .rating-labels {
-    display: flex; justify-content: space-between;
-    font-size: 12px; color: var(--text-muted);
-    max-width: 360px; margin: 0 auto;
-  }
-
-  /* ===== Text input ===== */
-  .input {
-    width: 100%; padding: 12px 16px;
-    background: var(--surface); border: 2px solid var(--border);
-    border-radius: var(--radius-lg); font-size: 15px; outline: none;
-    transition: border-color .12s, box-shadow .12s;
-  }
-  .input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(31, 78, 158, 0.12); }
-
-  /* ===== Review & Results ===== */
-  .review-list { display: flex; flex-direction: column; gap: 10px; }
-  .review-item {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 14px 18px;
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-  }
-  .review-item .rq { font-size: 13.5px; color: var(--text-muted); margin-bottom: 4px; }
-  .review-item .ra { font-weight: 500; }
-  .review-item .ra.empty { color: var(--text-subtle); font-weight: 400; font-style: italic; }
-  .review-edit {
-    font-size: 12.5px; color: var(--primary); font-weight: 500;
-    cursor: pointer; flex-shrink: 0;
-  }
-  .review-edit:hover { text-decoration: underline; }
-
-  .result-hero {
-    text-align: center; padding: 48px 20px 24px;
-  }
-  .result-ring {
-    width: 140px; height: 140px; margin: 0 auto 20px;
-    position: relative;
-  }
-  .result-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .result-ring .track { fill: none; stroke: var(--border-subtle); stroke-width: 10; }
-  .result-ring .fg { fill: none; stroke: var(--primary); stroke-width: 10; stroke-linecap: round;
-    stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset .9s; }
-  .result-ring.pass .fg { stroke: var(--success); }
-  .result-ring.fail .fg { stroke: var(--danger); }
-  .result-ring .score-text {
-    position: absolute; inset: 0; display: grid; place-items: center;
-    font-size: 30px; font-weight: 600; letter-spacing: -0.5px;
-  }
-  .result-hero h1 {
-    font-size: 28px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 8px;
-  }
-  .result-hero p { color: var(--text-muted); font-size: 14px; }
-  .result-hero .status {
-    display: inline-block; margin-top: 14px;
-    padding: 5px 14px; border-radius: 999px;
-    font-size: 13px; font-weight: 600; letter-spacing: 0.3px;
-  }
-  .result-hero .status.pass { background: var(--success-soft); color: var(--success); }
-  .result-hero .status.fail { background: var(--danger-soft); color: var(--danger); }
-
-  .result-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 14px; margin: 32px 0;
-  }
-  .result-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 18px;
-  }
-  .result-card .lbl {
-    font-size: 12px; color: var(--text-muted); font-weight: 500;
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .result-card .val { font-size: 24px; font-weight: 600; letter-spacing: -0.4px; margin-top: 6px; }
-  .result-card .sub { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
-
-  .breakdown { margin-bottom: 24px; }
-  .breakdown h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
-  .breakdown-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 16px; background: var(--surface);
-    border: 1px solid var(--border); border-radius: var(--radius-lg);
-    margin-bottom: 8px;
-  }
-  .breakdown-row .q-label { font-size: 13.5px; font-weight: 500; flex: 1; padding-right: 12px; }
-  .breakdown-row .verdict {
+  /* Explanation link below correct */
+  .opt .explain-link {
     display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 9px; border-radius: 4px;
-    font-size: 12px; font-weight: 500;
+    font-size: 12.5px; font-weight: 500; opacity: 0.9;
+    margin-top: 4px;
   }
-  .verdict.correct { background: var(--success-soft); color: var(--success); }
-  .verdict.wrong { background: var(--danger-soft); color: var(--danger); }
-  .verdict.skip { background: var(--bg-hover); color: var(--text-muted); }
+  .opt .opt-inner { display: flex; flex-direction: column; gap: 2px; }
 
-  @media (max-width: 680px) {
-    .quiz-shell { padding: 0 16px; }
-    .q-card { padding: 24px 20px; }
-    .q-title { font-size: 19px; }
-    .result-grid { grid-template-columns: 1fr; }
-    .intro h1 { font-size: 26px; }
-    .intro-stats { grid-template-columns: 1fr; gap: 8px; }
+  @keyframes pop {
+    0% { transform: scale(.96); }
+    60% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+
+  /* ========== Footer ========== */
+  .footer {
+    padding: 14px 22px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+  }
+  .report {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 500; color: var(--ink);
+  }
+  .report:hover { color: var(--coral); }
+  .report .ico {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--ink); color: var(--surface);
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .footer-icon-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: transparent; border: 1.5px solid var(--border);
+    color: var(--ink-muted); display: grid; place-items: center;
+    transition: all .15s;
+  }
+  .footer-icon-btn:hover { background: var(--surface); color: var(--ink); }
+
+  /* ========== Feedback banner ========== */
+  .banner {
+    border-radius: var(--radius-lg); padding: 20px;
+    color: #fff; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    animation: slideIn .35s cubic-bezier(.2,1.2,.3,1);
+  }
+  .banner.win { background: var(--green); }
+  .banner.lose { background: var(--red); }
+  .banner .emoji { font-size: 40px; line-height: 1; }
+  .banner .title { font-size: 20px; font-weight: 800; }
+  .banner .pts {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.2); padding: 5px 14px;
+    border-radius: 999px; font-weight: 700; font-size: 13px;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ========== Intro ========== */
+  .intro {
+    flex: 1; padding: 30px 22px;
+    display: flex; flex-direction: column; gap: 20px;
+    justify-content: center; text-align: center;
+  }
+  .intro-hero {
+    width: 180px; height: 180px; margin: 0 auto;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, #FFDFA8, var(--bg-deep));
+    display: grid; place-items: center;
+    box-shadow: inset 0 -10px 20px rgba(74, 46, 30, 0.08);
+  }
+  .intro h1 {
+    font-size: 30px; font-weight: 800; letter-spacing: -0.8px;
+    line-height: 1.15;
+  }
+  .intro p { color: var(--ink-muted); max-width: 340px; margin: 0 auto; }
+  .cta {
+    width: 100%; padding: 18px;
+    background: var(--green); color: #fff;
+    border-radius: 999px; font-weight: 700; font-size: 16px;
+    transition: background .15s;
+    box-shadow: 0 6px 16px rgba(76, 154, 108, 0.3);
+  }
+  .cta:hover { background: var(--green-deep); }
+  .cta.ink { background: var(--ink); box-shadow: 0 6px 16px rgba(74, 46, 30, 0.2); }
+  .cta.ink:hover { background: var(--ink-soft); }
+  .cta.coral { background: var(--coral); box-shadow: 0 6px 16px rgba(224, 137, 99, 0.3); }
+  .cta.coral:hover { background: var(--coral-hover); }
+
+  /* ========== Result ========== */
+  .result {
+    flex: 1; padding: 30px 22px;
+    display: flex; flex-direction: column; gap: 18px;
+    justify-content: center; text-align: center;
+  }
+  .result .star-box {
+    width: 180px; height: 180px; margin: 0 auto;
+  }
+  .result h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.6px; }
+  .result .sub { color: var(--ink-muted); max-width: 320px; margin: 0 auto; }
+  .points-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #FFF5DC; color: var(--ink);
+    padding: 10px 20px; border-radius: 999px;
+    font-weight: 700; font-size: 15px;
+    margin: 0 auto;
+  }
+  .points-badge .star { color: var(--amber); font-size: 16px; }
+  .result-stats {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; margin-top: 6px;
+  }
+  .result-stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 8px;
+  }
+  .result-stat .val { font-size: 20px; font-weight: 800; }
+  .result-stat .lbl { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+
+  .fade-in { animation: fade .25s ease-out; }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 </head>
 <body>
 
-<div class="quiz-shell">
-  <header class="quiz-header">
-    <div class="brand">
-      <div class="brand-mark">AX</div>
-      <div>
-        AXIoT
-        <div class="brand-sub">Operator Certification</div>
-      </div>
-    </div>
-    <div class="meta" id="meta"></div>
-  </header>
-
-  <div id="progressWrap" style="display:none">
-    <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
-    <div class="progress-text" id="progressText"></div>
-  </div>
-
-  <main class="quiz-body" id="body"></main>
-
-  <footer class="quiz-footer" id="footer" style="display:none"></footer>
+<div class="shell">
+  <div id="topbar" class="topbar"></div>
+  <div id="progressWrap" class="progress-wrap" style="display:none"></div>
+  <div id="ageBar" class="age-bar" style="display:none"></div>
+  <div id="body" class="body"></div>
+  <div id="footer" class="footer"></div>
 </div>
 
 <script>
-/* ============================================================
-   Inline icon library
-   ============================================================ */
-const ICON = {
-  gauge: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l4-4"/><path d="M3.34 17A10 10 0 1 1 20.66 17"/><circle cx="12" cy="14" r="1.5"/></svg>',
-  thermo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14V5a2 2 0 0 0-4 0v9a4 4 0 1 0 4 0z"/></svg>',
-  flow:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c3 0 3-4 6-4s3 4 6 4 3-4 6-4"/><path d="M3 18c3 0 3-4 6-4s3 4 6 4 3-4 6-4"/></svg>',
-  drop:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5s7 7.5 7 12.5a7 7 0 1 1-14 0c0-5 7-12.5 7-12.5z"/></svg>',
-  dashA: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 9v12"/><rect x="11" y="12" width="7" height="3" rx=".5" fill="currentColor" fill-opacity=".2"/><rect x="11" y="17" width="5" height="2" rx=".5" fill="currentColor" fill-opacity=".15"/></svg>',
-  dashB: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18"/><circle cx="8" cy="14" r="2.5" fill="currentColor" fill-opacity=".2"/><path d="M13 13h6M13 16h4"/></svg>',
-  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
-  x:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
-  clock: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-  arrowL:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>',
-  arrowR:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'
+/* ========================================================
+   Icons
+   ======================================================== */
+const ICO = {
+  back: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  tick: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+  x:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  eye:  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+  camera:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+  mascot: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="170" rx="70" ry="10" fill="rgba(74, 46, 30, 0.08)"/>
+    <path d="M100 25 L125 80 L182 88 L140 128 L152 185 L100 158 L48 185 L60 128 L18 88 L75 80 Z" fill="#E0A24A" stroke="#B87E29" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="82" cy="100" r="7" fill="#4A2E1E"/>
+    <circle cx="118" cy="100" r="7" fill="#4A2E1E"/>
+    <circle cx="85" cy="97" r="2.2" fill="#fff"/>
+    <circle cx="121" cy="97" r="2.2" fill="#fff"/>
+    <path d="M78 122 Q100 140 122 122" stroke="#4A2E1E" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <ellipse cx="68" cy="116" rx="6" ry="4" fill="#E08963" opacity="0.6"/>
+    <ellipse cx="132" cy="116" rx="6" ry="4" fill="#E08963" opacity="0.6"/>
+  </svg>`,
+  heroFace: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="100" r="65" fill="#E0A24A"/>
+    <circle cx="82" cy="95" r="7" fill="#4A2E1E"/>
+    <circle cx="118" cy="95" r="7" fill="#4A2E1E"/>
+    <circle cx="85" cy="92" r="2" fill="#fff"/>
+    <circle cx="121" cy="92" r="2" fill="#fff"/>
+    <path d="M78 120 Q100 138 122 120" stroke="#4A2E1E" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <circle cx="68" cy="112" r="5" fill="#E08963" opacity="0.5"/>
+    <circle cx="132" cy="112" r="5" fill="#E08963" opacity="0.5"/>
+    <path d="M40 40 Q50 55 40 70" stroke="#B87E29" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M160 40 Q150 55 160 70" stroke="#B87E29" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </svg>`
 };
 
-/* ============================================================
-   Questions
-   ============================================================ */
-const QUESTIONS = [
-  {
-    id: 'q1',
-    type: 'image-single',
-    cols: 4,
-    title: 'Which of these is a pressure sensor?',
-    desc: 'Select the instrument used to measure line pressure in pneumatic systems.',
-    options: [
-      { id: 'a', label: 'Pressure gauge', sub: 'PSI / bar', icon: ICON.gauge, tint: 'art-blue' },
-      { id: 'b', label: 'Thermocouple',   sub: 'Temperature', icon: ICON.thermo, tint: 'art-red' },
-      { id: 'c', label: 'Flow meter',     sub: 'Volume / time', icon: ICON.flow, tint: 'art-teal' },
-      { id: 'd', label: 'Humidity sensor',sub: 'Relative humidity', icon: ICON.drop, tint: 'art-purple' }
-    ],
-    correct: 'a'
-  },
-  {
-    id: 'q2',
-    type: 'image-single',
-    cols: 2,
-    title: 'Which dashboard layout best prioritizes critical alerts?',
-    desc: 'Compare the two layouts and choose the one that surfaces critical information first.',
-    options: [
-      { id: 'a', label: 'Layout A — Alerts-first', sub: 'Critical items at the top, charts below', icon: ICON.dashB, tint: 'art-amber' },
-      { id: 'b', label: 'Layout B — Charts-first', sub: 'KPI tiles and graphs at the top', icon: ICON.dashA, tint: 'art-slate' }
-    ],
-    correct: 'a'
-  },
-  {
-    id: 'q3',
-    type: 'multi',
-    title: 'Which of the following are required for proper device onboarding?',
-    desc: 'Select all that apply. Minimum two required.',
-    options: [
-      { id: 'a', title: 'Unique device ID', sub: 'Globally unique identifier assigned by AXIoT' },
-      { id: 'b', title: 'Assigned tenant & site', sub: 'Determines routing and access scope' },
-      { id: 'c', title: 'Physical location (GPS)', sub: 'Required only for mobile assets' },
-      { id: 'd', title: 'Firmware version tag', sub: 'Enables correct OTA updates' },
-      { id: 'e', title: 'Operator favorite color', sub: 'Not used for onboarding' }
-    ],
-    correct: ['a', 'b', 'd']
-  },
-  {
-    id: 'q4',
-    type: 'single',
-    title: 'What is the recommended telemetry refresh interval for active production lines?',
-    options: [
-      { id: 'a', title: 'Every 30 seconds', sub: 'Low bandwidth, slow detection' },
-      { id: 'b', title: 'Every 5 seconds', sub: 'Balanced for most line speeds' },
-      { id: 'c', title: 'Every 500 ms', sub: 'High bandwidth, real-time' },
-      { id: 'd', title: 'On-change only', sub: 'Only when value crosses threshold' }
-    ],
-    correct: 'b'
-  },
-  {
-    id: 'q5',
-    type: 'truefalse',
-    title: 'Role permission changes apply immediately to all active sessions.',
-    desc: 'Based on AXIoT documentation — is this statement true or false?',
-    correct: true
-  },
-  {
-    id: 'q6',
-    type: 'rating',
-    title: 'How familiar are you with the MQTT protocol?',
-    desc: 'Your answer helps us tailor the next training module. No right or wrong.',
-    min: 1, max: 5,
-    labels: ['Not at all', 'Expert']
-  },
-  {
-    id: 'q7',
-    type: 'text',
-    title: 'What is your assigned site ID?',
-    desc: 'Usually shown on your operator badge (e.g. ACME-PUN-03).',
-    placeholder: 'Enter your site ID'
-  }
+/* ========================================================
+   Question banks — same UI, content varies by age
+   ======================================================== */
+const AGES = [
+  { key: '3-5', label: 'Age 3–5', title: 'Little Learners' },
+  { key: '5-8', label: 'Age 5–8', title: 'Young Explorers' },
+  { key: '8-12', label: 'Age 8–12', title: 'Curious Minds' }
 ];
 
-/* ============================================================
-   State
-   ============================================================ */
-const STORAGE_KEY = 'axiot-quiz-state-v1';
-const state = loadState() || {
-  screen: 'intro',     // intro | question | review | result
-  current: 0,
-  answers: {},         // { q1: 'a', q2: 'a', q3: ['a','b'], q5: true, q6: 3, q7: 'ACME-PUN-03' }
-  startedAt: null
+const BANKS = {
+  '3-5': [
+    { q: 'Where is the dog? 🐶', options: ['In the house', 'On the moon', 'Under water', 'In the sky'], correctIdx: 0, explain: 'Dogs live with us at home, as pets.' },
+    { q: 'What color is the sun? ☀️', options: ['Yellow', 'Green', 'Purple', 'Blue'], correctIdx: 0, explain: 'The sun looks yellow when we see it.' },
+    { q: 'Which one is a fruit? 🍎', options: ['Apple', 'Chair', 'Pencil', 'Shoe'], correctIdx: 0, explain: 'An apple is a yummy fruit.' },
+    { q: 'How many wheels does a bike have? 🚲', options: ['Two', 'Five', 'Ten', 'One'], correctIdx: 0, explain: 'A bicycle has two wheels.' },
+    { q: 'Which animal says "moo"? 🐄', options: ['Cow', 'Cat', 'Duck', 'Pig'], correctIdx: 0, explain: 'Cows say moo!' }
+  ],
+  '5-8': [
+    { q: 'What animal did we just learn about?', options: ['Elephant', 'Penguin', 'Kangaroo', 'Ostrich'], correctIdx: 2, explain: 'Kangaroos are marsupials that live in Australia.' },
+    { q: 'Which of these is a mammal?', options: ['Fish', 'Bird', 'Dolphin', 'Frog'], correctIdx: 2, explain: 'Dolphins breathe air and feed milk to their young — they are mammals.' },
+    { q: 'How many days are in a week?', options: ['5', '6', '7', '8'], correctIdx: 2, explain: 'There are seven days: Monday through Sunday.' },
+    { q: 'Which is the tallest animal?', options: ['Lion', 'Giraffe', 'Zebra', 'Hippo'], correctIdx: 1, explain: 'Giraffes can grow up to 6 meters tall!' },
+    { q: 'What do plants need to grow?', options: ['Soda', 'Sunlight & water', 'Darkness', 'Cold only'], correctIdx: 1, explain: 'Plants use sunlight, water, and air to make their food.' }
+  ],
+  '8-12': [
+    { q: 'Why do some animals live in groups?', options: ['For entertainment only', 'For protection and hunting together', 'Because the weather is cold', 'They have no choice'], correctIdx: 1, explain: 'Living in groups helps animals protect each other, hunt more effectively, and raise young safely.' },
+    { q: 'Which process do plants use to make food?', options: ['Respiration', 'Photosynthesis', 'Digestion', 'Evaporation'], correctIdx: 1, explain: 'Photosynthesis uses sunlight, CO₂, and water to produce glucose and oxygen.' },
+    { q: 'If David was 27 years old in 2011, how old was he in 2003?', options: ['19 years', '37 years', '20 years', '17 years'], correctIdx: 0, explain: '2011 − 2003 = 8 years, so 27 − 8 = 19 years.' },
+    { q: 'What causes the seasons on Earth?', options: ["Earth's distance from the Sun", "Earth's axial tilt", 'Moon phases', 'Ocean currents'], correctIdx: 1, explain: "Earth's 23.5° axial tilt causes different parts of Earth to receive more or less direct sunlight through the year." },
+    { q: 'Which is the smallest prime number?', options: ['0', '1', '2', '3'], correctIdx: 2, explain: '2 is the smallest prime — and the only even one.' }
+  ]
 };
-function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){} }
-function loadState() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) { return null; } }
-function resetState() {
-  state.screen = 'intro';
-  state.current = 0;
-  state.answers = {};
-  state.startedAt = null;
-  saveState();
-  render();
-}
 
-/* ============================================================
-   Answer helpers
-   ============================================================ */
-function getAnswer(q) { return state.answers[q.id]; }
-function setAnswer(q, val) { state.answers[q.id] = val; saveState(); }
-function isAnswered(q) {
-  const a = getAnswer(q);
-  if (q.type === 'multi') return Array.isArray(a) && a.length > 0;
-  if (q.type === 'text') return typeof a === 'string' && a.trim().length > 0;
-  return a !== undefined && a !== null && a !== '';
+/* ========================================================
+   State
+   ======================================================== */
+const SKEY = 'littlelearners-v1';
+const state = load() || defaultState();
+function defaultState() {
+  return {
+    screen: 'intro',          // intro | question | result
+    ageKey: '5-8',
+    idx: 0,
+    answers: [],              // { picked, correct }
+    points: 0,
+    startedAt: null,
+    pickedThisQ: null         // index of chosen option for current question (locked after pick)
+  };
 }
-function isCorrect(q) {
-  const a = getAnswer(q);
-  if (a === undefined) return false;
-  if (q.type === 'multi') {
-    if (!Array.isArray(a) || !q.correct) return false;
-    const sorted = [...a].sort().join(',');
-    const need = [...q.correct].sort().join(',');
-    return sorted === need;
-  }
-  if (q.correct === undefined) return null; // open-ended, no grade
-  return a === q.correct;
-}
+function load() { try { return JSON.parse(localStorage.getItem(SKEY)); } catch(e) { return null; } }
+function save() { try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch(e) {} }
+function resetAll() { Object.assign(state, defaultState()); save(); render(); }
 
-/* ============================================================
-   Timer
-   ============================================================ */
-let timerInterval;
-function startTimer() {
-  if (!state.startedAt) state.startedAt = Date.now();
-  saveState();
-  clearInterval(timerInterval);
-  timerInterval = setInterval(updateTimer, 1000);
-  updateTimer();
-}
-function stopTimer() { clearInterval(timerInterval); }
-function updateTimer() {
-  const el = document.getElementById('timerText');
-  if (!el || !state.startedAt) return;
-  const s = Math.floor((Date.now() - state.startedAt) / 1000);
-  const mm = String(Math.floor(s / 60)).padStart(2, '0');
-  const ss = String(s % 60).padStart(2, '0');
-  el.textContent = `${mm}:${ss}`;
-}
+function questions() { return BANKS[state.ageKey]; }
+function currentQ() { return questions()[state.idx]; }
 
-/* ============================================================
+/* ========================================================
    Rendering
-   ============================================================ */
+   ======================================================== */
 function render() {
-  const body = document.getElementById('body');
-  const footer = document.getElementById('footer');
-  const progress = document.getElementById('progressWrap');
-  const meta = document.getElementById('meta');
-
+  const ageBar = document.getElementById('ageBar');
+  const progressWrap = document.getElementById('progressWrap');
   if (state.screen === 'intro') {
-    progress.style.display = 'none';
-    footer.style.display = 'none';
-    meta.innerHTML = '';
+    progressWrap.style.display = 'none';
+    ageBar.style.display = 'none';
+    renderTopbar({ kind: 'intro' });
     renderIntro();
-  } else if (state.screen === 'question') {
-    progress.style.display = 'block';
-    footer.style.display = 'flex';
-    renderMeta();
+    return;
+  }
+  if (state.screen === 'question') {
+    progressWrap.style.display = 'block';
+    ageBar.style.display = 'flex';
+    renderTopbar({ kind: 'question' });
+    renderAgeBar();
     renderProgress();
     renderQuestion();
-    renderFooter();
-  } else if (state.screen === 'review') {
-    progress.style.display = 'block';
-    footer.style.display = 'flex';
-    renderMeta();
-    updateProgressBar(100);
-    document.getElementById('progressText').innerHTML = `<span>Review your answers</span><span>${QUESTIONS.length} of ${QUESTIONS.length}</span>`;
-    renderReview();
-    renderReviewFooter();
-  } else if (state.screen === 'result') {
-    progress.style.display = 'none';
-    footer.style.display = 'flex';
-    meta.innerHTML = '';
-    stopTimer();
+    renderQFooter();
+    return;
+  }
+  if (state.screen === 'result') {
+    progressWrap.style.display = 'none';
+    ageBar.style.display = 'none';
+    renderTopbar({ kind: 'result' });
     renderResult();
-    renderResultFooter();
+    return;
   }
 }
 
-function renderMeta() {
-  document.getElementById('meta').innerHTML = `
-    <span class="timer">${ICON.clock}<span id="timerText">00:00</span></span>
+/* ===== Topbar ===== */
+function renderTopbar({ kind }) {
+  const ageTitle = AGES.find(a => a.key === state.ageKey).title;
+  if (kind === 'intro' || kind === 'result') {
+    document.getElementById('topbar').innerHTML = `
+      <div></div>
+      <div class="topbar-title">${ageTitle}</div>
+      <div></div>
+    `;
+    return;
+  }
+  document.getElementById('topbar').innerHTML = `
+    <button class="back-btn" onclick="goBack()" aria-label="Back">${ICO.back}</button>
+    <div class="topbar-title">${ageTitle}</div>
+    <button class="skip-btn" onclick="skipQ()">Skip</button>
   `;
 }
 
-function renderProgress() {
-  const pct = ((state.current) / QUESTIONS.length) * 100;
-  updateProgressBar(pct);
-  document.getElementById('progressText').innerHTML = `
-    <span>Question ${state.current + 1} of ${QUESTIONS.length}</span>
-    <span>${Object.keys(state.answers).length} answered</span>
-  `;
+/* ===== Age bar ===== */
+function renderAgeBar() {
+  document.getElementById('ageBar').innerHTML = AGES.map(a => `
+    <button class="age-chip ${a.key === state.ageKey ? 'active' : ''}" onclick="switchAge('${a.key}')">${a.label}</button>
+  `).join('');
 }
-function updateProgressBar(pct) {
-  document.getElementById('progressFill').style.width = pct + '%';
+function switchAge(key) {
+  if (key === state.ageKey) return;
+  state.ageKey = key; state.idx = 0; state.answers = [];
+  state.points = 0; state.pickedThisQ = null;
+  save(); render();
+}
+
+/* ===== Progress ===== */
+function renderProgress() {
+  const total = questions().length;
+  const answered = state.answers.length;
+  const pct = Math.round((answered / total) * 100);
+  document.getElementById('progressWrap').innerHTML = `
+    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="progress-text"><span class="done">${answered}</span><span class="total">/${total}</span></div>
+  `;
 }
 
 /* ===== Intro ===== */
 function renderIntro() {
+  const age = AGES.find(a => a.key === state.ageKey);
   document.getElementById('body').innerHTML = `
-    <div class="intro">
-      <div class="badge">Certification</div>
-      <h1>AXIoT Operator Assessment</h1>
-      <p>A short assessment to verify your familiarity with the platform and core operational concepts. Your progress is saved automatically.</p>
-      <div class="intro-stats">
-        <div class="intro-stat">
-          <div class="val">${QUESTIONS.length}</div>
-          <div class="lbl">Questions</div>
-        </div>
-        <div class="intro-stat">
-          <div class="val">~5 min</div>
-          <div class="lbl">Estimated time</div>
-        </div>
-        <div class="intro-stat">
-          <div class="val">70%</div>
-          <div class="lbl">Pass score</div>
-        </div>
+    <div class="intro fade-in">
+      <div class="intro-hero">${ICO.heroFace}</div>
+      <div>
+        <h1>${age.title}</h1>
+        <p>Tap Start to begin. The interface stays the same — only the question difficulty changes by age.</p>
       </div>
-      <button class="btn btn-primary btn-lg" onclick="startQuiz()">
-        Start assessment ${ICON.arrowR}
-      </button>
-      ${Object.keys(state.answers).length > 0 ? `
-        <div style="margin-top:18px;font-size:13px;color:var(--text-muted)">
-          You have saved progress. <span style="color:var(--primary);font-weight:500;cursor:pointer" onclick="resumeQuiz()">Resume</span> or <span style="color:var(--danger);cursor:pointer" onclick="resetState()">start over</span>.
-        </div>
-      ` : ''}
+      <div class="age-bar" style="display:flex;justify-content:center">
+        ${AGES.map(a => `<button class="age-chip ${a.key === state.ageKey ? 'active' : ''}" onclick="switchAge('${a.key}')">${a.label}</button>`).join('')}
+      </div>
     </div>
   `;
+  document.getElementById('footer').innerHTML = `
+    <button class="cta" style="width:100%" onclick="startQuiz()">Start Quiz →</button>
+  `;
+  document.getElementById('footer').style.justifyContent = 'center';
 }
+
 function startQuiz() {
   state.screen = 'question';
-  state.current = 0;
+  state.idx = 0; state.answers = []; state.points = 0; state.pickedThisQ = null;
   state.startedAt = Date.now();
-  saveState();
-  startTimer();
-  render();
-}
-function resumeQuiz() {
-  state.screen = 'question';
-  state.current = Math.min(state.current || 0, QUESTIONS.length - 1);
-  saveState();
-  startTimer();
-  render();
+  save(); render();
 }
 
 /* ===== Question ===== */
 function renderQuestion() {
-  const q = QUESTIONS[state.current];
-  let optionsHtml = '';
-  if (q.type === 'image-single') optionsHtml = renderImageOptions(q);
-  else if (q.type === 'single') optionsHtml = renderSingleOptions(q);
-  else if (q.type === 'multi') optionsHtml = renderMultiOptions(q);
-  else if (q.type === 'truefalse') optionsHtml = renderTrueFalse(q);
-  else if (q.type === 'rating') optionsHtml = renderRating(q);
-  else if (q.type === 'text') optionsHtml = renderText(q);
+  const q = currentQ();
+  const locked = state.pickedThisQ !== null;
 
   document.getElementById('body').innerHTML = `
-    <div class="q-card">
-      <div class="q-num">Question ${state.current + 1}</div>
-      <div class="q-title">${q.title}</div>
-      ${q.desc ? `<div class="q-desc">${q.desc}</div>` : ''}
-      ${optionsHtml}
+    <div class="fade-in">
+      <div class="q-title">${q.q}</div>
     </div>
-  `;
-}
-
-function renderImageOptions(q) {
-  const picked = getAnswer(q);
-  return `<div class="img-grid cols-${q.cols}">
-    ${q.options.map(o => `
-      <div class="img-tile ${picked === o.id ? 'selected' : ''}" onclick="pickImageSingle('${q.id}','${o.id}')">
-        <div class="check-mark">${ICON.check}</div>
-        <div class="art ${o.tint || ''}">${o.icon}</div>
-        <div class="label">${o.label}</div>
-        ${o.sub ? `<div class="sub">${o.sub}</div>` : ''}
-      </div>
-    `).join('')}
-  </div>`;
-}
-function pickImageSingle(qid, oid) {
-  state.answers[qid] = oid;
-  saveState();
-  render();
-}
-
-function renderSingleOptions(q) {
-  const picked = getAnswer(q);
-  return `<div class="opt-list">
-    ${q.options.map(o => `
-      <div class="opt-row ${picked === o.id ? 'selected' : ''}" onclick="pickImageSingle('${q.id}','${o.id}')">
-        <div class="bullet"></div>
-        <div class="opt-text">
-          <div class="opt-title">${o.title}</div>
-          ${o.sub ? `<div class="opt-sub">${o.sub}</div>` : ''}
-        </div>
-      </div>
-    `).join('')}
-  </div>`;
-}
-
-function renderMultiOptions(q) {
-  const picked = getAnswer(q) || [];
-  return `<div class="opt-list">
-    ${q.options.map(o => `
-      <div class="opt-row multi ${picked.includes(o.id) ? 'selected' : ''}" onclick="pickMulti('${q.id}','${o.id}')">
-        <div class="bullet"></div>
-        <div class="opt-text">
-          <div class="opt-title">${o.title}</div>
-          ${o.sub ? `<div class="opt-sub">${o.sub}</div>` : ''}
-        </div>
-      </div>
-    `).join('')}
-  </div>`;
-}
-function pickMulti(qid, oid) {
-  const cur = state.answers[qid] || [];
-  const idx = cur.indexOf(oid);
-  if (idx >= 0) cur.splice(idx, 1); else cur.push(oid);
-  state.answers[qid] = cur;
-  saveState();
-  render();
-}
-
-function renderTrueFalse(q) {
-  const picked = getAnswer(q);
-  return `<div class="tf-grid">
-    <div class="tf-btn ${picked === true ? 'selected' : ''}" onclick="pickTF('${q.id}', true)">
-      <div class="ico">${ICON.check}</div>
-      <div class="label">True</div>
-    </div>
-    <div class="tf-btn ${picked === false ? 'selected' : ''}" onclick="pickTF('${q.id}', false)">
-      <div class="ico">${ICON.x}</div>
-      <div class="label">False</div>
-    </div>
-  </div>`;
-}
-function pickTF(qid, val) { state.answers[qid] = val; saveState(); render(); }
-
-function renderRating(q) {
-  const picked = getAnswer(q);
-  let btns = '';
-  for (let i = q.min; i <= q.max; i++) {
-    btns += `<button class="rating-btn ${picked === i ? 'selected' : ''}" onclick="pickRating('${q.id}', ${i})">${i}</button>`;
-  }
-  return `
-    <div class="rating">${btns}</div>
-    <div class="rating-labels"><span>${q.labels[0]}</span><span>${q.labels[1]}</span></div>
-  `;
-}
-function pickRating(qid, val) { state.answers[qid] = val; saveState(); render(); }
-
-function renderText(q) {
-  const val = getAnswer(q) || '';
-  return `<input class="input" id="textAnswer" placeholder="${q.placeholder}" value="${val.replace(/"/g, '&quot;')}" oninput="state.answers['${q.id}'] = this.value; saveState(); updateFooterState();" autofocus />`;
-}
-
-/* ===== Footer ===== */
-function renderFooter() {
-  const q = QUESTIONS[state.current];
-  const answered = isAnswered(q);
-  const isLast = state.current === QUESTIONS.length - 1;
-  const canNext = answered || q.type === 'text' || q.type === 'rating'; // allow skip for open-ended
-  document.getElementById('footer').innerHTML = `
-    <button class="btn btn-ghost" onclick="prevQ()" ${state.current === 0 ? 'disabled' : ''}>
-      ${ICON.arrowL} Previous
-    </button>
-    <div class="hint">${answered ? 'Answered' : 'Select an answer to continue'}</div>
-    <button class="btn btn-primary" onclick="nextQ()" ${!canNext ? 'disabled' : ''}>
-      ${isLast ? 'Review' : 'Next'} ${ICON.arrowR}
-    </button>
-  `;
-}
-function updateFooterState() { renderFooter(); renderProgress(); }
-function prevQ() {
-  if (state.current > 0) { state.current--; saveState(); render(); }
-}
-function nextQ() {
-  if (state.current < QUESTIONS.length - 1) {
-    state.current++; saveState(); render();
-  } else {
-    state.screen = 'review'; saveState(); render();
-  }
-}
-
-/* ===== Review ===== */
-function renderReview() {
-  document.getElementById('body').innerHTML = `
-    <div style="margin-bottom:20px">
-      <div class="q-num" style="background:var(--primary-soft);border-color:var(--primary-soft);color:var(--primary)">Review</div>
-      <div class="q-title" style="font-size:24px">Check your answers</div>
-      <div class="q-desc">You can go back and change any response before submitting.</div>
-    </div>
-    <div class="review-list">
-      ${QUESTIONS.map((q, i) => `
-        <div class="review-item">
-          <div>
-            <div class="rq">Q${i+1}. ${q.title}</div>
-            <div class="ra ${isAnswered(q) ? '' : 'empty'}">${isAnswered(q) ? formatAnswer(q) : 'No answer'}</div>
-          </div>
-          <span class="review-edit" onclick="goToQ(${i})">Edit</span>
-        </div>
-      `).join('')}
-    </div>
-  `;
-}
-function formatAnswer(q) {
-  const a = getAnswer(q);
-  if (q.type === 'image-single' || q.type === 'single') {
-    const opt = q.options.find(o => o.id === a);
-    return opt ? (opt.label || opt.title) : '—';
-  }
-  if (q.type === 'multi') {
-    return (a || []).map(id => {
-      const opt = q.options.find(o => o.id === id);
-      return opt ? (opt.label || opt.title) : '';
-    }).filter(Boolean).join(', ');
-  }
-  if (q.type === 'truefalse') return a ? 'True' : 'False';
-  if (q.type === 'rating') return `${a} / ${q.max}`;
-  if (q.type === 'text') return a;
-  return String(a);
-}
-function goToQ(i) { state.current = i; state.screen = 'question'; saveState(); render(); }
-
-function renderReviewFooter() {
-  document.getElementById('footer').innerHTML = `
-    <button class="btn btn-ghost" onclick="state.screen='question';state.current=QUESTIONS.length-1;saveState();render()">
-      ${ICON.arrowL} Back to questions
-    </button>
-    <div class="hint">${Object.keys(state.answers).length} of ${QUESTIONS.length} answered</div>
-    <button class="btn btn-primary" onclick="submitQuiz()">
-      Submit assessment ${ICON.arrowR}
-    </button>
-  `;
-}
-
-function submitQuiz() { state.screen = 'result'; saveState(); render(); }
-
-/* ===== Result ===== */
-function renderResult() {
-  const graded = QUESTIONS.filter(q => q.correct !== undefined);
-  const correct = graded.filter(q => isCorrect(q)).length;
-  const total = graded.length;
-  const pct = total ? Math.round((correct / total) * 100) : 0;
-  const passed = pct >= 70;
-  const dash = 377 - (377 * pct / 100);
-  const duration = state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
-  const mm = String(Math.floor(duration / 60)).padStart(2, '0');
-  const ss = String(duration % 60).padStart(2, '0');
-
-  document.getElementById('body').innerHTML = `
-    <div class="result-hero">
-      <div class="result-ring ${passed ? 'pass' : 'fail'}">
-        <svg viewBox="0 0 140 140">
-          <circle class="track" cx="70" cy="70" r="60"/>
-          <circle class="fg" cx="70" cy="70" r="60" style="stroke-dashoffset:${dash}"/>
-        </svg>
-        <div class="score-text">${pct}%</div>
-      </div>
-      <h1>${passed ? 'Well done!' : 'Not quite there'}</h1>
-      <p>You answered <strong>${correct} of ${total}</strong> graded questions correctly.</p>
-      <div class="status ${passed ? 'pass' : 'fail'}">${passed ? '✓ PASSED' : '✕ DID NOT PASS'}</div>
-    </div>
-
-    <div class="result-grid">
-      <div class="result-card">
-        <div class="lbl">Score</div>
-        <div class="val">${correct}/${total}</div>
-        <div class="sub">${pct}% correct</div>
-      </div>
-      <div class="result-card">
-        <div class="lbl">Time</div>
-        <div class="val">${mm}:${ss}</div>
-        <div class="sub">Total duration</div>
-      </div>
-      <div class="result-card">
-        <div class="lbl">Completion</div>
-        <div class="val">${Math.round((Object.keys(state.answers).length / QUESTIONS.length) * 100)}%</div>
-        <div class="sub">${Object.keys(state.answers).length} of ${QUESTIONS.length} answered</div>
-      </div>
-    </div>
-
-    <div class="breakdown">
-      <h3>Question breakdown</h3>
-      ${QUESTIONS.map((q, i) => {
-        let cls = 'skip', txt = 'Skipped';
-        if (isAnswered(q)) {
-          if (q.correct === undefined) { cls = 'skip'; txt = 'Recorded'; }
-          else { cls = isCorrect(q) ? 'correct' : 'wrong'; txt = isCorrect(q) ? 'Correct' : 'Incorrect'; }
+    <div class="options">
+      ${q.options.map((opt, i) => {
+        const isRight = i === q.correctIdx;
+        let cls = '';
+        if (locked) {
+          if (i === state.pickedThisQ && isRight) cls = 'correct locked';
+          else if (i === state.pickedThisQ && !isRight) cls = 'wrong locked';
+          else if (isRight) cls = 'correct locked';
+          else cls = 'dim locked';
         }
+        const showExplain = locked && isRight;
+        const rightCircle = isRight && locked
+          ? `<div class="tick-circle">${ICO.tick}</div>`
+          : (!isRight && i === state.pickedThisQ && locked
+              ? `<div class="x-circle">${ICO.x}</div>`
+              : `<span class="chev">${ICO.chev}</span>`);
         return `
-          <div class="breakdown-row">
-            <div class="q-label">Q${i+1}. ${q.title}</div>
-            <span class="verdict ${cls}">${cls==='correct'?ICON.check:cls==='wrong'?ICON.x:''}${txt}</span>
-          </div>
+          <button class="opt ${cls}" onclick="${locked ? '' : `pickOption(${i})`}">
+            <div class="opt-inner">
+              <span class="opt-text">${opt}</span>
+              ${showExplain ? `<span class="explain-link">${ICO.eye} See explanation</span>` : ''}
+            </div>
+            ${rightCircle}
+          </button>
         `;
       }).join('')}
     </div>
+    ${locked ? `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--ink-muted);line-height:1.5">
+        <strong style="color:var(--ink)">Why?</strong> ${q.explain}
+      </div>
+    ` : ''}
   `;
 }
 
-function renderResultFooter() {
-  document.getElementById('footer').innerHTML = `
-    <button class="btn btn-ghost" onclick="resetState()">Retake assessment</button>
-    <div class="hint"></div>
-    <button class="btn btn-primary" onclick="window.location.href='index.html'">
-      Return to AXIoT ${ICON.arrowR}
-    </button>
+function pickOption(i) {
+  const q = currentQ();
+  state.pickedThisQ = i;
+  const correct = i === q.correctIdx;
+  if (correct) state.points += 10;
+  state.answers.push({ picked: i, correct });
+  save(); render();
+}
+
+function renderQFooter() {
+  const locked = state.pickedThisQ !== null;
+  const isLast = state.idx === questions().length - 1;
+  document.getElementById('footer').style.justifyContent = 'space-between';
+  if (locked) {
+    document.getElementById('footer').innerHTML = `
+      <button class="report"><span class="ico">!</span>Report question</button>
+      <button class="cta coral" style="width:auto;padding:12px 22px;font-size:14px" onclick="nextQ()">
+        ${isLast ? 'See Results' : 'Next Question'} →
+      </button>
+    `;
+  } else {
+    document.getElementById('footer').innerHTML = `
+      <button class="report"><span class="ico">!</span>Report question</button>
+      <button class="footer-icon-btn" title="Capture">${ICO.camera}</button>
+    `;
+  }
+}
+
+function skipQ() {
+  state.answers.push({ picked: null, correct: false, skipped: true });
+  state.pickedThisQ = null;
+  advance();
+}
+function nextQ() {
+  state.pickedThisQ = null;
+  advance();
+}
+function goBack() {
+  if (state.idx > 0) {
+    state.idx--;
+    // remove last answer to re-ask
+    state.answers.pop();
+    state.pickedThisQ = null;
+    save(); render();
+  } else {
+    state.screen = 'intro'; save(); render();
+  }
+}
+function advance() {
+  if (state.idx < questions().length - 1) {
+    state.idx++;
+    state.pickedThisQ = null;
+    save(); render();
+  } else {
+    state.screen = 'result'; save(); render();
+  }
+}
+
+/* ===== Result ===== */
+function renderResult() {
+  const total = questions().length;
+  const correct = state.answers.filter(a => a.correct).length;
+  const pct = Math.round((correct / total) * 100);
+  const passed = pct >= 70;
+  const duration = state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
+  const mm = String(Math.floor(duration / 60)).padStart(2, '0');
+  const ss = String(duration % 60).padStart(2, '0');
+  const title = pct === 100 ? 'Perfect Scorer!' : passed ? 'Great Job! You Did It!' : 'Good effort!';
+  const sub = pct === 100
+    ? 'Your flawless quiz performance sets a new standard of excellence.'
+    : `You got ${correct} out of ${total} correct!`;
+
+  document.getElementById('body').innerHTML = `
+    <div class="result fade-in">
+      <div class="star-box">${ICO.mascot}</div>
+      <div>
+        <h1>${title}</h1>
+        <div class="sub" style="margin-top:8px">${sub}</div>
+      </div>
+      <div class="points-badge"><span class="star">★</span> ${state.points} points earned</div>
+      <div class="result-stats">
+        <div class="result-stat"><div class="val">${correct}/${total}</div><div class="lbl">Correct</div></div>
+        <div class="result-stat"><div class="val">${pct}%</div><div class="lbl">Accuracy</div></div>
+        <div class="result-stat"><div class="val">${mm}:${ss}</div><div class="lbl">Time</div></div>
+      </div>
+    </div>
   `;
+  document.getElementById('footer').style.justifyContent = 'center';
+  document.getElementById('footer').style.flexDirection = 'column';
+  document.getElementById('footer').style.gap = '10px';
+  document.getElementById('footer').innerHTML = `
+    <button class="cta coral" style="width:100%" onclick="resetAll()">Try Again</button>
+    <button class="cta ink" style="width:100%" onclick="nextAge()">Next Quiz</button>
+  `;
+}
+function nextAge() {
+  const i = AGES.findIndex(a => a.key === state.ageKey);
+  const next = AGES[(i + 1) % AGES.length];
+  state.ageKey = next.key;
+  resetAll();
 }
 
 /* Init */
-if (state.screen === 'question' && state.startedAt) startTimer();
 render();
 </script>
 </body>
