@@ -1409,7 +1409,7 @@ function renderMatrix() {
         ${isSystem ? '' : `<button class="btn btn-danger-ghost btn-sm" onclick="deleteRole('${r.id}')">${SVG.trash} Delete</button>`}
       </div>
     </div>
-    ${isSystem ? `<div class="matrix-toolbar" style="color:var(--warn)">System roles are read-only. <span class="bulk-action" onclick="duplicateRole('${r.id}')">Duplicate to customize →</span></div>` : `
+    ${isSystem ? '' : `
       <div class="matrix-toolbar">
         <span>${r.users.toLocaleString()} user${r.users === 1 ? '' : 's'} assigned</span>
         <span style="color:var(--text-subtle)">·</span>
