@@ -1370,14 +1370,7 @@ function renderMatrix() {
   const rows = RESOURCES.map(res => {
     const isOpen = state.expanded[res.key];
     const hasChildren = res.children && res.children.length;
-    const hasCustom = res.customActions && res.customActions.length;
     const chev = hasChildren ? `<span class="chev ${isOpen ? 'open' : ''}">▸</span>` : `<span style="display:inline-block;width:18px"></span>`;
-    const customCell = hasCustom
-      ? res.customActions.map(a => {
-          const on = state.dirtyPerms[res.key].custom[a];
-          return `<span class="custom-action ${on ? 'on' : ''}" onclick="toggleCustom('${res.key}','${a}')">${on ? '<span class="tick">✓</span> ' : ''}${a}</span>`;
-        }).join('')
-      : '<span class="dash">—</span>';
 
     let html = `
       <tr class="group">
@@ -1386,7 +1379,6 @@ function renderMatrix() {
         <td>${checkbox(res.key, 'create', isSystem)}</td>
         <td>${checkbox(res.key, 'edit', isSystem)}</td>
         <td>${checkbox(res.key, 'delete', isSystem)}</td>
-        <td>${customCell}</td>
       </tr>
     `;
     if (hasChildren && isOpen) {
@@ -1397,7 +1389,6 @@ function renderMatrix() {
           <td>${checkbox(c.key, 'create', isSystem)}</td>
           <td>${checkbox(c.key, 'edit', isSystem)}</td>
           <td>${checkbox(c.key, 'delete', isSystem)}</td>
-          <td><span class="dash">—</span></td>
         </tr>
       `).join('');
     }
@@ -1427,7 +1418,7 @@ function renderMatrix() {
       </div>
     `}
     <table class="matrix-table">
-      <thead><tr><th class="first">Resource</th><th>View</th><th>Create</th><th>Edit</th><th>Delete</th><th>Custom actions</th></tr></thead>
+      <thead><tr><th class="first">Resource</th><th>View</th><th>Create</th><th>Edit</th><th>Delete</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
     <div class="matrix-foot">
