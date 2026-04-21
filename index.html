@@ -498,13 +498,17 @@
     border-bottom: 1px solid var(--border);
   }
   .matrix-table th.first { text-align: left; padding-left: 18px; width: 42%; }
-  .matrix-table th:not(.first) { width: 96px; }
+  .matrix-table th:not(.first),
+  .matrix-table td:not(.first) {
+    width: 96px; text-align: center; padding: 10px 0;
+  }
+  .matrix-table td:not(.first) .check { display: inline-block; }
   .col-hdr {
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    user-select: none;
+    display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+    user-select: none; line-height: 1;
   }
   .col-hdr .col-label { line-height: 1; }
-  .col-hdr .col-check { margin: 0; }
+  .col-hdr .col-check { margin: 0 !important; }
   .matrix-table td {
     padding: 11px 8px; text-align: center;
     border-bottom: 1px solid var(--border-subtle); font-size: 13.5px;
