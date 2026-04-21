@@ -1359,8 +1359,8 @@ function colHeader(action, label, disabled) {
   const checked = s === 'all' ? 'checked' : '';
   const indet = s === 'some' ? 'data-indet="1"' : '';
   return `<label class="col-hdr" style="cursor:${disabled?'not-allowed':'pointer'}">
-    <span class="col-label">${label}</span>
     <input type="checkbox" class="check col-check" ${checked} ${indet} ${disabled?'disabled':''} onchange="toggleColumn('${action}')" />
+    <span class="col-label">${label}</span>
   </label>`;
 }
 function toggleColumn(action) {
