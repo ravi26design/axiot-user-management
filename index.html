@@ -1340,6 +1340,27 @@ function checkbox(resourceKey, action, disabled) {
   const v = state.dirtyPerms[resourceKey][action];
   return `<input type="checkbox" class="check" ${v ? 'checked' : ''} ${disabled ? 'disabled' : ''} onclick="togglePerm('${resourceKey}','${action}')" />`;
 }
+function colHeader(action, label, disabled) {
+  const keys = Object.keys(state.dirtyPerms);
+  const total = keys.length;
+  const on = keys.filter(k => state.dirtyPerms[k][action]).length;
+  const state_ = on === 0 ? 'none' : (on === total ? 'all' : 'some');
+  const checked = state_ === 'all' ? 'checked' : '';
+  const indet = state_ === 'some' ? 'data-indet="1"' : '';
+  return `<label style="display:inline-flex;align-items:center;gap:6px;cursor:${disabled?'not-allowed':'pointer'};justify-content:center;width:100%">
+    <input type="checkbox" class="check col-check" ${checked} ${indet} ${disabled?'disabled':''} onclick="toggleColumn('${action}')" />
+    <span>${label}</span>
+  </label>`;
+}
+function toggleColumn(action) {
+  const r = selectedRole();
+  if (r.system) { toast('System roles cannot be modified', 'danger'); return; }
+  const keys = Object.keys(state.dirtyPerms);
+  const allOn = keys.every(k => state.dirtyPerms[k][action]);
+  const target = !allOn;  // if all on → turn off; else → turn all on
+  keys.forEach(k => state.dirtyPerms[k][action] = target);
+  renderMatrix();
+}
 function renderMatrix() {
   const r = selectedRole();
   const isSystem = r.system;
@@ -1396,7 +1417,13 @@ function renderMatrix() {
       </div>
     `}
     <table class="matrix-table">
-      <thead><tr><th class="first">Resource</th><th>View</th><th>Create</th><th>Edit</th><th>Delete</th></tr></thead>
+      <thead><tr>
+        <th class="first">Resource</th>
+        <th>${colHeader('view', 'View', isSystem)}</th>
+        <th>${colHeader('create', 'Create', isSystem)}</th>
+        <th>${colHeader('edit', 'Edit', isSystem)}</th>
+        <th>${colHeader('delete', 'Delete', isSystem)}</th>
+      </tr></thead>
       <tbody>${rows}</tbody>
     </table>
     <div class="matrix-foot">
@@ -1407,6 +1434,8 @@ function renderMatrix() {
       </div>
     </div>
   `;
+  // Apply indeterminate state to column header checkboxes
+  document.querySelectorAll('.col-check[data-indet="1"]').forEach(el => el.indeterminate = true);
 }
 
 function grantAll() {
