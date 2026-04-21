@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AXIoT — Operator Certification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary: #1F4E9E;
+    --primary-hover: #173F82;
+    --primary-soft: #E8EEF8;
+    --text-base: 11, 18, 32;
+    --text: rgba(var(--text-base), 1);
+    --text-muted: rgba(var(--text-base), 0.72);
+    --text-subtle: rgba(var(--text-base), 0.52);
+    --border: #D8DEE5;
+    --border-strong: #B8C0CC;
+    --border-subtle: #E8EBEF;
+    --bg: #F5F7FA;
+    --bg-hover: #EEF1F5;
+    --surface: #FFFFFF;
+    --success: #047048;
+    --success-soft: #E1F2E8;
+    --danger: #9F1A0F;
+    --danger-soft: #FBE3E0;
+    --warn: #8A3A05;
+    --warn-soft: #FCEEDC;
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
+    --shadow-md: 0 4px 14px rgba(16, 24, 40, 0.06);
+    --shadow-lg: 0 16px 40px rgba(16, 24, 40, 0.1);
+    --radius: 6px;
+    --radius-lg: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px; line-height: 1.5;
+    color: var(--text); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ===== Layout ===== */
+  .quiz-shell {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    max-width: 880px; margin: 0 auto; padding: 0 24px;
+  }
+  .quiz-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 0; gap: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+  .brand-mark {
+    width: 28px; height: 28px; border-radius: 6px; background: var(--text);
+    display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 12px;
+  }
+  .brand-sub { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .meta {
+    display: flex; align-items: center; gap: 18px;
+    font-size: 13px; color: var(--text-muted);
+  }
+  .meta .timer {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-weight: 500;
+  }
+  .meta .timer svg { color: var(--text-subtle); }
+
+  .progress-bar {
+    height: 4px; background: var(--border-subtle);
+    border-radius: 999px; margin: 20px 0 0; overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%; background: var(--primary);
+    width: 0; transition: width .3s cubic-bezier(.4,0,.2,1);
+    border-radius: 999px;
+  }
+  .progress-text {
+    display: flex; justify-content: space-between;
+    margin-top: 10px; font-size: 12.5px; color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .quiz-body { flex: 1; padding: 40px 0; }
+  .quiz-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 0; border-top: 1px solid var(--border);
+    gap: 12px;
+  }
+  .quiz-footer .hint { font-size: 12.5px; color: var(--text-subtle); }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px; font-size: 14px; font-weight: 500;
+    border-radius: 6px; border: 1px solid transparent;
+    transition: background .12s;
+  }
+  .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+  .btn-secondary:hover { background: var(--bg); }
+  .btn-ghost { color: var(--text-muted); }
+  .btn-ghost:hover { background: var(--bg-hover); color: var(--text); }
+  .btn-lg { padding: 11px 22px; font-size: 15px; }
+
+  /* ===== Intro screen ===== */
+  .intro {
+    max-width: 520px; margin: 60px auto; text-align: center;
+  }
+  .intro .badge {
+    display: inline-block; padding: 4px 12px;
+    background: var(--primary-soft); color: var(--primary);
+    font-size: 12px; font-weight: 600; letter-spacing: 0.4px;
+    text-transform: uppercase; border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .intro h1 {
+    font-size: 34px; font-weight: 600; letter-spacing: -0.8px;
+    line-height: 1.15; margin-bottom: 12px;
+  }
+  .intro p {
+    font-size: 15px; color: var(--text-muted); line-height: 1.6;
+    max-width: 440px; margin: 0 auto 28px;
+  }
+  .intro-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin-bottom: 32px;
+  }
+  .intro-stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 18px 14px;
+  }
+  .intro-stat .val { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+  .intro-stat .lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  /* ===== Question card ===== */
+  .q-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 32px 32px 28px;
+    box-shadow: var(--shadow-sm);
+  }
+  .q-num {
+    display: inline-block; padding: 3px 10px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; font-size: 11.5px; font-weight: 600;
+    color: var(--text-muted); letter-spacing: 0.5px;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+  .q-title {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.4px;
+    line-height: 1.3; margin-bottom: 8px;
+  }
+  .q-desc {
+    font-size: 14px; color: var(--text-muted); margin-bottom: 24px;
+    line-height: 1.55;
+  }
+
+  /* ===== Option: image tile ===== */
+  .img-grid {
+    display: grid; gap: 14px;
+  }
+  .img-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .img-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 680px) {
+    .img-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+  }
+  .img-tile {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+    cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .img-tile:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .img-tile.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(31, 78, 158, 0.15);
+  }
+  .img-tile .check-mark {
+    position: absolute; top: 10px; right: 10px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--primary); color: #fff;
+    display: grid; place-items: center;
+    opacity: 0; transform: scale(.8); transition: opacity .15s, transform .15s;
+  }
+  .img-tile.selected .check-mark { opacity: 1; transform: scale(1); }
+  .img-tile .art {
+    aspect-ratio: 16/11;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--bg), var(--bg-hover));
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .img-tile .art svg { width: 52%; height: 52%; color: var(--text); opacity: .85; }
+  .img-grid.cols-2 .img-tile .art { aspect-ratio: 4/3; }
+  .img-tile .label {
+    padding: 12px 14px; text-align: left;
+    font-weight: 500; font-size: 14px;
+  }
+  .img-tile .sub {
+    padding: 0 14px 12px; font-size: 12px; color: var(--text-muted);
+    margin-top: -2px;
+  }
+
+  /* Artful tinted backgrounds for image tiles */
+  .art-blue    { background: linear-gradient(135deg, #E8EEF8, #C8D6EC) !important; }
+  .art-green   { background: linear-gradient(135deg, #E1F2E8, #B9E0C9) !important; }
+  .art-amber   { background: linear-gradient(135deg, #FCEEDC, #F3D4A8) !important; }
+  .art-red     { background: linear-gradient(135deg, #FDECEC, #F7C9C3) !important; }
+  .art-purple  { background: linear-gradient(135deg, #F0EBFB, #DCCEF3) !important; }
+  .art-teal    { background: linear-gradient(135deg, #E0F2F1, #B2DFDC) !important; }
+  .art-slate   { background: linear-gradient(135deg, #EEF1F5, #D8DEE5) !important; }
+  .art-yellow  { background: linear-gradient(135deg, #FEF3C7, #FDE68A) !important; }
+
+  /* ===== Option: radio list ===== */
+  .opt-list { display: flex; flex-direction: column; gap: 10px; }
+  .opt-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer; transition: border-color .12s, background .12s;
+  }
+  .opt-row:hover { border-color: var(--border-strong); background: var(--bg); }
+  .opt-row.selected { border-color: var(--primary); background: var(--primary-soft); }
+  .opt-row .bullet {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border-strong); background: var(--surface);
+    flex-shrink: 0; display: grid; place-items: center; margin-top: 1px;
+    transition: border-color .12s;
+  }
+  .opt-row.selected .bullet { border-color: var(--primary); background: var(--primary); }
+  .opt-row.selected .bullet::after {
+    content: ''; width: 8px; height: 8px; background: #fff; border-radius: 50%;
+  }
+  .opt-row .opt-text { flex: 1; }
+  .opt-row .opt-title { font-weight: 500; font-size: 14.5px; }
+  .opt-row .opt-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
+
+  /* Checkbox variant */
+  .opt-row.multi .bullet {
+    border-radius: 4px;
+  }
+  .opt-row.multi.selected .bullet::after {
+    content: ''; width: 10px; height: 6px;
+    border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translate(1px, -2px);
+    background: none; border-radius: 0;
+  }
+
+  /* ===== True/False ===== */
+  .tf-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  .tf-btn {
+    padding: 22px 18px; background: var(--surface);
+    border: 2px solid var(--border); border-radius: var(--radius-lg);
+    cursor: pointer; transition: border-color .12s, background .12s;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .tf-btn:hover { border-color: var(--border-strong); background: var(--bg); }
+  .tf-btn.selected { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+  .tf-btn .ico {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--bg); display: grid; place-items: center;
+    border: 1px solid var(--border);
+  }
+  .tf-btn.selected .ico { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .tf-btn .label { font-weight: 600; font-size: 16px; }
+
+  /* ===== Rating scale ===== */
+  .rating {
+    display: flex; gap: 8px; justify-content: center;
+    margin: 20px 0 10px;
+  }
+  .rating-btn {
+    width: 56px; height: 56px; border-radius: 10px;
+    background: var(--surface); border: 2px solid var(--border);
+    font-size: 18px; font-weight: 600; color: var(--text-muted);
+    cursor: pointer; transition: border-color .12s, background .12s, color .12s;
+  }
+  .rating-btn:hover { border-color: var(--border-strong); }
+  .rating-btn.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
+  .rating-labels {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text-muted);
+    max-width: 360px; margin: 0 auto;
+  }
+
+  /* ===== Text input ===== */
+  .input {
+    width: 100%; padding: 12px 16px;
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: var(--radius-lg); font-size: 15px; outline: none;
+    transition: border-color .12s, box-shadow .12s;
+  }
+  .input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(31, 78, 158, 0.12); }
+
+  /* ===== Review & Results ===== */
+  .review-list { display: flex; flex-direction: column; gap: 10px; }
+  .review-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 18px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+  }
+  .review-item .rq { font-size: 13.5px; color: var(--text-muted); margin-bottom: 4px; }
+  .review-item .ra { font-weight: 500; }
+  .review-item .ra.empty { color: var(--text-subtle); font-weight: 400; font-style: italic; }
+  .review-edit {
+    font-size: 12.5px; color: var(--primary); font-weight: 500;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .review-edit:hover { text-decoration: underline; }
+
+  .result-hero {
+    text-align: center; padding: 48px 20px 24px;
+  }
+  .result-ring {
+    width: 140px; height: 140px; margin: 0 auto 20px;
+    position: relative;
+  }
+  .result-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .result-ring .track { fill: none; stroke: var(--border-subtle); stroke-width: 10; }
+  .result-ring .fg { fill: none; stroke: var(--primary); stroke-width: 10; stroke-linecap: round;
+    stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset .9s; }
+  .result-ring.pass .fg { stroke: var(--success); }
+  .result-ring.fail .fg { stroke: var(--danger); }
+  .result-ring .score-text {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font-size: 30px; font-weight: 600; letter-spacing: -0.5px;
+  }
+  .result-hero h1 {
+    font-size: 28px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 8px;
+  }
+  .result-hero p { color: var(--text-muted); font-size: 14px; }
+  .result-hero .status {
+    display: inline-block; margin-top: 14px;
+    padding: 5px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.3px;
+  }
+  .result-hero .status.pass { background: var(--success-soft); color: var(--success); }
+  .result-hero .status.fail { background: var(--danger-soft); color: var(--danger); }
+
+  .result-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin: 32px 0;
+  }
+  .result-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 18px;
+  }
+  .result-card .lbl {
+    font-size: 12px; color: var(--text-muted); font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .result-card .val { font-size: 24px; font-weight: 600; letter-spacing: -0.4px; margin-top: 6px; }
+  .result-card .sub { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
+
+  .breakdown { margin-bottom: 24px; }
+  .breakdown h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .breakdown-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    margin-bottom: 8px;
+  }
+  .breakdown-row .q-label { font-size: 13.5px; font-weight: 500; flex: 1; padding-right: 12px; }
+  .breakdown-row .verdict {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 4px;
+    font-size: 12px; font-weight: 500;
+  }
+  .verdict.correct { background: var(--success-soft); color: var(--success); }
+  .verdict.wrong { background: var(--danger-soft); color: var(--danger); }
+  .verdict.skip { background: var(--bg-hover); color: var(--text-muted); }
+
+  @media (max-width: 680px) {
+    .quiz-shell { padding: 0 16px; }
+    .q-card { padding: 24px 20px; }
+    .q-title { font-size: 19px; }
+    .result-grid { grid-template-columns: 1fr; }
+    .intro h1 { font-size: 26px; }
+    .intro-stats { grid-template-columns: 1fr; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-shell">
+  <header class="quiz-header">
+    <div class="brand">
+      <div class="brand-mark">AX</div>
+      <div>
+        AXIoT
+        <div class="brand-sub">Operator Certification</div>
+      </div>
+    </div>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <div id="progressWrap" style="display:none">
+    <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText"></div>
+  </div>
+
+  <main class="quiz-body" id="body"></main>
+
+  <footer class="quiz-footer" id="footer" style="display:none"></footer>
+</div>
+
+<script>
+/* ============================================================
+   Inline icon library
+   ============================================================ */
+const ICON = {
+  gauge: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l4-4"/><path d="M3.34 17A10 10 0 1 1 20.66 17"/><circle cx="12" cy="14" r="1.5"/></svg>',
+  thermo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14V5a2 2 0 0 0-4 0v9a4 4 0 1 0 4 0z"/></svg>',
+  flow:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c3 0 3-4 6-4s3 4 6 4 3-4 6-4"/><path d="M3 18c3 0 3-4 6-4s3 4 6 4 3-4 6-4"/></svg>',
+  drop:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5s7 7.5 7 12.5a7 7 0 1 1-14 0c0-5 7-12.5 7-12.5z"/></svg>',
+  dashA: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 9v12"/><rect x="11" y="12" width="7" height="3" rx=".5" fill="currentColor" fill-opacity=".2"/><rect x="11" y="17" width="5" height="2" rx=".5" fill="currentColor" fill-opacity=".15"/></svg>',
+  dashB: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18"/><circle cx="8" cy="14" r="2.5" fill="currentColor" fill-opacity=".2"/><path d="M13 13h6M13 16h4"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+  x:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  clock: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+  arrowL:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>',
+  arrowR:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'
+};
+
+/* ============================================================
+   Questions
+   ============================================================ */
+const QUESTIONS = [
+  {
+    id: 'q1',
+    type: 'image-single',
+    cols: 4,
+    title: 'Which of these is a pressure sensor?',
+    desc: 'Select the instrument used to measure line pressure in pneumatic systems.',
+    options: [
+      { id: 'a', label: 'Pressure gauge', sub: 'PSI / bar', icon: ICON.gauge, tint: 'art-blue' },
+      { id: 'b', label: 'Thermocouple',   sub: 'Temperature', icon: ICON.thermo, tint: 'art-red' },
+      { id: 'c', label: 'Flow meter',     sub: 'Volume / time', icon: ICON.flow, tint: 'art-teal' },
+      { id: 'd', label: 'Humidity sensor',sub: 'Relative humidity', icon: ICON.drop, tint: 'art-purple' }
+    ],
+    correct: 'a'
+  },
+  {
+    id: 'q2',
+    type: 'image-single',
+    cols: 2,
+    title: 'Which dashboard layout best prioritizes critical alerts?',
+    desc: 'Compare the two layouts and choose the one that surfaces critical information first.',
+    options: [
+      { id: 'a', label: 'Layout A — Alerts-first', sub: 'Critical items at the top, charts below', icon: ICON.dashB, tint: 'art-amber' },
+      { id: 'b', label: 'Layout B — Charts-first', sub: 'KPI tiles and graphs at the top', icon: ICON.dashA, tint: 'art-slate' }
+    ],
+    correct: 'a'
+  },
+  {
+    id: 'q3',
+    type: 'multi',
+    title: 'Which of the following are required for proper device onboarding?',
+    desc: 'Select all that apply. Minimum two required.',
+    options: [
+      { id: 'a', title: 'Unique device ID', sub: 'Globally unique identifier assigned by AXIoT' },
+      { id: 'b', title: 'Assigned tenant & site', sub: 'Determines routing and access scope' },
+      { id: 'c', title: 'Physical location (GPS)', sub: 'Required only for mobile assets' },
+      { id: 'd', title: 'Firmware version tag', sub: 'Enables correct OTA updates' },
+      { id: 'e', title: 'Operator favorite color', sub: 'Not used for onboarding' }
+    ],
+    correct: ['a', 'b', 'd']
+  },
+  {
+    id: 'q4',
+    type: 'single',
+    title: 'What is the recommended telemetry refresh interval for active production lines?',
+    options: [
+      { id: 'a', title: 'Every 30 seconds', sub: 'Low bandwidth, slow detection' },
+      { id: 'b', title: 'Every 5 seconds', sub: 'Balanced for most line speeds' },
+      { id: 'c', title: 'Every 500 ms', sub: 'High bandwidth, real-time' },
+      { id: 'd', title: 'On-change only', sub: 'Only when value crosses threshold' }
+    ],
+    correct: 'b'
+  },
+  {
+    id: 'q5',
+    type: 'truefalse',
+    title: 'Role permission changes apply immediately to all active sessions.',
+    desc: 'Based on AXIoT documentation — is this statement true or false?',
+    correct: true
+  },
+  {
+    id: 'q6',
+    type: 'rating',
+    title: 'How familiar are you with the MQTT protocol?',
+    desc: 'Your answer helps us tailor the next training module. No right or wrong.',
+    min: 1, max: 5,
+    labels: ['Not at all', 'Expert']
+  },
+  {
+    id: 'q7',
+    type: 'text',
+    title: 'What is your assigned site ID?',
+    desc: 'Usually shown on your operator badge (e.g. ACME-PUN-03).',
+    placeholder: 'Enter your site ID'
+  }
+];
+
+/* ============================================================
+   State
+   ============================================================ */
+const STORAGE_KEY = 'axiot-quiz-state-v1';
+const state = loadState() || {
+  screen: 'intro',     // intro | question | review | result
+  current: 0,
+  answers: {},         // { q1: 'a', q2: 'a', q3: ['a','b'], q5: true, q6: 3, q7: 'ACME-PUN-03' }
+  startedAt: null
+};
+function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){} }
+function loadState() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) { return null; } }
+function resetState() {
+  state.screen = 'intro';
+  state.current = 0;
+  state.answers = {};
+  state.startedAt = null;
+  saveState();
+  render();
+}
+
+/* ============================================================
+   Answer helpers
+   ============================================================ */
+function getAnswer(q) { return state.answers[q.id]; }
+function setAnswer(q, val) { state.answers[q.id] = val; saveState(); }
+function isAnswered(q) {
+  const a = getAnswer(q);
+  if (q.type === 'multi') return Array.isArray(a) && a.length > 0;
+  if (q.type === 'text') return typeof a === 'string' && a.trim().length > 0;
+  return a !== undefined && a !== null && a !== '';
+}
+function isCorrect(q) {
+  const a = getAnswer(q);
+  if (a === undefined) return false;
+  if (q.type === 'multi') {
+    if (!Array.isArray(a) || !q.correct) return false;
+    const sorted = [...a].sort().join(',');
+    const need = [...q.correct].sort().join(',');
+    return sorted === need;
+  }
+  if (q.correct === undefined) return null; // open-ended, no grade
+  return a === q.correct;
+}
+
+/* ============================================================
+   Timer
+   ============================================================ */
+let timerInterval;
+function startTimer() {
+  if (!state.startedAt) state.startedAt = Date.now();
+  saveState();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimer, 1000);
+  updateTimer();
+}
+function stopTimer() { clearInterval(timerInterval); }
+function updateTimer() {
+  const el = document.getElementById('timerText');
+  if (!el || !state.startedAt) return;
+  const s = Math.floor((Date.now() - state.startedAt) / 1000);
+  const mm = String(Math.floor(s / 60)).padStart(2, '0');
+  const ss = String(s % 60).padStart(2, '0');
+  el.textContent = `${mm}:${ss}`;
+}
+
+/* ============================================================
+   Rendering
+   ============================================================ */
+function render() {
+  const body = document.getElementById('body');
+  const footer = document.getElementById('footer');
+  const progress = document.getElementById('progressWrap');
+  const meta = document.getElementById('meta');
+
+  if (state.screen === 'intro') {
+    progress.style.display = 'none';
+    footer.style.display = 'none';
+    meta.innerHTML = '';
+    renderIntro();
+  } else if (state.screen === 'question') {
+    progress.style.display = 'block';
+    footer.style.display = 'flex';
+    renderMeta();
+    renderProgress();
+    renderQuestion();
+    renderFooter();
+  } else if (state.screen === 'review') {
+    progress.style.display = 'block';
+    footer.style.display = 'flex';
+    renderMeta();
+    updateProgressBar(100);
+    document.getElementById('progressText').innerHTML = `<span>Review your answers</span><span>${QUESTIONS.length} of ${QUESTIONS.length}</span>`;
+    renderReview();
+    renderReviewFooter();
+  } else if (state.screen === 'result') {
+    progress.style.display = 'none';
+    footer.style.display = 'flex';
+    meta.innerHTML = '';
+    stopTimer();
+    renderResult();
+    renderResultFooter();
+  }
+}
+
+function renderMeta() {
+  document.getElementById('meta').innerHTML = `
+    <span class="timer">${ICON.clock}<span id="timerText">00:00</span></span>
+  `;
+}
+
+function renderProgress() {
+  const pct = ((state.current) / QUESTIONS.length) * 100;
+  updateProgressBar(pct);
+  document.getElementById('progressText').innerHTML = `
+    <span>Question ${state.current + 1} of ${QUESTIONS.length}</span>
+    <span>${Object.keys(state.answers).length} answered</span>
+  `;
+}
+function updateProgressBar(pct) {
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+/* ===== Intro ===== */
+function renderIntro() {
+  document.getElementById('body').innerHTML = `
+    <div class="intro">
+      <div class="badge">Certification</div>
+      <h1>AXIoT Operator Assessment</h1>
+      <p>A short assessment to verify your familiarity with the platform and core operational concepts. Your progress is saved automatically.</p>
+      <div class="intro-stats">
+        <div class="intro-stat">
+          <div class="val">${QUESTIONS.length}</div>
+          <div class="lbl">Questions</div>
+        </div>
+        <div class="intro-stat">
+          <div class="val">~5 min</div>
+          <div class="lbl">Estimated time</div>
+        </div>
+        <div class="intro-stat">
+          <div class="val">70%</div>
+          <div class="lbl">Pass score</div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-lg" onclick="startQuiz()">
+        Start assessment ${ICON.arrowR}
+      </button>
+      ${Object.keys(state.answers).length > 0 ? `
+        <div style="margin-top:18px;font-size:13px;color:var(--text-muted)">
+          You have saved progress. <span style="color:var(--primary);font-weight:500;cursor:pointer" onclick="resumeQuiz()">Resume</span> or <span style="color:var(--danger);cursor:pointer" onclick="resetState()">start over</span>.
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+function startQuiz() {
+  state.screen = 'question';
+  state.current = 0;
+  state.startedAt = Date.now();
+  saveState();
+  startTimer();
+  render();
+}
+function resumeQuiz() {
+  state.screen = 'question';
+  state.current = Math.min(state.current || 0, QUESTIONS.length - 1);
+  saveState();
+  startTimer();
+  render();
+}
+
+/* ===== Question ===== */
+function renderQuestion() {
+  const q = QUESTIONS[state.current];
+  let optionsHtml = '';
+  if (q.type === 'image-single') optionsHtml = renderImageOptions(q);
+  else if (q.type === 'single') optionsHtml = renderSingleOptions(q);
+  else if (q.type === 'multi') optionsHtml = renderMultiOptions(q);
+  else if (q.type === 'truefalse') optionsHtml = renderTrueFalse(q);
+  else if (q.type === 'rating') optionsHtml = renderRating(q);
+  else if (q.type === 'text') optionsHtml = renderText(q);
+
+  document.getElementById('body').innerHTML = `
+    <div class="q-card">
+      <div class="q-num">Question ${state.current + 1}</div>
+      <div class="q-title">${q.title}</div>
+      ${q.desc ? `<div class="q-desc">${q.desc}</div>` : ''}
+      ${optionsHtml}
+    </div>
+  `;
+}
+
+function renderImageOptions(q) {
+  const picked = getAnswer(q);
+  return `<div class="img-grid cols-${q.cols}">
+    ${q.options.map(o => `
+      <div class="img-tile ${picked === o.id ? 'selected' : ''}" onclick="pickImageSingle('${q.id}','${o.id}')">
+        <div class="check-mark">${ICON.check}</div>
+        <div class="art ${o.tint || ''}">${o.icon}</div>
+        <div class="label">${o.label}</div>
+        ${o.sub ? `<div class="sub">${o.sub}</div>` : ''}
+      </div>
+    `).join('')}
+  </div>`;
+}
+function pickImageSingle(qid, oid) {
+  state.answers[qid] = oid;
+  saveState();
+  render();
+}
+
+function renderSingleOptions(q) {
+  const picked = getAnswer(q);
+  return `<div class="opt-list">
+    ${q.options.map(o => `
+      <div class="opt-row ${picked === o.id ? 'selected' : ''}" onclick="pickImageSingle('${q.id}','${o.id}')">
+        <div class="bullet"></div>
+        <div class="opt-text">
+          <div class="opt-title">${o.title}</div>
+          ${o.sub ? `<div class="opt-sub">${o.sub}</div>` : ''}
+        </div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+function renderMultiOptions(q) {
+  const picked = getAnswer(q) || [];
+  return `<div class="opt-list">
+    ${q.options.map(o => `
+      <div class="opt-row multi ${picked.includes(o.id) ? 'selected' : ''}" onclick="pickMulti('${q.id}','${o.id}')">
+        <div class="bullet"></div>
+        <div class="opt-text">
+          <div class="opt-title">${o.title}</div>
+          ${o.sub ? `<div class="opt-sub">${o.sub}</div>` : ''}
+        </div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+function pickMulti(qid, oid) {
+  const cur = state.answers[qid] || [];
+  const idx = cur.indexOf(oid);
+  if (idx >= 0) cur.splice(idx, 1); else cur.push(oid);
+  state.answers[qid] = cur;
+  saveState();
+  render();
+}
+
+function renderTrueFalse(q) {
+  const picked = getAnswer(q);
+  return `<div class="tf-grid">
+    <div class="tf-btn ${picked === true ? 'selected' : ''}" onclick="pickTF('${q.id}', true)">
+      <div class="ico">${ICON.check}</div>
+      <div class="label">True</div>
+    </div>
+    <div class="tf-btn ${picked === false ? 'selected' : ''}" onclick="pickTF('${q.id}', false)">
+      <div class="ico">${ICON.x}</div>
+      <div class="label">False</div>
+    </div>
+  </div>`;
+}
+function pickTF(qid, val) { state.answers[qid] = val; saveState(); render(); }
+
+function renderRating(q) {
+  const picked = getAnswer(q);
+  let btns = '';
+  for (let i = q.min; i <= q.max; i++) {
+    btns += `<button class="rating-btn ${picked === i ? 'selected' : ''}" onclick="pickRating('${q.id}', ${i})">${i}</button>`;
+  }
+  return `
+    <div class="rating">${btns}</div>
+    <div class="rating-labels"><span>${q.labels[0]}</span><span>${q.labels[1]}</span></div>
+  `;
+}
+function pickRating(qid, val) { state.answers[qid] = val; saveState(); render(); }
+
+function renderText(q) {
+  const val = getAnswer(q) || '';
+  return `<input class="input" id="textAnswer" placeholder="${q.placeholder}" value="${val.replace(/"/g, '&quot;')}" oninput="state.answers['${q.id}'] = this.value; saveState(); updateFooterState();" autofocus />`;
+}
+
+/* ===== Footer ===== */
+function renderFooter() {
+  const q = QUESTIONS[state.current];
+  const answered = isAnswered(q);
+  const isLast = state.current === QUESTIONS.length - 1;
+  const canNext = answered || q.type === 'text' || q.type === 'rating'; // allow skip for open-ended
+  document.getElementById('footer').innerHTML = `
+    <button class="btn btn-ghost" onclick="prevQ()" ${state.current === 0 ? 'disabled' : ''}>
+      ${ICON.arrowL} Previous
+    </button>
+    <div class="hint">${answered ? 'Answered' : 'Select an answer to continue'}</div>
+    <button class="btn btn-primary" onclick="nextQ()" ${!canNext ? 'disabled' : ''}>
+      ${isLast ? 'Review' : 'Next'} ${ICON.arrowR}
+    </button>
+  `;
+}
+function updateFooterState() { renderFooter(); renderProgress(); }
+function prevQ() {
+  if (state.current > 0) { state.current--; saveState(); render(); }
+}
+function nextQ() {
+  if (state.current < QUESTIONS.length - 1) {
+    state.current++; saveState(); render();
+  } else {
+    state.screen = 'review'; saveState(); render();
+  }
+}
+
+/* ===== Review ===== */
+function renderReview() {
+  document.getElementById('body').innerHTML = `
+    <div style="margin-bottom:20px">
+      <div class="q-num" style="background:var(--primary-soft);border-color:var(--primary-soft);color:var(--primary)">Review</div>
+      <div class="q-title" style="font-size:24px">Check your answers</div>
+      <div class="q-desc">You can go back and change any response before submitting.</div>
+    </div>
+    <div class="review-list">
+      ${QUESTIONS.map((q, i) => `
+        <div class="review-item">
+          <div>
+            <div class="rq">Q${i+1}. ${q.title}</div>
+            <div class="ra ${isAnswered(q) ? '' : 'empty'}">${isAnswered(q) ? formatAnswer(q) : 'No answer'}</div>
+          </div>
+          <span class="review-edit" onclick="goToQ(${i})">Edit</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function formatAnswer(q) {
+  const a = getAnswer(q);
+  if (q.type === 'image-single' || q.type === 'single') {
+    const opt = q.options.find(o => o.id === a);
+    return opt ? (opt.label || opt.title) : '—';
+  }
+  if (q.type === 'multi') {
+    return (a || []).map(id => {
+      const opt = q.options.find(o => o.id === id);
+      return opt ? (opt.label || opt.title) : '';
+    }).filter(Boolean).join(', ');
+  }
+  if (q.type === 'truefalse') return a ? 'True' : 'False';
+  if (q.type === 'rating') return `${a} / ${q.max}`;
+  if (q.type === 'text') return a;
+  return String(a);
+}
+function goToQ(i) { state.current = i; state.screen = 'question'; saveState(); render(); }
+
+function renderReviewFooter() {
+  document.getElementById('footer').innerHTML = `
+    <button class="btn btn-ghost" onclick="state.screen='question';state.current=QUESTIONS.length-1;saveState();render()">
+      ${ICON.arrowL} Back to questions
+    </button>
+    <div class="hint">${Object.keys(state.answers).length} of ${QUESTIONS.length} answered</div>
+    <button class="btn btn-primary" onclick="submitQuiz()">
+      Submit assessment ${ICON.arrowR}
+    </button>
+  `;
+}
+
+function submitQuiz() { state.screen = 'result'; saveState(); render(); }
+
+/* ===== Result ===== */
+function renderResult() {
+  const graded = QUESTIONS.filter(q => q.correct !== undefined);
+  const correct = graded.filter(q => isCorrect(q)).length;
+  const total = graded.length;
+  const pct = total ? Math.round((correct / total) * 100) : 0;
+  const passed = pct >= 70;
+  const dash = 377 - (377 * pct / 100);
+  const duration = state.startedAt ? Math.floor((Date.now() - state.startedAt) / 1000) : 0;
+  const mm = String(Math.floor(duration / 60)).padStart(2, '0');
+  const ss = String(duration % 60).padStart(2, '0');
+
+  document.getElementById('body').innerHTML = `
+    <div class="result-hero">
+      <div class="result-ring ${passed ? 'pass' : 'fail'}">
+        <svg viewBox="0 0 140 140">
+          <circle class="track" cx="70" cy="70" r="60"/>
+          <circle class="fg" cx="70" cy="70" r="60" style="stroke-dashoffset:${dash}"/>
+        </svg>
+        <div class="score-text">${pct}%</div>
+      </div>
+      <h1>${passed ? 'Well done!' : 'Not quite there'}</h1>
+      <p>You answered <strong>${correct} of ${total}</strong> graded questions correctly.</p>
+      <div class="status ${passed ? 'pass' : 'fail'}">${passed ? '✓ PASSED' : '✕ DID NOT PASS'}</div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="lbl">Score</div>
+        <div class="val">${correct}/${total}</div>
+        <div class="sub">${pct}% correct</div>
+      </div>
+      <div class="result-card">
+        <div class="lbl">Time</div>
+        <div class="val">${mm}:${ss}</div>
+        <div class="sub">Total duration</div>
+      </div>
+      <div class="result-card">
+        <div class="lbl">Completion</div>
+        <div class="val">${Math.round((Object.keys(state.answers).length / QUESTIONS.length) * 100)}%</div>
+        <div class="sub">${Object.keys(state.answers).length} of ${QUESTIONS.length} answered</div>
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <h3>Question breakdown</h3>
+      ${QUESTIONS.map((q, i) => {
+        let cls = 'skip', txt = 'Skipped';
+        if (isAnswered(q)) {
+          if (q.correct === undefined) { cls = 'skip'; txt = 'Recorded'; }
+          else { cls = isCorrect(q) ? 'correct' : 'wrong'; txt = isCorrect(q) ? 'Correct' : 'Incorrect'; }
+        }
+        return `
+          <div class="breakdown-row">
+            <div class="q-label">Q${i+1}. ${q.title}</div>
+            <span class="verdict ${cls}">${cls==='correct'?ICON.check:cls==='wrong'?ICON.x:''}${txt}</span>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderResultFooter() {
+  document.getElementById('footer').innerHTML = `
+    <button class="btn btn-ghost" onclick="resetState()">Retake assessment</button>
+    <div class="hint"></div>
+    <button class="btn btn-primary" onclick="window.location.href='index.html'">
+      Return to AXIoT ${ICON.arrowR}
+    </button>
+  `;
+}
+
+/* Init */
+if (state.screen === 'question' && state.startedAt) startTimer();
+render();
+</script>
+</body>
+</html>
