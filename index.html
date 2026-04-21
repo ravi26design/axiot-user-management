@@ -857,12 +857,12 @@ const NAV = [
 ];
 
 const RESOURCES = [
-  { key: 'devices', label: 'Devices', customActions: ['Execute'], children: [
+  { key: 'devices', label: 'Devices', children: [
     { key: 'telemetry', label: 'Telemetry streams' },
     { key: 'commands', label: 'Remote commands' }
   ]},
-  { key: 'alerts', label: 'Alerts', customActions: ['Acknowledge', 'Resolve'] },
-  { key: 'reports', label: 'Reports', customActions: ['Export'] },
+  { key: 'alerts', label: 'Alerts' },
+  { key: 'reports', label: 'Reports' },
   { key: 'users', label: 'Users' },
   { key: 'rolesRes', label: 'Roles & permissions' },
   { key: 'tenants', label: 'Tenants' },
@@ -872,22 +872,17 @@ const RESOURCES = [
 function emptyPerms() {
   const p = {};
   RESOURCES.forEach(r => {
-    p[r.key] = { view: false, create: false, edit: false, delete: false, custom: {} };
-    (r.customActions || []).forEach(a => p[r.key].custom[a] = false);
+    p[r.key] = { view: false, create: false, edit: false, delete: false };
     (r.children || []).forEach(c => {
-      p[c.key] = { view: false, create: false, edit: false, delete: false, custom: {} };
+      p[c.key] = { view: false, create: false, edit: false, delete: false };
     });
   });
   return p;
 }
 function fullPerms() {
   const p = emptyPerms();
-  RESOURCES.forEach(r => {
-    ['view','create','edit','delete'].forEach(a => p[r.key][a] = true);
-    Object.keys(p[r.key].custom).forEach(a => p[r.key].custom[a] = true);
-    (r.children || []).forEach(c => {
-      ['view','create','edit','delete'].forEach(a => p[c.key][a] = true);
-    });
+  Object.keys(p).forEach(k => {
+    ['view','create','edit','delete'].forEach(a => p[k][a] = true);
   });
   return p;
 }
@@ -900,9 +895,6 @@ const initialRoles = [
     ['devices','alerts','reports','users','telemetry','commands'].forEach(k => { p[k].view = p[k].create = p[k].edit = true; });
     p.devices.delete = true;
     p.users.delete = true;
-    Object.keys(p.alerts.custom).forEach(a => p.alerts.custom[a] = true);
-    p.devices.custom.Execute = true;
-    p.reports.custom.Export = true;
     return p;
   })() },
   { id: 'operator', name: 'Plant Operator', system: false, users: 148, updated: 'today', desc: 'Day-to-day operators managing devices and acknowledging alerts on their assigned lines.', perms: (() => {
@@ -910,12 +902,8 @@ const initialRoles = [
     p.devices.view = p.devices.create = p.devices.edit = true;
     p.telemetry.view = true;
     p.commands.view = p.commands.edit = true;
-    p.devices.custom.Execute = true;
     p.alerts.view = true;
-    p.alerts.custom.Acknowledge = true;
-    p.alerts.custom.Resolve = true;
     p.reports.view = true;
-    p.reports.custom.Export = true;
     return p;
   })() },
   { id: 'tech', name: 'Maintenance Technician', system: false, users: 63, updated: 'Apr 04', desc: 'Performs maintenance tasks and resolves device issues.', perms: (() => {
@@ -923,10 +911,7 @@ const initialRoles = [
     p.devices.view = p.devices.edit = true;
     p.telemetry.view = true;
     p.commands.view = p.commands.edit = true;
-    p.devices.custom.Execute = true;
     p.alerts.view = true;
-    p.alerts.custom.Acknowledge = true;
-    p.alerts.custom.Resolve = true;
     return p;
   })() },
   { id: 'viewer', name: 'Viewer', system: true, users: 1046, updated: 'Jan 22', desc: 'Read-only access across assigned tenants.', perms: (() => {
@@ -1276,7 +1261,6 @@ function countChanges() {
   for (const k of Object.keys(state.dirtyPerms)) {
     const a = state.dirtyPerms[k], b = state.initialPerms[k];
     ['view','create','edit','delete'].forEach(p => { if (a[p] !== b[p]) n++; });
-    for (const c of Object.keys(a.custom || {})) if (a.custom[c] !== b.custom[c]) n++;
   }
   return n;
 }
@@ -1284,12 +1268,6 @@ function togglePerm(resourceKey, action) {
   const r = selectedRole();
   if (r.system) { toast('System roles cannot be modified', 'danger'); return; }
   state.dirtyPerms[resourceKey][action] = !state.dirtyPerms[resourceKey][action];
-  renderMatrix();
-}
-function toggleCustom(resourceKey, action) {
-  const r = selectedRole();
-  if (r.system) { toast('System roles cannot be modified', 'danger'); return; }
-  state.dirtyPerms[resourceKey].custom[action] = !state.dirtyPerms[resourceKey].custom[action];
   renderMatrix();
 }
 function toggleGroup(resourceKey) {
@@ -1436,7 +1414,6 @@ function grantAll() {
   if (r.system) { toast('System roles cannot be modified', 'danger'); return; }
   for (const k of Object.keys(state.dirtyPerms)) {
     ['view','create','edit','delete'].forEach(a => state.dirtyPerms[k][a] = true);
-    for (const c of Object.keys(state.dirtyPerms[k].custom)) state.dirtyPerms[k].custom[c] = true;
   }
   renderMatrix();
 }
@@ -1445,7 +1422,6 @@ function revokeAll() {
   if (r.system) { toast('System roles cannot be modified', 'danger'); return; }
   for (const k of Object.keys(state.dirtyPerms)) {
     ['view','create','edit','delete'].forEach(a => state.dirtyPerms[k][a] = false);
-    for (const c of Object.keys(state.dirtyPerms[k].custom)) state.dirtyPerms[k].custom[c] = false;
   }
   renderMatrix();
 }
