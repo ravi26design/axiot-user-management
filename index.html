@@ -179,11 +179,15 @@
     margin-left: 6px;
   }
   .profile-chip:hover { background: var(--bg-hover); }
-  .profile-chip .who { display: flex; flex-direction: column; line-height: 1.15; }
-  .profile-chip .who .name { font-size: 13px; font-weight: 600; color: var(--text); }
-  .profile-chip .who .sub { font-size: 11.5px; color: var(--text-muted); }
+  .profile-chip .who { display: flex; flex-direction: column; line-height: 1.2; gap: 3px; }
+  .profile-chip .who .name { font-size: 13.5px; font-weight: 600; color: var(--text); white-space: nowrap; }
+  .profile-chip .who .sub { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+  .profile-chip .who .role-tag { line-height: 1.3; }
   .profile-chip .caret { color: var(--text-subtle); font-size: 10px; margin-left: 2px; }
-  @media (max-width: 720px) {
+  @media (max-width: 560px) {
+    .profile-chip .who .sub { display: none; }
+  }
+  @media (max-width: 460px) {
     .profile-chip .who { display: none; }
   }
 
@@ -1253,7 +1257,7 @@ function renderTopbar() {
         <div class="avatar avatar-32">RP</div>
         <div class="who">
           <span class="name">Ravi Prasad</span>
-          <span class="sub">Administrator</span>
+          <span class="role-tag role-admin" style="align-self:flex-start;padding:1px 6px;font-size:10.5px">Administrator</span>
         </div>
         <span class="caret">▾</span>
       </div>
