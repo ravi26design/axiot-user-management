@@ -150,7 +150,7 @@
     padding: 2px 6px; border: 1px solid var(--border);
     border-radius: 3px; background: var(--surface);
   }
-  .top-actions { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+  .top-actions { display: flex; align-items: center; gap: 4px; margin-left: auto; }
   .icon-btn {
     width: 32px; height: 32px; border-radius: 5px;
     display: grid; place-items: center; color: var(--text-muted);
@@ -161,6 +161,114 @@
     position: absolute; top: 7px; right: 7px;
     width: 6px; height: 6px; background: var(--danger);
     border: 1.5px solid var(--surface); border-radius: 999px;
+  }
+  .notif-badge {
+    position: absolute; top: 4px; right: 3px;
+    min-width: 16px; height: 16px; padding: 0 4px;
+    background: var(--danger); color: #fff;
+    font-size: 10px; font-weight: 600; line-height: 16px;
+    border-radius: 10px; text-align: center;
+    border: 1.5px solid var(--surface);
+  }
+
+  /* Profile chip */
+  .profile-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 10px 4px 4px; border-radius: 999px;
+    cursor: pointer; transition: background .12s;
+    margin-left: 6px;
+  }
+  .profile-chip:hover { background: var(--bg-hover); }
+  .profile-chip .who { display: flex; flex-direction: column; line-height: 1.15; }
+  .profile-chip .who .name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .profile-chip .who .sub { font-size: 11.5px; color: var(--text-muted); }
+  .profile-chip .caret { color: var(--text-subtle); font-size: 10px; margin-left: 2px; }
+  @media (max-width: 720px) {
+    .profile-chip .who { display: none; }
+  }
+
+  /* Popovers (notif + profile) */
+  .popover {
+    position: fixed; z-index: 80;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: var(--shadow-md);
+    overflow: hidden; min-width: 320px;
+    animation: popIn .15s ease;
+  }
+  @keyframes popIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .pop-head {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pop-head .title { font-weight: 600; font-size: 14px; }
+  .pop-head .link {
+    font-size: 12.5px; color: var(--primary); font-weight: 500; cursor: pointer;
+  }
+  .pop-head .link:hover { text-decoration: underline; }
+
+  /* Notifications */
+  .pop-notifs { width: 360px; max-height: 440px; overflow-y: auto; }
+  .notif {
+    display: flex; gap: 12px; padding: 12px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    cursor: pointer; position: relative;
+  }
+  .notif:hover { background: var(--bg); }
+  .notif:last-child { border-bottom: none; }
+  .notif.unread::before {
+    content: ''; position: absolute; left: 6px; top: 18px;
+    width: 6px; height: 6px; background: var(--primary); border-radius: 50%;
+  }
+  .notif-ico {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: grid; place-items: center;
+    background: var(--bg); color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .notif-ico.danger { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+  .notif-ico.warn   { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+  .notif-ico.success{ background: var(--success-soft); color: var(--success); border-color: transparent; }
+  .notif-ico.info   { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
+  .notif-body .title { font-size: 13.5px; font-weight: 500; color: var(--text); }
+  .notif-body .msg { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.45; }
+  .notif-body .time { font-size: 11.5px; color: var(--text-subtle); margin-top: 5px; }
+  .pop-foot {
+    padding: 10px 16px; border-top: 1px solid var(--border);
+    text-align: center; font-size: 13px; font-weight: 500;
+    color: var(--primary); cursor: pointer; background: var(--bg);
+  }
+  .pop-foot:hover { background: var(--bg-hover); }
+
+  /* Profile menu */
+  .pop-profile { width: 260px; }
+  .prof-head {
+    padding: 14px 16px; display: flex; gap: 12px; align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .prof-head .avatar { width: 40px; height: 40px; font-size: 14px; }
+  .prof-head .name { font-weight: 600; font-size: 14px; color: var(--text); }
+  .prof-head .email { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .prof-head .role-mini {
+    display: inline-block; margin-top: 4px;
+    font-size: 10.5px; padding: 1px 7px;
+    background: var(--primary-soft); color: var(--primary);
+    border-radius: 3px; font-weight: 600; letter-spacing: 0.3px;
+  }
+  .prof-menu { padding: 4px; }
+  .prof-menu button, .prof-menu a {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 8px 10px; font-size: 13.5px; color: var(--text);
+    border-radius: 5px; text-align: left; cursor: pointer;
+  }
+  .prof-menu button:hover, .prof-menu a:hover { background: var(--bg-hover); }
+  .prof-menu button.danger { color: var(--danger); }
+  .prof-menu button.danger:hover { background: var(--danger-soft); }
+  .prof-menu .sep { height: 1px; background: var(--border-subtle); margin: 4px 0; }
+  .prof-menu svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .85; }
+  .prof-kbd {
+    margin-left: auto; font-size: 10.5px; color: var(--text-subtle);
+    padding: 1px 5px; border: 1px solid var(--border); border-radius: 3px;
+    background: var(--surface);
   }
   .avatar {
     border-radius: 50%;
@@ -1010,6 +1118,121 @@ function renderSidebar(activeScreen) {
   });
 }
 
+/* ==== Notifications data ==== */
+const NOTIFS = [
+  { id: 1, type: 'danger', title: 'Critical alert on Line A', msg: 'Compressor #4 exceeded threshold (78 psi). Immediate inspection required.', time: '2 min ago', unread: true },
+  { id: 2, type: 'warn', title: '8 invites expiring soon', msg: 'Pending user invitations will expire in the next 3 days.', time: '1 hour ago', unread: true },
+  { id: 3, type: 'success', title: 'Role "Plant Operator" updated', msg: 'You saved changes to 3 permissions.', time: '3 hours ago', unread: true },
+  { id: 4, type: 'info', title: 'New user joined', msg: 'Marcus Chen accepted the invitation to Acme Industries.', time: 'Yesterday', unread: false },
+  { id: 5, type: 'info', title: 'Weekly digest available', msg: 'Your summary for April 14–20 is ready.', time: '2 days ago', unread: false }
+];
+const NOTIF_ICONS = {
+  danger: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9l-8 13.4A2 2 0 0 0 4 20h16a2 2 0 0 0 1.7-2.7l-8-13.4a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  warn:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',
+  success:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  info:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>'
+};
+
+function closeAllPopovers() {
+  document.querySelectorAll('.popover').forEach(p => p.remove());
+}
+
+function openNotifs(evt) {
+  evt.stopPropagation();
+  if (document.getElementById('popNotifs')) { closeAllPopovers(); return; }
+  closeAllPopovers();
+  const rect = evt.currentTarget.getBoundingClientRect();
+  const pop = document.createElement('div');
+  pop.className = 'popover';
+  pop.id = 'popNotifs';
+  pop.style.top = (rect.bottom + 8) + 'px';
+  pop.style.right = (window.innerWidth - rect.right) + 'px';
+  pop.innerHTML = `
+    <div class="pop-head">
+      <span class="title">Notifications</span>
+      <span class="link" onclick="markAllRead()">Mark all as read</span>
+    </div>
+    <div class="pop-notifs">
+      ${NOTIFS.map(n => `
+        <div class="notif ${n.unread ? 'unread' : ''}" onclick="openNotif(${n.id})">
+          <div class="notif-ico ${n.type}">${NOTIF_ICONS[n.type]}</div>
+          <div class="notif-body">
+            <div class="title">${n.title}</div>
+            <div class="msg">${n.msg}</div>
+            <div class="time">${n.time}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="pop-foot" onclick="toast('Opening all notifications');closeAllPopovers()">View all notifications</div>
+  `;
+  document.body.appendChild(pop);
+}
+
+function markAllRead() {
+  NOTIFS.forEach(n => n.unread = false);
+  closeAllPopovers();
+  renderTopbar();
+  toast('All notifications marked as read');
+}
+function openNotif(id) {
+  const n = NOTIFS.find(x => x.id === id);
+  n.unread = false;
+  closeAllPopovers();
+  renderTopbar();
+  toast('Opening: ' + n.title);
+}
+
+function openProfile(evt) {
+  evt.stopPropagation();
+  if (document.getElementById('popProfile')) { closeAllPopovers(); return; }
+  closeAllPopovers();
+  const rect = evt.currentTarget.getBoundingClientRect();
+  const pop = document.createElement('div');
+  pop.className = 'popover pop-profile';
+  pop.id = 'popProfile';
+  pop.style.top = (rect.bottom + 8) + 'px';
+  pop.style.right = (window.innerWidth - rect.right) + 'px';
+  pop.innerHTML = `
+    <div class="prof-head">
+      <div class="avatar avatar-32">RP</div>
+      <div>
+        <div class="name">Ravi Prasad</div>
+        <div class="email">ravi@pseudocode.co</div>
+        <span class="role-mini">ADMINISTRATOR</span>
+      </div>
+    </div>
+    <div class="prof-menu">
+      <button onclick="profileAction('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My profile</button>
+      <button onclick="profileAction('sessions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>My sessions</button>
+      <button onclick="profileAction('prefs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.66.88 1.09 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Preferences</button>
+      <div class="sep"></div>
+      <button onclick="profileAction('tenant')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>Switch tenant</button>
+      <button onclick="profileAction('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>Help & documentation</button>
+      <div class="sep"></div>
+      <button class="danger" onclick="profileAction('signout')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Sign out<span class="prof-kbd">⇧⌘Q</span></button>
+    </div>
+  `;
+  document.body.appendChild(pop);
+}
+
+function profileAction(kind) {
+  closeAllPopovers();
+  if (kind === 'signout') {
+    confirmDialog('Sign out of AXIoT?', 'You will be returned to the sign-in page.', () => toast('Signed out', 'danger'));
+    return;
+  }
+  const labels = { profile: 'My profile', sessions: 'My sessions', prefs: 'Preferences', tenant: 'Switch tenant', help: 'Help & documentation' };
+  toast('Opening: ' + labels[kind]);
+}
+
+// Close popovers on outside click / Esc
+document.addEventListener('click', e => {
+  if (!e.target.closest('.popover') && !e.target.closest('[onclick*="openNotifs"]') && !e.target.closest('[onclick*="openProfile"]')) {
+    closeAllPopovers();
+  }
+});
+
 function toggleSidebar() {
   document.body.classList.toggle('sidebar-collapsed');
   try { localStorage.setItem('axiot-sidebar-collapsed', document.body.classList.contains('sidebar-collapsed') ? '1' : '0'); } catch (e) {}
@@ -1018,12 +1241,22 @@ function toggleSidebar() {
 try { if (localStorage.getItem('axiot-sidebar-collapsed') === '1') document.body.classList.add('sidebar-collapsed'); } catch (e) {}
 
 function renderTopbar() {
+  const unread = NOTIFS.filter(n => n.unread).length;
   const html = `
     <div class="tenant-switch"><div class="tenant-mark">AC</div>Acme Industries<span class="caret">▾</span></div>
     <div class="top-actions">
-      <button class="icon-btn">${SVG.bell}<span class="dot-indicator"></span></button>
-      <button class="icon-btn">${SVG.help}</button>
-      <div class="avatar avatar-32" style="margin-left:6px">RP</div>
+      <button class="icon-btn" onclick="openNotifs(event)" title="Notifications" aria-label="Notifications">
+        ${SVG.bell}${unread ? `<span class="notif-badge">${unread}</span>` : ''}
+      </button>
+      <button class="icon-btn" title="Help">${SVG.help}</button>
+      <div class="profile-chip" onclick="openProfile(event)" title="Account">
+        <div class="avatar avatar-32">RP</div>
+        <div class="who">
+          <span class="name">Ravi Prasad</span>
+          <span class="sub">Administrator</span>
+        </div>
+        <span class="caret">▾</span>
+      </div>
     </div>
   `;
   document.querySelectorAll('[data-topbar]').forEach(el => el.innerHTML = html);
@@ -1608,7 +1841,7 @@ renderRoles();
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    closeUserDrawer(); closeRoleDrawer(); closeConfirm();
+    closeUserDrawer(); closeRoleDrawer(); closeConfirm(); closeAllPopovers();
   }
 });
 </script>
