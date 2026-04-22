@@ -808,6 +808,7 @@
             <div class="filter-wrap"><button class="chip-select" id="filterRoleBtn" onclick="toggleFilter('role', this)">Role <span class="caret">▾</span></button></div>
             <div class="filter-wrap"><button class="chip-select" id="filterStatusBtn" onclick="toggleFilter('status', this)">Status <span class="caret">▾</span></button></div>
             <div class="filter-wrap"><button class="chip-select" id="filterTenantBtn" onclick="toggleFilter('tenant', this)">Tenant <span class="caret">▾</span></button></div>
+            <div class="filter-wrap"><button class="chip-select" id="filterLocationBtn" onclick="toggleFilter('location', this)">Location <span class="caret">▾</span></button></div>
             <button class="chip-select" id="clearFiltersBtn" onclick="clearAllFilters()" style="display:none;color:var(--danger);border-color:var(--danger)">Clear all</button>
             <div class="toolbar-right">
               <button class="icon-btn" onclick="renderUsers()" title="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-6.4-2.6L3 16"/><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 6.4 2.6L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></svg></button>
@@ -825,8 +826,9 @@
               <thead><tr>
                 <th style="width:36px"><input type="checkbox" class="check" onchange="toggleAll(this)" /></th>
                 <th>Name <span class="sort">▲</span></th>
-                <th>Role</th>
                 <th>Tenant</th>
+                <th>Location</th>
+                <th>Role</th>
                 <th>Status</th>
                 <th>Last active</th>
                 <th style="width:64px"></th>
@@ -1103,14 +1105,14 @@ const state = {
 };
 
 const users = [
-  { name: 'Priya Sharma', email: 'priya.sharma@acme-industries.com', role: 'Administrator', tenant: 'Acme Industries', status: 'active', last: '2 min ago', init: 'PS' },
-  { name: 'Marcus Chen', email: 'marcus.chen@acme-industries.com', role: 'Plant Operator', tenant: 'Pune Plant — Line A', status: 'active', last: '28 min ago', init: 'MC' },
-  { name: 'Aisha Patel', email: 'aisha.patel@northwind.co', role: 'Owner', tenant: 'Northwind Energy', status: 'active', last: '1 hour ago', init: 'AP' },
-  { name: 'David Okafor', email: 'd.okafor@acme-industries.com', role: 'Maintenance Tech', tenant: 'Chennai Plant', status: 'active', last: '3 hours ago', init: 'DO' },
-  { name: 'Elena Volkova', email: 'elena@contoso-energy.com', role: 'Viewer', tenant: 'Contoso Energy', status: 'pending', last: '—', init: 'EV' },
-  { name: 'Rahul Menon', email: 'rahul.m@acme-industries.com', role: 'Plant Operator', tenant: 'Pune Plant — Line B', status: 'active', last: 'Yesterday', init: 'RM' },
-  { name: 'Sophie Laurent', email: 's.laurent@northwind.co', role: 'Administrator', tenant: 'Northwind Energy', status: 'inactive', last: '3 weeks ago', init: 'SL' },
-  { name: 'Tomás García', email: 'tomas@contoso-energy.com', role: 'Viewer', tenant: 'Contoso Energy', status: 'active', last: '5 min ago', init: 'TG' }
+  { name: 'Priya Sharma', email: 'priya.sharma@acme-industries.com', role: 'Administrator', tenant: 'Acme Industries', location: 'Mumbai HQ', status: 'active', last: '2 min ago', init: 'PS' },
+  { name: 'Marcus Chen', email: 'marcus.chen@acme-industries.com', role: 'Plant Operator', tenant: 'Acme Industries', location: 'Pune Plant — Line A', status: 'active', last: '28 min ago', init: 'MC' },
+  { name: 'Aisha Patel', email: 'aisha.patel@northwind.co', role: 'Owner', tenant: 'Northwind Energy', location: 'Head Office', status: 'active', last: '1 hour ago', init: 'AP' },
+  { name: 'David Okafor', email: 'd.okafor@acme-industries.com', role: 'Maintenance Tech', tenant: 'Acme Industries', location: 'Chennai Plant', status: 'active', last: '3 hours ago', init: 'DO' },
+  { name: 'Elena Volkova', email: 'elena@contoso-energy.com', role: 'Viewer', tenant: 'Contoso Energy', location: 'Warsaw Site', status: 'pending', last: '—', init: 'EV' },
+  { name: 'Rahul Menon', email: 'rahul.m@acme-industries.com', role: 'Plant Operator', tenant: 'Acme Industries', location: 'Pune Plant — Line B', status: 'active', last: 'Yesterday', init: 'RM' },
+  { name: 'Sophie Laurent', email: 's.laurent@northwind.co', role: 'Administrator', tenant: 'Northwind Energy', location: 'Paris HQ', status: 'inactive', last: '3 weeks ago', init: 'SL' },
+  { name: 'Tomás García', email: 'tomas@contoso-energy.com', role: 'Viewer', tenant: 'Contoso Energy', location: 'Madrid Site', status: 'active', last: '5 min ago', init: 'TG' }
 ];
 
 /* ============================================================
@@ -1334,7 +1336,7 @@ function roleTag(role) {
 }
 
 const STATUS_LABELS = { active: 'Active', inactive: 'Inactive', pending: 'Pending' };
-const userFilters = { search: '', role: new Set(), status: new Set(), tenant: new Set() };
+const userFilters = { search: '', role: new Set(), status: new Set(), tenant: new Set(), location: new Set() };
 
 function filteredUsers() {
   const q = userFilters.search.trim().toLowerCase();
@@ -1343,6 +1345,7 @@ function filteredUsers() {
     if (userFilters.role.size && !userFilters.role.has(u.role)) return false;
     if (userFilters.status.size && !userFilters.status.has(u.status)) return false;
     if (userFilters.tenant.size && !userFilters.tenant.has(u.tenant)) return false;
+    if (userFilters.location.size && !userFilters.location.has(u.location)) return false;
     return true;
   });
 }
@@ -1361,8 +1364,9 @@ function renderUsers() {
     <tr>
       <td><input type="checkbox" class="check" onchange="rowSelect()" /></td>
       <td><div class="cell-user"><div class="avatar avatar-28">${u.init}</div><div><div class="cell-user-name">${u.name}</div><div class="cell-user-sub">${u.email}</div></div></div></td>
-      <td>${roleTag(u.role)}</td>
       <td style="color:var(--text-muted)">${u.tenant}</td>
+      <td style="color:var(--text-muted)">${u.location || '—'}</td>
+      <td>${roleTag(u.role)}</td>
       <td>${statusChip(u.status)}</td>
       <td style="color:var(--text-muted)">${u.last}</td>
       <td><div class="row-actions">
@@ -1375,7 +1379,7 @@ function renderUsers() {
   const tbody = document.getElementById('userRows');
   tbody.innerHTML = list.length
     ? rows
-    : `<tr><td colspan="7"><div class="empty-state">
+    : `<tr><td colspan="8"><div class="empty-state">
          <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">No users match your filters</div>
          <div style="font-size:13px">Try adjusting your search or clearing filters.</div>
          <div style="margin-top:14px"><button class="btn btn-secondary btn-sm" onclick="clearAllFilters();clearSearch()">Clear all filters</button></div>
@@ -1404,7 +1408,8 @@ function renderFilterChips() {
   setChip('filterRoleBtn', 'Role', userFilters.role);
   setChip('filterStatusBtn', 'Status', userFilters.status);
   setChip('filterTenantBtn', 'Tenant', userFilters.tenant);
-  const anyActive = userFilters.role.size + userFilters.status.size + userFilters.tenant.size > 0;
+  setChip('filterLocationBtn', 'Location', userFilters.location);
+  const anyActive = userFilters.role.size + userFilters.status.size + userFilters.tenant.size + userFilters.location.size > 0;
   const clr = document.getElementById('clearFiltersBtn');
   if (clr) clr.style.display = anyActive ? 'inline-flex' : 'none';
 }
@@ -1419,6 +1424,7 @@ function toggleFilter(kind, btn) {
   if (kind === 'role') options = [...new Set(users.map(u => u.role))];
   if (kind === 'status') options = ['active','inactive','pending'];
   if (kind === 'tenant') options = [...new Set(users.map(u => u.tenant))];
+  if (kind === 'location') options = [...new Set(users.map(u => u.location).filter(Boolean))];
   const set = userFilters[kind];
   const counts = {};
   users.forEach(u => { const v = kind === 'status' ? u.status : u[kind]; counts[v] = (counts[v] || 0) + 1; });
@@ -1453,7 +1459,7 @@ function clearFilter(kind) {
   renderUsers();
 }
 function clearAllFilters() {
-  userFilters.role.clear(); userFilters.status.clear(); userFilters.tenant.clear();
+  userFilters.role.clear(); userFilters.status.clear(); userFilters.tenant.clear(); userFilters.location.clear();
   document.querySelectorAll('.filter-pop').forEach(p => p.remove());
   renderUsers();
 }
