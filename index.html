@@ -796,19 +796,21 @@
     margin-bottom: 18px;
   }
   .user-hero-avatar {
-    width: 72px; height: 72px; border-radius: 50%;
+    width: 64px; height: 64px; border-radius: 50%;
     flex-shrink: 0;
     display: grid; place-items: center;
-    font-size: 26px; font-weight: 700; color: #fff;
-    background: var(--primary);
+    font-size: 22px; font-weight: 600;
+    background: var(--bg-hover); color: var(--text-muted);
+    border: 1px solid var(--border);
     letter-spacing: 0.5px;
   }
-  .user-hero-avatar.av-red    { background: #C44536; }
-  .user-hero-avatar.av-amber  { background: #B76443; }
-  .user-hero-avatar.av-green  { background: #3E7F58; }
-  .user-hero-avatar.av-purple { background: #7C5FC8; }
-  .user-hero-avatar.av-blue   { background: #1F4E9E; }
-  .user-hero-avatar.av-slate  { background: #64748B; }
+  /* role-tinted variants kept as no-ops so existing class names stay harmless */
+  .user-hero-avatar.av-red,
+  .user-hero-avatar.av-amber,
+  .user-hero-avatar.av-green,
+  .user-hero-avatar.av-purple,
+  .user-hero-avatar.av-blue,
+  .user-hero-avatar.av-slate { background: var(--bg-hover); color: var(--text-muted); }
 
   .user-hero-main { flex: 1; min-width: 0; }
   .user-hero-name {
