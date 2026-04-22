@@ -1676,7 +1676,7 @@ function switchDetailsTab(tab) { state.detailsTab = tab; renderUserDetails(); }
 function renderUserDetails() {
   const u = users[state.detailsUserIdx];
   if (!u) { switchScreen('users'); return; }
-  const deviceCount = DEVICES.filter(d => d.tenant === u.tenant).length;
+  const deviceCount = DEVICES.filter(d => d.tenant === u.tenant && d.location === u.location).length;
 
   const content = document.getElementById('userDetailsContent');
 
@@ -1843,14 +1843,12 @@ function renderOverviewTab(u) {
 }
 
 function renderDevicesTab(u) {
-  // Show all devices in user's tenant. In-scope (same location) inherit role defaults; out-of-scope start as no access.
-  const tenantDevices = DEVICES.filter(d => d.tenant === u.tenant);
+  // Scope: only devices at this user's tenant + location
+  const tenantDevices = DEVICES.filter(d => d.tenant === u.tenant && d.location === u.location);
   const defaults = roleDefaults(u.role);
   const overrideCount = u.deviceOverrides ? Object.values(u.deviceOverrides).reduce((n, o) => n + Object.keys(o).length, 0) : 0;
 
-  const rows = tenantDevices.map(d => {
-    const inScope = deviceInScope(u, d);
-    return `
+  const rows = tenantDevices.map(d => `
       <tr>
         <td>
           <div class="dev-name">
@@ -1860,9 +1858,6 @@ function renderDevicesTab(u) {
               <div class="dev-sub">${d.type} · ${d.location}</div>
             </div>
           </div>
-        </td>
-        <td>
-          <span class="override-pill ${inScope?'scope':'out'}">${inScope?'In user location':'Other location'}</span>
         </td>
         ${DEVICE_ACTIONS.map(a => {
           const on = effectivePerm(u, d, a);
@@ -1874,8 +1869,7 @@ function renderDevicesTab(u) {
           ${u.deviceOverrides && u.deviceOverrides[d.id] ? `<button class="btn btn-ghost btn-sm" onclick="resetDeviceOverride(${state.detailsUserIdx},'${d.id}')" title="Reset to role defaults">Reset</button>` : '<span style="color:var(--text-subtle);font-size:12px">—</span>'}
         </td>
       </tr>
-    `;
-  }).join('');
+    `).join('');
 
   const permSummary = [
     defaults.view && 'View',
@@ -1897,7 +1891,7 @@ function renderDevicesTab(u) {
     <div class="panel">
       <div class="toolbar">
         <div style="font-size:13.5px;color:var(--text-muted)">
-          <strong style="color:var(--text)">${tenantDevices.length}</strong> devices
+          <strong style="color:var(--text)">${tenantDevices.length}</strong> device${tenantDevices.length===1?'':'s'} at <strong style="color:var(--text)">${u.location || '—'}</strong>
           ${overrideCount > 0 ? ` · <strong style="color:var(--warn)">${overrideCount}</strong> override${overrideCount===1?'':'s'}` : ''}
         </div>
         <div class="toolbar-right" style="display:flex;gap:14px;align-items:center">
@@ -1912,14 +1906,13 @@ function renderDevicesTab(u) {
           <thead>
             <tr>
               <th>Device</th>
-              <th>Scope</th>
               <th class="center">View</th>
               <th class="center">Control</th>
               <th class="center">Configure</th>
               <th class="center" style="width:80px"></th>
             </tr>
           </thead>
-          <tbody>${rows}</tbody>
+          <tbody>${rows.length ? rows : `<tr><td colspan="5"><div class="empty-state"><div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px">No devices at this location</div><div style="font-size:12.5px">No devices are assigned to ${u.location || 'this user\'s location'} yet.</div></div></td></tr>`}</tbody>
         </table>
       </div>
     </div>
