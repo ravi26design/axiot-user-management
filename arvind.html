@@ -1171,10 +1171,8 @@
   body.client-view .client-col,
   body.client-view .role-filter-bar,
   body.client-view .invite-client-field,
-  body.client-view #newRoleScope,
-  body.client-view #newRoleScope + .hint,
-  body.client-view #newRoleScope,
-  body.client-view .field:has(#newRoleScope) { display: none !important; }
+  body.client-view .field:has(#newRoleScope),
+  body.client-view .enterprise-only { display: none !important; }
 
   /* ===== Grouped action bar for user details ===== */
   .action-bar {
@@ -1458,6 +1456,11 @@
         <select class="select" id="newRoleScope" required></select>
         <div class="hint">Which client this role is for.</div>
       </div>
+      <div class="field enterprise-only">
+        <label class="label">Industry <span class="req">*</span></label>
+        <select class="select" id="newRoleIndustry" required></select>
+        <div class="hint">Industry context — inherited from the client by default.</div>
+      </div>
       <select class="select" id="newRoleTemplate" style="display:none"><option value=""></option></select>
     </div>
   </div>
@@ -1588,19 +1591,19 @@ const adminPerms = () => {
 
 const initialRoles = [
   // Dynamic Looms roles
-  { id: 'dl-super', name: 'Super Admin', system: false, client: 'Dynamic Looms', users: 1, updated: 'Mar 12', desc: 'Full platform access for Dynamic Looms — can manage all clients, users, devices, and settings.', perms: fullPerms() },
-  { id: 'dl-admin', name: 'Admin',       system: false, client: 'Dynamic Looms', users: 2, updated: 'Apr 08', desc: 'Manage Dynamic Looms operations — users, devices, and day-to-day activities.', perms: adminPerms() },
+  { id: 'dl-super', name: 'Super Admin', system: false, client: 'Dynamic Looms', industry: 'Textiles & Apparel', users: 1, updated: 'Mar 12', desc: 'Full platform access for Dynamic Looms — can manage all clients, users, devices, and settings.', perms: fullPerms() },
+  { id: 'dl-admin', name: 'Admin',       system: false, client: 'Dynamic Looms', industry: 'Textiles & Apparel', users: 2, updated: 'Apr 08', desc: 'Manage Dynamic Looms operations — users, devices, and day-to-day activities.', perms: adminPerms() },
 
   // Arvind roles
-  { id: 'av-super',  name: 'Super Admin',            system: false, client: 'Arvind', users: 1,   updated: 'Feb 28',   desc: 'Full admin rights — manage everything in the workspace.', perms: fullPerms() },
-  { id: 'av-admin',  name: 'Admin',                  system: false, client: 'Arvind', users: 4,   updated: 'today',    desc: 'Manage users, devices, and day-to-day operations.', perms: adminPerms() },
-  { id: 'av-mgr',    name: 'Plant Manager',          system: false, client: 'Arvind', users: 6,   updated: 'Apr 18',   desc: 'Oversees a specific plant — manage users, devices, and reports within that site.', perms: (() => {
+  { id: 'av-super',  name: 'Super Admin',            system: false, client: 'Arvind', industry: 'Textiles & Apparel', users: 1,   updated: 'Feb 28',   desc: 'Full admin rights — manage everything in the workspace.', perms: fullPerms() },
+  { id: 'av-admin',  name: 'Admin',                  system: false, client: 'Arvind', industry: 'Textiles & Apparel', users: 4,   updated: 'today',    desc: 'Manage users, devices, and day-to-day operations.', perms: adminPerms() },
+  { id: 'av-mgr',    name: 'Plant Manager',          system: false, client: 'Arvind', industry: 'Textiles & Apparel', users: 6,   updated: 'Apr 18',   desc: 'Oversees a specific plant — manage users, devices, and reports within that site.', perms: (() => {
     const p = emptyPerms();
     ['devices','alerts','reports','users','telemetry','commands'].forEach(k => { if (p[k]) { p[k].view = p[k].create = p[k].edit = true; } });
     p.devices.delete = true;
     return p;
   })() },
-  { id: 'av-sup',    name: 'Shift Supervisor',       system: false, client: 'Arvind', users: 12,  updated: 'Apr 14',   desc: 'Supervises a shift — acknowledges alerts and monitors operators.', perms: (() => {
+  { id: 'av-sup',    name: 'Shift Supervisor',       system: false, client: 'Arvind', industry: 'Textiles & Apparel', users: 12,  updated: 'Apr 14',   desc: 'Supervises a shift — acknowledges alerts and monitors operators.', perms: (() => {
     const p = emptyPerms();
     p.devices.view = p.devices.edit = true;
     p.telemetry.view = true;
@@ -1610,7 +1613,7 @@ const initialRoles = [
     p.users.view = true;
     return p;
   })() },
-  { id: 'av-op',     name: 'Plant Operator',         system: false, client: 'Arvind', users: 58,  updated: 'Apr 09',   desc: 'Day-to-day operator — runs devices and handles alerts on assigned lines.', perms: (() => {
+  { id: 'av-op',     name: 'Plant Operator',         system: false, client: 'Arvind', industry: 'Textiles & Apparel', users: 58,  updated: 'Apr 09',   desc: 'Day-to-day operator — runs devices and handles alerts on assigned lines.', perms: (() => {
     const p = emptyPerms();
     p.devices.view = p.devices.create = p.devices.edit = true;
     p.telemetry.view = true;
@@ -1619,7 +1622,7 @@ const initialRoles = [
     p.reports.view = true;
     return p;
   })() },
-  { id: 'av-tech',   name: 'Maintenance Technician', system: false, client: 'Arvind', users: 22,  updated: 'Apr 05',   desc: 'Maintenance crew — diagnoses and fixes device issues.', perms: (() => {
+  { id: 'av-tech',   name: 'Maintenance Technician', system: false, client: 'Arvind', industry: 'Textiles & Apparel', users: 22,  updated: 'Apr 05',   desc: 'Maintenance crew — diagnoses and fixes device issues.', perms: (() => {
     const p = emptyPerms();
     p.devices.view = p.devices.edit = true;
     p.telemetry.view = true;
@@ -1627,18 +1630,18 @@ const initialRoles = [
     p.alerts.view = p.alerts.edit = true;
     return p;
   })() },
-  { id: 'av-analyst',name: 'Data Analyst',           system: false, client: 'Arvind', users: 3,   updated: 'Apr 02',   desc: 'Read + export analytics and reports, no device control.', perms: (() => {
+  { id: 'av-analyst',name: 'Data Analyst',           system: false, client: 'Arvind', industry: 'Textiles & Apparel', users: 3,   updated: 'Apr 02',   desc: 'Read + export analytics and reports, no device control.', perms: (() => {
     const p = emptyPerms();
     ['devices','alerts','reports','telemetry'].forEach(k => p[k].view = true);
     p.reports.create = p.reports.edit = true;
     return p;
   })() },
-  { id: 'av-viewer', name: 'Viewer',                 system: false, client: 'Arvind', users: 104, updated: 'Mar 28',   desc: 'Read-only access to devices, alerts, and reports.', perms: (() => {
+  { id: 'av-viewer', name: 'Viewer',                 system: false, client: 'Arvind', industry: 'Textiles & Apparel', users: 104, updated: 'Mar 28',   desc: 'Read-only access to devices, alerts, and reports.', perms: (() => {
     const p = emptyPerms();
     ['devices','alerts','reports','telemetry'].forEach(k => p[k].view = true);
     return p;
   })() },
-  { id: 'av-audit',  name: 'Compliance Auditor',     system: false, client: 'Arvind', users: 2,   updated: 'Mar 20',   desc: 'Read-only access to audit trails, logs, and compliance reports.', perms: (() => {
+  { id: 'av-audit',  name: 'Compliance Auditor',     system: false, client: 'Arvind', industry: 'Textiles & Apparel', users: 2,   updated: 'Mar 20',   desc: 'Read-only access to audit trails, logs, and compliance reports.', perms: (() => {
     const p = emptyPerms();
     ['devices','alerts','reports','users','telemetry','rolesRes'].forEach(k => { if (p[k]) p[k].view = true; });
     return p;
@@ -1662,35 +1665,53 @@ const LOCATIONS_BY_CLIENT = {
   'Dynamic Looms': ['Mumbai HQ'],
   'Arvind':        ['Pune Plant — Line A', 'Pune Plant — Line B', 'Chennai Plant', 'Ahmedabad HQ']
 };
+const INDUSTRIES = [
+  'Textiles & Apparel',
+  'Manufacturing',
+  'Automotive',
+  'Energy & Utilities',
+  'Oil & Gas',
+  'Chemicals',
+  'Pharmaceuticals',
+  'Food & Beverage',
+  'Electronics',
+  'Aerospace',
+  'Mining & Metals',
+  'Logistics & Warehousing'
+];
+const INDUSTRY_BY_CLIENT = {
+  'Dynamic Looms': 'Textiles & Apparel',
+  'Arvind':        'Textiles & Apparel'
+};
 
 const DEVICES = [
   // Dynamic Looms — Mumbai HQ (platform ops)
-  { id: 'd-001', name: 'Platform Gateway GW-DL01',  type: 'Gateway', client: 'Dynamic Looms', location: 'Mumbai HQ' },
-  { id: 'd-002', name: 'Monitoring Server MS-01',   type: 'Server',  client: 'Dynamic Looms', location: 'Mumbai HQ' },
+  { id: 'd-001', name: 'Platform Gateway GW-DL01',  type: 'Gateway', client: 'Dynamic Looms', industry: 'Textiles & Apparel', location: 'Mumbai HQ' },
+  { id: 'd-002', name: 'Monitoring Server MS-01',   type: 'Server',  client: 'Dynamic Looms', industry: 'Textiles & Apparel', location: 'Mumbai HQ' },
 
   // Arvind — Pune Plant — Line A
-  { id: 'd-010', name: 'Compressor #4',             type: 'Compressor', client: 'Arvind', location: 'Pune Plant — Line A' },
-  { id: 'd-011', name: 'Valve Cluster V12',         type: 'Valve',      client: 'Arvind', location: 'Pune Plant — Line A' },
-  { id: 'd-012', name: 'Conveyor Motor M3',         type: 'Motor',      client: 'Arvind', location: 'Pune Plant — Line A' },
-  { id: 'd-013', name: 'Temperature Sensor TS-A7',  type: 'Sensor',     client: 'Arvind', location: 'Pune Plant — Line A' },
-  { id: 'd-014', name: 'Flow Meter FM-12',          type: 'Flow meter', client: 'Arvind', location: 'Pune Plant — Line A' },
-  { id: 'd-015', name: 'Pressure Gauge PG-A1',      type: 'Gauge',      client: 'Arvind', location: 'Pune Plant — Line A' },
+  { id: 'd-010', name: 'Compressor #4',             type: 'Compressor', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
+  { id: 'd-011', name: 'Valve Cluster V12',         type: 'Valve',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
+  { id: 'd-012', name: 'Conveyor Motor M3',         type: 'Motor',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
+  { id: 'd-013', name: 'Temperature Sensor TS-A7',  type: 'Sensor',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
+  { id: 'd-014', name: 'Flow Meter FM-12',          type: 'Flow meter', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
+  { id: 'd-015', name: 'Pressure Gauge PG-A1',      type: 'Gauge',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
 
   // Arvind — Pune Plant — Line B
-  { id: 'd-020', name: 'Pump Station P2',           type: 'Pump',      client: 'Arvind', location: 'Pune Plant — Line B' },
-  { id: 'd-021', name: 'Heat Exchanger H1',         type: 'Exchanger', client: 'Arvind', location: 'Pune Plant — Line B' },
-  { id: 'd-022', name: 'Cooling Tower CT-B2',       type: 'Cooling',   client: 'Arvind', location: 'Pune Plant — Line B' },
-  { id: 'd-023', name: 'Conveyor Motor M5',         type: 'Motor',     client: 'Arvind', location: 'Pune Plant — Line B' },
+  { id: 'd-020', name: 'Pump Station P2',           type: 'Pump',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line B' },
+  { id: 'd-021', name: 'Heat Exchanger H1',         type: 'Exchanger', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line B' },
+  { id: 'd-022', name: 'Cooling Tower CT-B2',       type: 'Cooling',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line B' },
+  { id: 'd-023', name: 'Conveyor Motor M5',         type: 'Motor',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line B' },
 
   // Arvind — Chennai Plant
-  { id: 'd-030', name: 'Press Line PR-1',           type: 'Press',     client: 'Arvind', location: 'Chennai Plant' },
-  { id: 'd-031', name: 'Boiler B-07',               type: 'Boiler',    client: 'Arvind', location: 'Chennai Plant' },
-  { id: 'd-032', name: 'Robotic Arm RA-02',         type: 'Robot',     client: 'Arvind', location: 'Chennai Plant' },
-  { id: 'd-033', name: 'Welder Station WS-14',      type: 'Welder',    client: 'Arvind', location: 'Chennai Plant' },
+  { id: 'd-030', name: 'Press Line PR-1',           type: 'Press',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant' },
+  { id: 'd-031', name: 'Boiler B-07',               type: 'Boiler',    client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant' },
+  { id: 'd-032', name: 'Robotic Arm RA-02',         type: 'Robot',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant' },
+  { id: 'd-033', name: 'Welder Station WS-14',      type: 'Welder',    client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant' },
 
   // Arvind — Ahmedabad HQ
-  { id: 'd-040', name: 'HQ Gateway GW-AHM01',       type: 'Gateway',   client: 'Arvind', location: 'Ahmedabad HQ' },
-  { id: 'd-041', name: 'Network Switch NSW-12',     type: 'Network',   client: 'Arvind', location: 'Ahmedabad HQ' }
+  { id: 'd-040', name: 'HQ Gateway GW-AHM01',       type: 'Gateway',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Ahmedabad HQ' },
+  { id: 'd-041', name: 'Network Switch NSW-12',     type: 'Network',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Ahmedabad HQ' }
 ];
 
 // Device actions and role defaults (used when no override present)
@@ -1722,16 +1743,16 @@ function isOverridden(user, device, action) {
 
 const users = [
   // Dynamic Looms — platform admins
-  { name: 'Priya Sharma',   email: 'priya@dynamiclooms.com',   role: 'Super Admin', client: 'Dynamic Looms', location: 'Mumbai HQ', status: 'active',   last: '2 min ago',    init: 'PS' },
-  { name: 'Aisha Patel',    email: 'aisha@dynamiclooms.com',   role: 'Admin',       client: 'Dynamic Looms', location: 'Mumbai HQ', status: 'active',   last: '1 hour ago',   init: 'AP' },
-  { name: 'Sophie Laurent', email: 'sophie@dynamiclooms.com',  role: 'Admin',       client: 'Dynamic Looms', location: 'Mumbai HQ', status: 'inactive', last: '3 weeks ago',  init: 'SL' },
+  { name: 'Priya Sharma',   email: 'priya@dynamiclooms.com',   role: 'Super Admin', client: 'Dynamic Looms', industry: 'Textiles & Apparel', location: 'Mumbai HQ', status: 'active',   last: '2 min ago',    init: 'PS' },
+  { name: 'Aisha Patel',    email: 'aisha@dynamiclooms.com',   role: 'Admin',       client: 'Dynamic Looms', industry: 'Textiles & Apparel', location: 'Mumbai HQ', status: 'active',   last: '1 hour ago',   init: 'AP' },
+  { name: 'Sophie Laurent', email: 'sophie@dynamiclooms.com',  role: 'Admin',       client: 'Dynamic Looms', industry: 'Textiles & Apparel', location: 'Mumbai HQ', status: 'inactive', last: '3 weeks ago',  init: 'SL' },
 
   // Arvind — 1 Super Admin + 4 Admins
-  { name: 'Marcus Chen',    email: 'marcus.chen@arvind.com',   role: 'Super Admin', client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '28 min ago',   init: 'MC' },
-  { name: 'David Okafor',   email: 'd.okafor@arvind.com',      role: 'Admin',       client: 'Arvind', location: 'Chennai Plant',       status: 'active',   last: '3 hours ago',  init: 'DO' },
-  { name: 'Rahul Menon',    email: 'rahul@arvind.com',         role: 'Admin',       client: 'Arvind', location: 'Pune Plant — Line B', status: 'active',   last: 'Yesterday',    init: 'RM' },
-  { name: 'Elena Volkova',  email: 'elena@arvind.com',         role: 'Admin',       client: 'Arvind', location: 'Chennai Plant',       status: 'pending',  last: '—',            init: 'EV' },
-  { name: 'Tomás García',   email: 'tomas@arvind.com',         role: 'Admin',       client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '5 min ago',    init: 'TG' }
+  { name: 'Marcus Chen',    email: 'marcus.chen@arvind.com',   role: 'Super Admin', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A', status: 'active',   last: '28 min ago',   init: 'MC' },
+  { name: 'David Okafor',   email: 'd.okafor@arvind.com',      role: 'Admin',       client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant',       status: 'active',   last: '3 hours ago',  init: 'DO' },
+  { name: 'Rahul Menon',    email: 'rahul@arvind.com',         role: 'Admin',       client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line B', status: 'active',   last: 'Yesterday',    init: 'RM' },
+  { name: 'Elena Volkova',  email: 'elena@arvind.com',         role: 'Admin',       client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant',       status: 'pending',  last: '—',            init: 'EV' },
+  { name: 'Tomás García',   email: 'tomas@arvind.com',         role: 'Admin',       client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A', status: 'active',   last: '5 min ago',    init: 'TG' }
 ];
 
 /* ============================================================
@@ -2975,6 +2996,7 @@ function openNewRoleDrawer() {
   document.getElementById('newRoleDesc').value = '';
   const scope = document.getElementById('newRoleScope');
   scope.innerHTML = '<option value="" disabled>Select a client…</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  scope.onchange = syncRoleIndustry;
   if (VIEW_CLIENT) {
     scope.value = VIEW_CLIENT;
     scope.disabled = true;
@@ -2986,6 +3008,10 @@ function openNewRoleDrawer() {
       scope.value = '';
     }
   }
+  // Industry dropdown
+  const ind = document.getElementById('newRoleIndustry');
+  ind.innerHTML = '<option value="" disabled>Select an industry…</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
+  syncRoleIndustry();
   // Change submit button label
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
   if (submitBtn) submitBtn.textContent = 'Create role';
@@ -3005,6 +3031,10 @@ function editRole(id) {
   scope.innerHTML = '<option value="" disabled>Select a client…</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
   scope.value = r.client || '';
   scope.disabled = !!VIEW_CLIENT;
+  scope.onchange = syncRoleIndustry;
+  const ind = document.getElementById('newRoleIndustry');
+  ind.innerHTML = '<option value="" disabled>Select an industry…</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
+  ind.value = r.industry || INDUSTRY_BY_CLIENT[r.client] || '';
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
   if (submitBtn) submitBtn.textContent = 'Save changes';
   document.getElementById('roleDrawer').classList.add('open');
@@ -3015,12 +3045,23 @@ function closeRoleDrawer() {
   document.getElementById('roleDrawer').classList.remove('open');
   document.getElementById('roleDrawerBackdrop').classList.remove('open');
 }
+function syncRoleIndustry() {
+  const scope = document.getElementById('newRoleScope')?.value;
+  const ind = document.getElementById('newRoleIndustry');
+  if (!ind) return;
+  if (scope && INDUSTRY_BY_CLIENT[scope] && !ind.value) {
+    ind.value = INDUSTRY_BY_CLIENT[scope];
+  }
+}
+
 function submitNewRole() {
   const name = document.getElementById('newRoleName').value.trim();
   const desc = document.getElementById('newRoleDesc').value.trim();
   const scope = document.getElementById('newRoleScope').value;
+  const industry = document.getElementById('newRoleIndustry').value;
   if (!name) { toast('Role name is required', 'danger'); return; }
   if (!scope) { toast('Please select which client this role is for', 'danger'); return; }
+  if (!VIEW_CLIENT && !industry) { toast('Please select an industry', 'danger'); return; }
 
   // Edit mode — update existing role
   if (state.editingRoleId) {
@@ -3029,6 +3070,7 @@ function submitNewRole() {
       r.name = name;
       r.desc = desc || r.desc;
       r.client = scope;
+      r.industry = industry || r.industry;
       r.updated = 'just now';
     }
     state.editingRoleId = null;
@@ -3044,6 +3086,7 @@ function submitNewRole() {
     id: 'r_' + Date.now(),
     name, system: false, users: 0, updated: 'just now',
     client: scope,
+    industry: industry || INDUSTRY_BY_CLIENT[scope] || null,
     desc: desc || 'Custom role.',
     perms: basePerms
   };
