@@ -1064,7 +1064,7 @@
       <div class="content">
         <div class="page-head">
           <div>
-            <div class="page-title">Users</div>
+            <div class="page-title">All users <span id="usersCount" style="color:var(--text-muted);font-weight:500;font-size:18px"></span></div>
             <div class="page-sub">Manage team members, roles, and access across all tenants in your workspace.</div>
           </div>
           <div style="display:flex;gap:8px">
@@ -2118,6 +2118,8 @@ function renderUsers() {
 
   renderFilterChips();
   rowSelect();
+  const countEl2 = document.getElementById('usersCount');
+  if (countEl2) countEl2.textContent = '(' + users.length.toLocaleString() + ')';
 }
 
 function renderFilterChips() {
