@@ -1704,11 +1704,12 @@ function renderUserDetails() {
         <span style="cursor:pointer;color:var(--primary)" onclick="switchScreen('users')">Users</span>
         <span class="sep">/</span> <span class="current">${u.name}</span>
       </div>
-      <div style="display:flex;gap:8px;flex-shrink:0">
+      <div style="display:flex;gap:12px;flex-shrink:0;align-items:center">
+        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-muted);user-select:none" title="${u.status === 'active' ? 'Deactivate user' : 'Activate user'}">
+          <span>${u.status === 'active' ? 'Active' : 'Inactive'}</span>
+          <span class="switch ${u.status === 'active' ? 'on' : ''}" onclick="toggleStatus(${state.detailsUserIdx});setTimeout(renderUserDetails,50)"></span>
+        </label>
         <button class="btn btn-secondary btn-sm" onclick="openUserDrawer(${state.detailsUserIdx})">${SVG.edit} Edit</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleStatus(${state.detailsUserIdx});setTimeout(renderUserDetails,50)">
-          ${u.status === 'active' ? 'Deactivate' : 'Activate'}
-        </button>
         <button class="btn btn-danger-ghost btn-sm" onclick="deleteUserFromDetails(${state.detailsUserIdx})">${SVG.trash} Delete</button>
       </div>
     </div>
