@@ -1456,10 +1456,10 @@
         <select class="select" id="newRoleScope" required></select>
         <div class="hint">Which client this role is for.</div>
       </div>
-      <div class="field enterprise-only">
+      <div class="field">
         <label class="label">Industry <span class="req">*</span></label>
         <select class="select" id="newRoleIndustry" required></select>
-        <div class="hint">Industry context — inherited from the client by default.</div>
+        <div class="hint">Industry context for this role.</div>
       </div>
       <select class="select" id="newRoleTemplate" style="display:none"><option value=""></option></select>
     </div>
@@ -3064,7 +3064,7 @@ function submitNewRole() {
   const industry = document.getElementById('newRoleIndustry').value;
   if (!name) { toast('Role name is required', 'danger'); return; }
   if (!scope) { toast('Please select which client this role is for', 'danger'); return; }
-  if (!VIEW_CLIENT && !industry) { toast('Please select an industry', 'danger'); return; }
+  if (!industry) { toast('Please select an industry', 'danger'); return; }
 
   // Edit mode — update existing role
   if (state.editingRoleId) {
