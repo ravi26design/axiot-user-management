@@ -657,8 +657,34 @@
   .scope-chip.enterprise { background: var(--primary-soft);  color: var(--primary);     border-color: rgba(31,78,158,0.15); }
   .scope-chip.client     { background: #F0EBFB;              color: #5B21B6;            border-color: #DCCEF3; }
 
-  .role-filter-bar { padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg); }
+  .role-filter-bar { padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg); position: relative; }
   .role-filter-row { display: flex; gap: 6px; align-items: center; }
+
+  /* Single searchable dropdown for Roles scope */
+  .rf-dropdown {
+    width: 100%;
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    font-size: 13.5px; font-weight: 500; color: var(--text);
+    cursor: pointer;
+    transition: border-color .12s, box-shadow .12s;
+    text-align: left;
+  }
+  .rf-dropdown:hover { border-color: var(--primary); }
+  .rf-dropdown.open { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(31,78,158,0.12); }
+  .rf-dropdown .dd-ico { color: var(--text-subtle); flex-shrink: 0; }
+  .rf-dropdown .dd-label { flex: 1; }
+  .rf-dropdown .dd-label small { color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+  .rf-dropdown .dd-caret { color: var(--text-subtle); font-size: 10px; transition: transform .15s; }
+  .rf-dropdown.open .dd-caret { transform: rotate(180deg); }
+  .rf-dropdown .dd-clear {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: var(--text-subtle); font-size: 11px;
+  }
+  .rf-dropdown .dd-clear:hover { background: var(--bg-hover); color: var(--text); }
   .rf-chip {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 5px 10px; border-radius: 999px;
@@ -2600,45 +2626,68 @@ function filteredRoles() {
 function toggleClientPop(evt) {
   evt.stopPropagation();
   const existing = document.getElementById('rfClientPop');
-  if (existing) { existing.remove(); return; }
-  const btn = document.getElementById('rfClientBtn');
+  if (existing) {
+    existing.remove();
+    document.getElementById('rfDropdown')?.classList.remove('open');
+    return;
+  }
+  const btn = document.getElementById('rfDropdown');
   if (!btn) return;
+  btn.classList.add('open');
   const bar = btn.closest('.role-filter-bar');
   const allClients = [...new Set(state.roles.map(r => r.client).filter(Boolean))].sort();
+  const allCount = state.roles.length;
+  const globalCount = state.roles.filter(r => !r.client).length;
+  const cur = state.roleClientFilter;
+
   const pop = document.createElement('div');
   pop.className = 'rf-pop';
   pop.id = 'rfClientPop';
+  pop.style.width = 'calc(100% - 28px)';
   pop.innerHTML = `
     <div class="rf-pop-search">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
       <input id="rfClientSearch" placeholder="Search clients…" oninput="filterClientPop()" autofocus />
     </div>
     <div class="rf-pop-list" id="rfClientList">
+      <div class="rf-opt ${cur === 'all' ? 'selected' : ''}" data-client="All clients" onclick="setRoleFilter('all');closeRfPop()">
+        All clients<span class="opt-count">${allCount}</span>
+      </div>
+      <div class="rf-opt ${cur === 'global' ? 'selected' : ''}" data-client="Global" onclick="setRoleFilter('global');closeRfPop()">
+        Global only<span class="opt-count">${globalCount}</span>
+      </div>
+      ${allClients.length ? '<div style="height:1px;background:var(--border-subtle);margin:4px 2px"></div>' : ''}
       ${allClients.map(c => {
         const count = state.roles.filter(r => r.client === c).length;
-        const sel = state.roleClientFilter === c ? 'selected' : '';
-        return `<div class="rf-opt ${sel}" data-client="${c}" onclick="setRoleFilter('${c}');document.getElementById('rfClientPop').remove();">
+        const sel = cur === c ? 'selected' : '';
+        return `<div class="rf-opt ${sel}" data-client="${c}" onclick="setRoleFilter('${c}');closeRfPop()">
           ${c}<span class="opt-count">${count}</span>
         </div>`;
-      }).join('') || '<div class="rf-pop-empty">No clients yet</div>'}
+      }).join('')}
     </div>
   `;
-  // Position the pop under the button
+  // Anchor below the dropdown, full width
   const rect = btn.getBoundingClientRect();
   const barRect = bar.getBoundingClientRect();
-  pop.style.left = (rect.left - barRect.left) + 'px';
-  pop.style.top = (rect.bottom - barRect.top + 4) + 'px';
+  pop.style.left = '14px';
+  pop.style.right = '14px';
+  pop.style.width = 'auto';
+  pop.style.top = (rect.bottom - barRect.top + 6) + 'px';
   bar.appendChild(pop);
   // Close on outside click
   setTimeout(() => {
     const closer = (e) => {
-      if (!e.target.closest('#rfClientPop') && !e.target.closest('#rfClientBtn')) {
-        const p = document.getElementById('rfClientPop'); if (p) p.remove();
+      if (!e.target.closest('#rfClientPop') && !e.target.closest('#rfDropdown')) {
+        closeRfPop();
         document.removeEventListener('click', closer);
       }
     };
     document.addEventListener('click', closer);
   }, 0);
+}
+function closeRfPop() {
+  const p = document.getElementById('rfClientPop'); if (p) p.remove();
+  document.getElementById('rfDropdown')?.classList.remove('open');
 }
 function filterClientPop() {
   const q = (document.getElementById('rfClientSearch')?.value || '').toLowerCase().trim();
@@ -2682,24 +2731,24 @@ function renderRoles() {
 
   document.getElementById('roleCount').textContent = `${visible.length} of ${state.roles.length}`;
 
-  // Resolve active client selection for the Client dropdown chip
+  // Resolve active selection label for the dropdown
   const f = state.roleClientFilter;
-  const isClientPicked = f !== 'all' && f !== 'global';
-  const clientCount = isClientPicked ? state.roles.filter(r => r.client === f).length : 0;
+  const visibleCount = visible.length;
+  let label;
+  if (f === 'all') label = `All clients <small>(${state.roles.length})</small>`;
+  else if (f === 'global') label = `Global only <small>(${state.roles.filter(r => !r.client).length})</small>`;
+  else label = `${f} <small>(${visibleCount})</small>`;
 
   document.getElementById('roleList').innerHTML = `
-    <div class="role-filter-bar" style="position:relative">
-      <div class="role-filter-row">
-        <button class="rf-chip ${f === 'all' ? 'active' : ''}" onclick="setRoleFilter('all')">
-          All <span class="rf-count">${state.roles.length}</span>
-        </button>
-        <button class="rf-chip ${f === 'global' ? 'active' : ''}" onclick="setRoleFilter('global')">
-          Global <span class="rf-count">${state.roles.filter(r => !r.client).length}</span>
-        </button>
-        <button class="rf-chip ${isClientPicked ? 'active' : ''}" onclick="toggleClientPop(event)" id="rfClientBtn">
-          ${isClientPicked ? `${f} <span class="rf-count">${clientCount}</span> <span class="rf-x" onclick="event.stopPropagation();setRoleFilter('all')">✕</span>` : `Client <span class="rf-caret">▾</span>`}
-        </button>
-      </div>
+    <div class="role-filter-bar">
+      <button class="rf-dropdown" id="rfDropdown" onclick="toggleClientPop(event)">
+        <span class="dd-ico">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>
+        </span>
+        <span class="dd-label">${label}</span>
+        ${f !== 'all' ? `<span class="dd-clear" onclick="event.stopPropagation();setRoleFilter('all')" title="Clear filter">✕</span>` : ''}
+        <span class="dd-caret">▾</span>
+      </button>
     </div>
     ${visible.length === 0 ? `
       <div style="padding:24px 16px;text-align:center;color:var(--text-muted);font-size:13px">No roles in this scope.</div>
