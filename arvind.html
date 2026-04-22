@@ -1689,7 +1689,7 @@ const users = [
    Rendering — shared shell
    ============================================================ */
 function renderSidebar(activeScreen) {
-  const workspaceLabel = VIEW_CLIENT ? `${VIEW_CLIENT} workspace` : 'Dynamic Looms';
+  const workspaceLabel = VIEW_CLIENT ? `Client · ${VIEW_CLIENT}` : 'Dynamic Looms';
   const html = `
     <button class="sidebar-collapse" onclick="toggleSidebar()" title="Collapse sidebar" aria-label="Toggle sidebar">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
