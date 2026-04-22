@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign in — AXIoT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --primary: #1F4E9E;
+    --primary-hover: #173F82;
+    --primary-soft: #E8EEF8;
+    --text-base: 11, 18, 32;
+    --text: rgba(var(--text-base), 1);
+    --text-muted: rgba(var(--text-base), 0.72);
+    --text-subtle: rgba(var(--text-base), 0.52);
+    --border: #D8DEE5;
+    --border-strong: #B8C0CC;
+    --bg: #F5F7FA;
+    --bg-hover: #EEF1F5;
+    --surface: #FFFFFF;
+    --success: #047048;
+    --danger: #9F1A0F;
+    --warn: #8A3A05;
+    --radius: 8px;
+    --radius-lg: 12px;
+
+    --fs-xxs: 11px; --fs-xs: 12px; --fs-sm: 13px;
+    --fs-base: 14px; --fs-md: 15px; --fs-lg: 16px;
+    --fs-xl: 20px; --fs-2xl: 24px; --fs-3xl: 30px;
+    --fw-reg: 400; --fw-med: 500; --fw-semi: 600; --fw-bold: 700;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: var(--fs-base); line-height: 1.5;
+    color: var(--text); background: var(--surface);
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: inherit; text-decoration: none; cursor: pointer; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input { font-family: inherit; font-size: inherit; color: inherit; }
+
+  [data-lucide] { width: 16px; height: 16px; stroke-width: 1.8; flex-shrink: 0; }
+
+  /* Layout */
+  .auth-wrap {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    background: var(--surface);
+  }
+  @media (max-width: 900px) {
+    .auth-wrap { grid-template-columns: 1fr; }
+    .auth-visual { display: none; }
+  }
+
+  /* Left visual panel */
+  .auth-visual {
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    padding: 56px 64px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .auth-visual::before {
+    content: ''; position: absolute;
+    top: -140px; right: -140px;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(31, 78, 158, 0.1), transparent 70%);
+  }
+  .auth-visual::after {
+    content: ''; position: absolute;
+    bottom: -120px; left: -60px;
+    width: 340px; height: 340px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(4, 112, 72, 0.08), transparent 70%);
+  }
+  .auth-brand {
+    display: flex; align-items: center; gap: 12px;
+    font-weight: var(--fw-semi); font-size: var(--fs-lg);
+    position: relative; z-index: 1;
+  }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 7px;
+    background: var(--text); color: #fff;
+    display: grid; place-items: center;
+    font-weight: var(--fw-bold); font-size: 13px;
+  }
+  .auth-quote { position: relative; z-index: 1; }
+  .auth-quote h2 {
+    font-size: 32px; font-weight: var(--fw-semi);
+    letter-spacing: -0.7px; line-height: 1.2;
+    margin-bottom: 16px; max-width: 460px;
+  }
+  .auth-quote p {
+    font-size: var(--fs-md); color: var(--text-muted);
+    line-height: 1.6; max-width: 420px;
+  }
+  .auth-meta {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    max-width: 460px; padding-top: 28px;
+    border-top: 1px solid var(--border);
+    position: relative; z-index: 1;
+  }
+  .auth-meta .m-val {
+    font-size: var(--fs-xl); font-weight: var(--fw-semi);
+    letter-spacing: -0.3px; margin-bottom: 4px;
+  }
+  .auth-meta .m-lbl {
+    font-size: var(--fs-xs); color: var(--text-muted); font-weight: var(--fw-med);
+  }
+
+  /* Right form panel */
+  .auth-form {
+    padding: 56px 64px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  @media (max-width: 640px) { .auth-form { padding: 32px 24px; } }
+
+  .auth-card { max-width: 400px; width: 100%; margin: 0 auto; }
+
+  .auth-card h1 {
+    font-size: var(--fs-2xl); font-weight: var(--fw-semi);
+    letter-spacing: -0.5px;
+  }
+  .auth-card .sub {
+    color: var(--text-muted); margin-top: 6px; margin-bottom: 24px;
+    font-size: var(--fs-base);
+  }
+
+  /* Tabs — segmented pill */
+  .tabs {
+    display: flex; padding: 4px; gap: 2px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 24px;
+  }
+  .tab {
+    flex: 1; display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 10px 14px; border-radius: 7px;
+    font-size: var(--fs-sm); font-weight: var(--fw-med);
+    color: var(--text-muted); cursor: pointer;
+    transition: background .15s, color .15s, box-shadow .15s;
+  }
+  .tab:hover:not(.active) { background: var(--bg-hover); color: var(--text); }
+  .tab.active {
+    background: var(--surface); color: var(--text);
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+  }
+  .tab.active [data-lucide] { color: var(--primary); }
+
+  /* Context banner under tabs */
+  .context-banner {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px;
+    background: var(--primary-soft);
+    border: 1px solid rgba(31, 78, 158, 0.15);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: var(--fs-sm); color: var(--text);
+    line-height: 1.5;
+  }
+  .context-banner [data-lucide] {
+    color: var(--primary); margin-top: 1px;
+  }
+  .context-banner strong { font-weight: var(--fw-semi); }
+
+  /* Fields */
+  .field { margin-bottom: 14px; }
+  .label {
+    display: block; font-size: var(--fs-sm); font-weight: var(--fw-med);
+    margin-bottom: 6px; color: var(--text);
+  }
+  .input-wrap {
+    position: relative;
+    display: flex; align-items: center;
+  }
+  .input-wrap [data-lucide] {
+    position: absolute; left: 14px;
+    color: var(--text-subtle);
+    pointer-events: none;
+  }
+  .input {
+    width: 100%; padding: 11px 14px 11px 42px;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: 8px; font-size: var(--fs-base); outline: none;
+    transition: border-color .1s, box-shadow .1s;
+  }
+  .input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(31, 78, 158, 0.15);
+  }
+  .input-wrap .pw-toggle {
+    position: absolute; right: 10px;
+    width: 28px; height: 28px; border-radius: 5px;
+    color: var(--text-subtle);
+    display: grid; place-items: center;
+  }
+  .input-wrap .pw-toggle:hover { background: var(--bg-hover); color: var(--text); }
+
+  .row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: var(--fs-sm); margin: 6px 0 18px;
+  }
+  .checkbox {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--text-muted); cursor: pointer;
+  }
+  .checkbox input { accent-color: var(--primary); cursor: pointer; }
+  .row a {
+    color: var(--primary); font-weight: var(--fw-med);
+  }
+  .row a:hover { text-decoration: underline; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 16px; font-size: var(--fs-base); font-weight: var(--fw-med);
+    border-radius: 8px; border: 1px solid transparent;
+    transition: background .12s, border-color .12s;
+    width: 100%;
+  }
+  .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+  .btn-secondary {
+    background: var(--surface); color: var(--text); border-color: var(--border-strong);
+  }
+  .btn-secondary:hover { background: var(--bg); }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 20px 0; color: var(--text-subtle);
+    font-size: var(--fs-xxs); font-weight: var(--fw-semi);
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* Demo quick-fill card */
+  .demo-card {
+    margin-top: 24px; padding: 14px 16px;
+    border: 1px dashed var(--border-strong); border-radius: 10px;
+    background: var(--bg);
+  }
+  .demo-card .demo-title {
+    font-size: var(--fs-xs); font-weight: var(--fw-semi);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-muted); margin-bottom: 8px;
+  }
+  .demo-pills {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .demo-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--border);
+    font-size: var(--fs-xs); font-weight: var(--fw-med);
+    color: var(--text); cursor: pointer;
+    transition: border-color .1s, background .1s;
+  }
+  .demo-pill:hover { border-color: var(--primary); color: var(--primary); }
+
+  .foot {
+    text-align: center; margin-top: 28px;
+    font-size: var(--fs-xs); color: var(--text-muted);
+  }
+  .foot a { color: var(--primary); font-weight: var(--fw-med); }
+  .foot .legal {
+    margin-top: 14px; font-size: var(--fs-xxs); color: var(--text-subtle);
+  }
+  .foot .legal a { color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div class="auth-wrap">
+  <!-- Left visual panel -->
+  <aside class="auth-visual">
+    <div class="auth-brand">
+      <div class="brand-mark">AX</div>
+      AXIoT
+    </div>
+    <div class="auth-quote">
+      <h2>The operating system for industrial fleets.</h2>
+      <p>Monitor 100,000+ connected devices across plants and clients, with enterprise-grade access control and compliance built in.</p>
+    </div>
+    <div class="auth-meta">
+      <div>
+        <div class="m-val">99.99%</div>
+        <div class="m-lbl">Platform uptime</div>
+      </div>
+      <div>
+        <div class="m-val">SOC 2</div>
+        <div class="m-lbl">Type II certified</div>
+      </div>
+      <div>
+        <div class="m-val">ISO 27001</div>
+        <div class="m-lbl">Compliant</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right form panel -->
+  <section class="auth-form">
+    <div class="auth-card">
+      <h1>Sign in to AXIoT</h1>
+      <p class="sub">Select your account type and enter your credentials.</p>
+
+      <!-- Tabs -->
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tab-enterprise" role="tab" onclick="switchTab('enterprise')">
+          <i data-lucide="briefcase-business"></i>
+          Enterprise
+        </button>
+        <button class="tab" id="tab-client" role="tab" onclick="switchTab('client')">
+          <i data-lucide="building-2"></i>
+          Client
+        </button>
+      </div>
+
+      <!-- Context banner updates per tab -->
+      <div class="context-banner" id="contextBanner">
+        <i data-lucide="info"></i>
+        <div id="contextText"></div>
+      </div>
+
+      <form id="loginForm" onsubmit="submitLogin(event)">
+        <!-- Optional "Client" workspace field, visible only in Client tab -->
+        <div class="field" id="workspaceField" style="display:none">
+          <label class="label">Client workspace</label>
+          <div class="input-wrap">
+            <i data-lucide="building-2"></i>
+            <input class="input" id="workspace" type="text" placeholder="e.g. arvind" autocomplete="organization" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Work email</label>
+          <div class="input-wrap">
+            <i data-lucide="mail"></i>
+            <input class="input" id="email" type="email" placeholder="you@company.com" autocomplete="email" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Password</label>
+          <div class="input-wrap">
+            <i data-lucide="lock"></i>
+            <input class="input" id="password" type="password" placeholder="••••••••••••" autocomplete="current-password" required />
+            <button class="pw-toggle" type="button" onclick="togglePw()" aria-label="Show password" title="Show password">
+              <i data-lucide="eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label class="checkbox">
+            <input type="checkbox" checked />
+            Keep me signed in
+          </label>
+          <a href="#">Forgot password?</a>
+        </div>
+
+        <button class="btn btn-primary" type="submit">
+          Sign in
+          <i data-lucide="arrow-right"></i>
+        </button>
+
+        <div class="divider">or</div>
+
+        <button class="btn btn-secondary" type="button" onclick="alert('SSO demo')">
+          <i data-lucide="shield-check"></i>
+          Continue with SAML SSO
+        </button>
+      </form>
+
+      <!-- Demo quick-fill -->
+      <div class="demo-card">
+        <div class="demo-title">Demo accounts (click to fill)</div>
+        <div class="demo-pills" id="demoPills"></div>
+      </div>
+
+      <div class="foot">
+        Don't have an account? <a href="#">Contact your administrator</a>
+        <div class="legal">
+          Protected by reCAPTCHA · <a href="#">Terms</a> · <a href="#">Privacy</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const TAB_CONFIG = {
+  enterprise: {
+    title: 'Enterprise admin',
+    context: 'Sign in as an <strong>Enterprise admin</strong> to manage the AXIoT platform and onboard clients. Example: <strong>Dynamic Looms</strong>.',
+    demos: [
+      { label: 'Super Admin', email: 'priya@dynamiclooms.com' },
+      { label: 'Administrator', email: 'aisha@dynamiclooms.com' }
+    ],
+    showWorkspace: false
+  },
+  client: {
+    title: 'Client user',
+    context: 'Sign in to your <strong>Client workspace</strong> to manage your sites, devices, and team. Example: <strong>Arvind</strong>.',
+    demos: [
+      { label: 'Owner (Arvind)', email: 'marcus.chen@arvind.com', workspace: 'arvind' },
+      { label: 'Operator (Arvind)', email: 'rahul@arvind.com', workspace: 'arvind' },
+      { label: 'Maintenance (Arvind)', email: 'd.okafor@arvind.com', workspace: 'arvind' }
+    ],
+    showWorkspace: true
+  }
+};
+
+let activeTab = 'enterprise';
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  const cfg = TAB_CONFIG[tab];
+  document.getElementById('contextText').innerHTML = cfg.context;
+  document.getElementById('workspaceField').style.display = cfg.showWorkspace ? 'block' : 'none';
+
+  // Render demo pills
+  document.getElementById('demoPills').innerHTML = cfg.demos.map(d => `
+    <button class="demo-pill" type="button" onclick="fillDemo('${d.email}', '${d.workspace || ''}')">
+      <i data-lucide="user"></i> ${d.label}
+    </button>
+  `).join('');
+
+  // Clear form
+  document.getElementById('email').value = '';
+  document.getElementById('password').value = '';
+  if (cfg.showWorkspace) document.getElementById('workspace').value = '';
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function fillDemo(email, workspace) {
+  document.getElementById('email').value = email;
+  document.getElementById('password').value = 'demo123456';
+  if (workspace) {
+    const w = document.getElementById('workspace');
+    if (w) w.value = workspace;
+  }
+}
+
+function togglePw() {
+  const pw = document.getElementById('password');
+  pw.type = pw.type === 'password' ? 'text' : 'password';
+}
+
+function submitLogin(evt) {
+  evt.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  if (!email || !password) return;
+
+  // Persist context (for demo)
+  try {
+    localStorage.setItem('axiot-login', JSON.stringify({
+      type: activeTab,
+      email,
+      workspace: activeTab === 'client' ? document.getElementById('workspace').value : null,
+      signedInAt: new Date().toISOString()
+    }));
+  } catch (e) {}
+
+  // Redirect to the admin panel
+  window.location.href = 'index.html';
+}
+
+// Init
+switchTab('enterprise');
+if (window.lucide) window.lucide.createIcons();
+</script>
+</body>
+</html>
