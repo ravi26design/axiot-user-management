@@ -1054,6 +1054,70 @@
   .name-link:hover { color: var(--primary); text-decoration: underline; }
   .row-clickable { cursor: pointer; }
   .row-clickable:hover .cell-user-name { color: var(--primary); }
+
+  /* ===== Grouped action bar for user details ===== */
+  .action-bar {
+    display: inline-flex; align-items: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 4px; gap: 2px;
+    box-shadow: var(--shadow-sm);
+  }
+  .ab-status {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 6px 12px; cursor: pointer; user-select: none;
+    border-radius: 7px; transition: background .12s;
+  }
+  .ab-status:hover { background: var(--bg); }
+  .ab-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 0 3px rgba(4, 112, 72, 0.12);
+  }
+  .ab-dot.inactive { background: var(--text-subtle); box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.12); }
+  .ab-dot.pending { background: var(--warn); box-shadow: 0 0 0 3px rgba(138, 58, 5, 0.12); }
+  .ab-status-label {
+    font-size: var(--fs-sm); font-weight: var(--fw-med);
+    color: var(--text);
+  }
+  .ab-divider {
+    width: 1px; height: 24px; background: var(--border);
+    margin: 0 4px; flex-shrink: 0;
+  }
+  .ab-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px; border-radius: 7px;
+    font-size: var(--fs-sm); font-weight: var(--fw-med);
+    color: var(--text); cursor: pointer;
+    transition: background .12s;
+    background: transparent; border: none;
+  }
+  .ab-btn:hover { background: var(--bg); }
+  .ab-btn.primary { background: var(--primary); color: #fff; }
+  .ab-btn.primary:hover { background: var(--primary-hover); }
+  .ab-btn.icon-only { padding: 7px; }
+  .ab-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .ab-btn.danger { color: var(--danger); }
+  .ab-btn.danger:hover { background: var(--danger-soft); }
+  .ab-menu-wrap { position: relative; }
+  .ab-menu {
+    position: absolute; top: calc(100% + 6px); right: 0;
+    min-width: 200px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: var(--shadow-md);
+    padding: 4px; z-index: 40;
+    display: none;
+  }
+  .ab-menu.open { display: block; }
+  .ab-menu button {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 8px 10px; font-size: var(--fs-sm); color: var(--text);
+    border-radius: 6px; text-align: left;
+  }
+  .ab-menu button:hover { background: var(--bg-hover); }
+  .ab-menu button.danger { color: var(--danger); }
+  .ab-menu button.danger:hover { background: var(--danger-soft); }
+  .ab-menu button svg { width: 14px; height: 14px; opacity: 0.85; flex-shrink: 0; }
+  .ab-menu .sep { height: 1px; background: var(--border-subtle); margin: 4px 0; }
   .empty-state {
     padding: 40px 20px; text-align: center; color: var(--text-muted);
   }
@@ -1753,13 +1817,38 @@ function renderUserDetails() {
         <div class="page-title">User details</div>
         <div class="page-sub">Profile, device access, and activity for this user.</div>
       </div>
-      <div style="display:flex;gap:12px;flex-shrink:0;align-items:center">
-        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-muted);user-select:none" title="${u.status === 'active' ? 'Deactivate user' : 'Activate user'}">
-          <span>${u.status === 'active' ? 'Active' : 'Inactive'}</span>
-          <span class="switch ${u.status === 'active' ? 'on' : ''}" onclick="toggleStatus(${state.detailsUserIdx});setTimeout(renderUserDetails,50)"></span>
-        </label>
-        <button class="btn btn-secondary btn-sm" onclick="openUserDrawer(${state.detailsUserIdx})">${SVG.edit} Edit</button>
-        <button class="btn btn-danger-ghost btn-sm" onclick="deleteUserFromDetails(${state.detailsUserIdx})">${SVG.trash} Delete</button>
+      <div class="action-bar">
+        <div class="ab-status" onclick="toggleStatus(${state.detailsUserIdx});setTimeout(renderUserDetails,50)" title="${u.status === 'active' ? 'Deactivate user' : 'Activate user'}">
+          <span class="ab-dot ${u.status}"></span>
+          <span class="ab-status-label">${u.status === 'active' ? 'Active' : u.status === 'pending' ? 'Pending' : 'Inactive'}</span>
+          <span class="switch ${u.status === 'active' ? 'on' : ''}"></span>
+        </div>
+        <div class="ab-divider"></div>
+        <button class="ab-btn primary" onclick="openUserDrawer(${state.detailsUserIdx})">${SVG.edit} Edit profile</button>
+        <div class="ab-menu-wrap">
+          <button class="ab-btn icon-only" onclick="toggleDetailsMenu(event)" title="More actions" aria-label="More actions">
+            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+          </button>
+          <div class="ab-menu" id="detailsMenu">
+            <button onclick="resetPassword(${state.detailsUserIdx});closeDetailsMenu()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Reset password
+            </button>
+            <button onclick="switchDetailsTab('sessions');closeDetailsMenu()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              View sessions
+            </button>
+            <button onclick="toast('Activity log exported');closeDetailsMenu()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+              Export data
+            </button>
+            <div class="sep"></div>
+            <button class="danger" onclick="deleteUserFromDetails(${state.detailsUserIdx});closeDetailsMenu()">
+              ${SVG.trash}
+              Delete user
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2055,6 +2144,19 @@ function renderActivityTab(u) {
     </div>
   `;
 }
+
+function toggleDetailsMenu(evt) {
+  evt.stopPropagation();
+  const m = document.getElementById('detailsMenu');
+  if (m) m.classList.toggle('open');
+}
+function closeDetailsMenu() {
+  const m = document.getElementById('detailsMenu');
+  if (m) m.classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ab-menu-wrap')) closeDetailsMenu();
+});
 
 function deleteUserFromDetails(idx) {
   const u = users[idx];
