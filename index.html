@@ -1622,7 +1622,6 @@ try { if (localStorage.getItem('axiot-sidebar-collapsed') === '1') document.body
 function renderTopbar() {
   const unread = NOTIFS.filter(n => n.unread).length;
   const html = `
-    <div class="tenant-switch"><div class="tenant-mark">AC</div>Acme Industries<span class="caret">▾</span></div>
     <div class="top-actions">
       <button class="icon-btn" onclick="openNotifs(event)" title="Notifications" aria-label="Notifications">
         ${SVG.bell}${unread ? `<span class="notif-badge">${unread}</span>` : ''}
