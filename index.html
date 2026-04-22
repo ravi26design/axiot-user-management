@@ -900,11 +900,30 @@
       <div class="field"><label class="label">Phone <span style="color:var(--text-subtle);font-weight:400">(optional)</span></label><input class="input" placeholder="+91 98000 00000" /></div>
     </div>
     <div class="form-section">
-      <div class="form-section-title">Access & role</div>
-      <div class="field"><label class="label">Role <span class="req">*</span></label><select class="select" id="inviteRole"></select></div>
-      <div class="field-row">
-        <div class="field"><label class="label">Tenant</label><select class="select"><option>Acme Industries</option></select></div>
-        <div class="field"><label class="label">Sub-tenant</label><select class="select"><option>Pune Plant — Line A</option><option>Pune Plant — Line B</option><option>Chennai Plant</option></select></div>
+      <div class="form-section-title">Assignment</div>
+      <div class="field">
+        <label class="label">Tenant <span class="req">*</span></label>
+        <select class="select" id="inviteTenant">
+          <option>Acme Industries</option>
+          <option>Northwind Energy</option>
+          <option>Contoso Energy</option>
+        </select>
+        <div class="hint">The organization this user belongs to.</div>
+      </div>
+      <div class="field">
+        <label class="label">Location <span class="req">*</span></label>
+        <select class="select" id="inviteLocation">
+          <option>Pune Plant — Line A</option>
+          <option>Pune Plant — Line B</option>
+          <option>Chennai Plant</option>
+          <option>Mumbai HQ</option>
+        </select>
+        <div class="hint">Site or sub-tenant within the tenant.</div>
+      </div>
+      <div class="field">
+        <label class="label">Role <span class="req">*</span></label>
+        <select class="select" id="inviteRole"></select>
+        <div class="hint">Determines what this user can view and manage.</div>
       </div>
     </div>
     <div class="form-section">
