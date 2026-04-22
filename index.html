@@ -1563,48 +1563,21 @@ function fullPerms() {
   return p;
 }
 
+// Admin gets full CRUD but cannot delete users/roles/tenants/billing
+const adminPerms = () => {
+  const p = fullPerms();
+  ['users','rolesRes','tenants','billing'].forEach(k => { if (p[k]) p[k].delete = false; });
+  return p;
+};
+
 const initialRoles = [
-  // Global roles — available to any client
-  { id: 'super',  name: 'Super Admin', system: false, client: null, users: 2,   updated: 'Mar 12', desc: 'Full platform access across all clients.', perms: fullPerms() },
-  { id: 'owner',  name: 'Owner',       system: false, client: null, users: 5,   updated: 'Feb 28', desc: 'Client owner with full admin rights within their organization.', perms: (() => { const p = fullPerms(); p.billing.delete = false; return p; })() },
-  { id: 'viewer', name: 'Viewer',      system: false, client: null, users: 1046, updated: 'Jan 22', desc: 'Read-only access across assigned clients.', perms: (() => {
-    const p = emptyPerms();
-    ['devices','alerts','reports','telemetry'].forEach(k => p[k].view = true);
-    return p;
-  })() },
+  // Dynamic Looms roles
+  { id: 'dl-super', name: 'Super Admin', system: false, client: 'Dynamic Looms', users: 1, updated: 'Mar 12', desc: 'Full platform access for Dynamic Looms — can manage all clients, users, devices, and settings.', perms: fullPerms() },
+  { id: 'dl-admin', name: 'Admin',       system: false, client: 'Dynamic Looms', users: 2, updated: 'Apr 08', desc: 'Manage Dynamic Looms operations — users, devices, and day-to-day activities.', perms: adminPerms() },
 
-  // Arvind-specific roles (created by Enterprise for this client)
-  { id: 'admin',    name: 'Administrator',         system: false, client: 'Arvind', users: 4,   updated: 'Apr 08', desc: 'Manages users, devices, and day-to-day operations at Arvind.', perms: (() => {
-    const p = emptyPerms();
-    ['devices','alerts','reports','users','telemetry','commands'].forEach(k => { p[k].view = p[k].create = p[k].edit = true; });
-    p.devices.delete = true;
-    p.users.delete = true;
-    return p;
-  })() },
-  { id: 'operator', name: 'Plant Operator',        system: false, client: 'Arvind', users: 148, updated: 'today', desc: 'Day-to-day operators managing devices and acknowledging alerts on assigned lines.', perms: (() => {
-    const p = emptyPerms();
-    p.devices.view = p.devices.create = p.devices.edit = true;
-    p.telemetry.view = true;
-    p.commands.view = p.commands.edit = true;
-    p.alerts.view = true;
-    p.reports.view = true;
-    return p;
-  })() },
-  { id: 'tech',     name: 'Maintenance Technician', system: false, client: 'Arvind', users: 63,  updated: 'Apr 04', desc: 'Performs maintenance tasks and resolves device issues at Arvind plants.', perms: (() => {
-    const p = emptyPerms();
-    p.devices.view = p.devices.edit = true;
-    p.telemetry.view = true;
-    p.commands.view = p.commands.edit = true;
-    p.alerts.view = true;
-    return p;
-  })() },
-
-  // Dynamic Looms-specific role example
-  { id: 'dl-ops', name: 'Platform Operator', system: false, client: 'Dynamic Looms', users: 3, updated: 'Apr 10', desc: 'Internal platform operations team at Dynamic Looms.', perms: (() => {
-    const p = emptyPerms();
-    ['devices','alerts','reports','users','tenants'].forEach(k => p[k].view = true);
-    return p;
-  })() }
+  // Arvind roles
+  { id: 'av-super', name: 'Super Admin', system: false, client: 'Arvind', users: 1, updated: 'Feb 28', desc: 'Full admin rights for Arvind — manage everything within this client.', perms: fullPerms() },
+  { id: 'av-admin', name: 'Admin',       system: false, client: 'Arvind', users: 4, updated: 'today', desc: 'Manage Arvind operations — users, devices, and day-to-day activities.', perms: adminPerms() }
 ];
 
 const state = {
@@ -1658,13 +1631,8 @@ const DEVICES = [
 // Device actions and role defaults (used when no override present)
 const DEVICE_ACTIONS = ['view', 'control', 'configure'];
 const ROLE_DEVICE_DEFAULTS = {
-  'Super Admin':           { view: true,  control: true,  configure: true  },
-  'Owner':                 { view: true,  control: true,  configure: true  },
-  'Administrator':         { view: true,  control: true,  configure: true  },
-  'Plant Operator':        { view: true,  control: true,  configure: false },
-  'Maintenance Tech':      { view: true,  control: true,  configure: true  },
-  'Maintenance Technician':{ view: true,  control: true,  configure: true  },
-  'Viewer':                { view: true,  control: false, configure: false }
+  'Super Admin': { view: true, control: true, configure: true },
+  'Admin':       { view: true, control: true, configure: true }
 };
 function roleDefaults(role) {
   return ROLE_DEVICE_DEFAULTS[role] || { view: false, control: false, configure: false };
@@ -1689,16 +1657,16 @@ function isOverridden(user, device, action) {
 
 const users = [
   // Dynamic Looms — platform admins
-  { name: 'Priya Sharma',   email: 'priya@dynamiclooms.com',   role: 'Super Admin',    client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'active',   last: '2 min ago',    init: 'PS' },
-  { name: 'Aisha Patel',    email: 'aisha@dynamiclooms.com',   role: 'Administrator',  client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'active',   last: '1 hour ago',   init: 'AP' },
-  { name: 'Sophie Laurent', email: 'sophie@dynamiclooms.com',  role: 'Administrator',  client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'inactive', last: '3 weeks ago',  init: 'SL' },
+  { name: 'Priya Sharma',   email: 'priya@dynamiclooms.com',   role: 'Super Admin', client: 'Dynamic Looms', location: 'Mumbai HQ', status: 'active',   last: '2 min ago',    init: 'PS' },
+  { name: 'Aisha Patel',    email: 'aisha@dynamiclooms.com',   role: 'Admin',       client: 'Dynamic Looms', location: 'Mumbai HQ', status: 'active',   last: '1 hour ago',   init: 'AP' },
+  { name: 'Sophie Laurent', email: 'sophie@dynamiclooms.com',  role: 'Admin',       client: 'Dynamic Looms', location: 'Mumbai HQ', status: 'inactive', last: '3 weeks ago',  init: 'SL' },
 
-  // Arvind — client users
-  { name: 'Marcus Chen',    email: 'marcus.chen@arvind.com',   role: 'Owner',              client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '28 min ago',   init: 'MC' },
-  { name: 'David Okafor',   email: 'd.okafor@arvind.com',      role: 'Maintenance Tech',   client: 'Arvind', location: 'Chennai Plant',       status: 'active',   last: '3 hours ago',  init: 'DO' },
-  { name: 'Rahul Menon',    email: 'rahul@arvind.com',         role: 'Plant Operator',     client: 'Arvind', location: 'Pune Plant — Line B', status: 'active',   last: 'Yesterday',    init: 'RM' },
-  { name: 'Elena Volkova',  email: 'elena@arvind.com',         role: 'Viewer',             client: 'Arvind', location: 'Chennai Plant',       status: 'pending',  last: '—',            init: 'EV' },
-  { name: 'Tomás García',   email: 'tomas@arvind.com',         role: 'Plant Operator',     client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '5 min ago',    init: 'TG' }
+  // Arvind — 1 Super Admin + 4 Admins
+  { name: 'Marcus Chen',    email: 'marcus.chen@arvind.com',   role: 'Super Admin', client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '28 min ago',   init: 'MC' },
+  { name: 'David Okafor',   email: 'd.okafor@arvind.com',      role: 'Admin',       client: 'Arvind', location: 'Chennai Plant',       status: 'active',   last: '3 hours ago',  init: 'DO' },
+  { name: 'Rahul Menon',    email: 'rahul@arvind.com',         role: 'Admin',       client: 'Arvind', location: 'Pune Plant — Line B', status: 'active',   last: 'Yesterday',    init: 'RM' },
+  { name: 'Elena Volkova',  email: 'elena@arvind.com',         role: 'Admin',       client: 'Arvind', location: 'Chennai Plant',       status: 'pending',  last: '—',            init: 'EV' },
+  { name: 'Tomás García',   email: 'tomas@arvind.com',         role: 'Admin',       client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '5 min ago',    init: 'TG' }
 ];
 
 /* ============================================================
