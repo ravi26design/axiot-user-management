@@ -1457,9 +1457,9 @@
         <div class="hint">Which client this role is for.</div>
       </div>
       <div class="field enterprise-only">
-        <label class="label">Location <span class="req">*</span></label>
+        <label class="label">Industry <span class="req">*</span></label>
         <select class="select" id="newRoleIndustry" required></select>
-        <div class="hint">Location / industry context — inherited from the client by default. (Field name: Location in our terminology.)</div>
+        <div class="hint">Industry context — inherited from the client by default.</div>
       </div>
       <select class="select" id="newRoleTemplate" style="display:none"><option value=""></option></select>
     </div>
@@ -3013,7 +3013,7 @@ function openNewRoleDrawer() {
   }
   // Industry dropdown
   const ind = document.getElementById('newRoleIndustry');
-  ind.innerHTML = '<option value="" disabled>Select a location…</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
+  ind.innerHTML = '<option value="" disabled>Select an industry…</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
   syncRoleIndustry();
   // Change submit button label
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
@@ -3036,7 +3036,7 @@ function editRole(id) {
   scope.disabled = !!VIEW_CLIENT;
   scope.onchange = syncRoleIndustry;
   const ind = document.getElementById('newRoleIndustry');
-  ind.innerHTML = '<option value="" disabled>Select a location…</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
+  ind.innerHTML = '<option value="" disabled>Select an industry…</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
   ind.value = r.industry || INDUSTRY_BY_CLIENT[r.client] || '';
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
   if (submitBtn) submitBtn.textContent = 'Save changes';
@@ -3064,7 +3064,7 @@ function submitNewRole() {
   const industry = document.getElementById('newRoleIndustry').value;
   if (!name) { toast('Role name is required', 'danger'); return; }
   if (!scope) { toast('Please select which client this role is for', 'danger'); return; }
-  if (!VIEW_CLIENT && !industry) { toast('Please select a location', 'danger'); return; }
+  if (!VIEW_CLIENT && !industry) { toast('Please select an industry', 'danger'); return; }
 
   // Edit mode — update existing role
   if (state.editingRoleId) {
