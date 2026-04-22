@@ -1698,10 +1698,19 @@ function renderUserDetails() {
   })[u.status];
 
   content.innerHTML = `
-    <div class="breadcrumb">
-      Administration <span class="sep">/</span>
-      <span style="cursor:pointer;color:var(--primary)" onclick="switchScreen('users')">Users</span>
-      <span class="sep">/</span> <span class="current">${u.name}</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="breadcrumb" style="margin-bottom:0">
+        Administration <span class="sep">/</span>
+        <span style="cursor:pointer;color:var(--primary)" onclick="switchScreen('users')">Users</span>
+        <span class="sep">/</span> <span class="current">${u.name}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn btn-secondary btn-sm" onclick="openUserDrawer(${state.detailsUserIdx})">${SVG.edit} Edit</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleStatus(${state.detailsUserIdx});setTimeout(renderUserDetails,50)">
+          ${u.status === 'active' ? 'Deactivate' : 'Activate'}
+        </button>
+        <button class="btn btn-danger-ghost btn-sm" onclick="deleteUserFromDetails(${state.detailsUserIdx})">${SVG.trash} Delete</button>
+      </div>
     </div>
 
     <div class="user-hero">
@@ -1737,13 +1746,6 @@ function renderUserDetails() {
       </div>
       <div class="user-hero-right">
         ${statusPill}
-        <div class="actions">
-          <button class="btn btn-secondary btn-sm" onclick="openUserDrawer(${state.detailsUserIdx})">${SVG.edit} Edit</button>
-          <button class="btn btn-secondary btn-sm" onclick="toggleStatus(${state.detailsUserIdx});setTimeout(renderUserDetails,50)">
-            ${u.status === 'active' ? 'Deactivate' : 'Activate'}
-          </button>
-          <button class="btn btn-danger-ghost btn-sm" onclick="deleteUserFromDetails(${state.detailsUserIdx})">${SVG.trash}</button>
-        </div>
       </div>
     </div>
 
