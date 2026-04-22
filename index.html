@@ -1444,11 +1444,9 @@
         <textarea class="textarea" id="newRoleDesc" placeholder="What does this role do?"></textarea>
       </div>
       <div class="field">
-        <label class="label">Role for</label>
-        <select class="select" id="newRoleScope">
-          <option value="">Global — all clients</option>
-        </select>
-        <div class="hint">Choose which client this role is for, or keep it global.</div>
+        <label class="label">Role for <span class="req">*</span></label>
+        <select class="select" id="newRoleScope" required></select>
+        <div class="hint">Which client this role is for.</div>
       </div>
       <select class="select" id="newRoleTemplate" style="display:none"><option value=""></option></select>
     </div>
@@ -2891,14 +2889,14 @@ function openNewRoleDrawer() {
   document.getElementById('roleDrawerTitle').textContent = 'Create new role';
   document.getElementById('newRoleName').value = '';
   document.getElementById('newRoleDesc').value = '';
-  const tpl = document.getElementById('newRoleTemplate');
-  tpl.parentElement.style.display = '';
-  tpl.innerHTML = '<option value="">Blank — no permissions</option>' + state.roles.map(r => `<option value="${r.id}">Copy from: ${r.name}</option>`).join('');
   const scope = document.getElementById('newRoleScope');
-  scope.innerHTML = '<option value="">Global — all clients</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  scope.innerHTML = '<option value="" disabled>Select a client…</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
   scope.disabled = false;
+  // Preselect scope matching current filter, else leave placeholder
   if (state.roleClientFilter && state.roleClientFilter !== 'all' && state.roleClientFilter !== 'global') {
     scope.value = state.roleClientFilter;
+  } else {
+    scope.value = '';
   }
   // Change submit button label
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
@@ -2915,11 +2913,8 @@ function editRole(id) {
   document.getElementById('roleDrawerTitle').textContent = 'Edit role';
   document.getElementById('newRoleName').value = r.name;
   document.getElementById('newRoleDesc').value = r.desc || '';
-  // Hide "Start from template" in edit mode
-  const tpl = document.getElementById('newRoleTemplate');
-  tpl.parentElement.style.display = 'none';
   const scope = document.getElementById('newRoleScope');
-  scope.innerHTML = '<option value="">Global — all clients</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  scope.innerHTML = '<option value="" disabled>Select a client…</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
   scope.value = r.client || '';
   scope.disabled = false;
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
@@ -2935,8 +2930,9 @@ function closeRoleDrawer() {
 function submitNewRole() {
   const name = document.getElementById('newRoleName').value.trim();
   const desc = document.getElementById('newRoleDesc').value.trim();
-  const scope = document.getElementById('newRoleScope').value;  // '' → global, or client name
+  const scope = document.getElementById('newRoleScope').value;
   if (!name) { toast('Role name is required', 'danger'); return; }
+  if (!scope) { toast('Please select which client this role is for', 'danger'); return; }
 
   // Edit mode — update existing role
   if (state.editingRoleId) {
@@ -2944,7 +2940,7 @@ function submitNewRole() {
     if (r) {
       r.name = name;
       r.desc = desc || r.desc;
-      r.client = scope || null;
+      r.client = scope;
       r.updated = 'just now';
     }
     state.editingRoleId = null;
@@ -2954,13 +2950,12 @@ function submitNewRole() {
     return;
   }
 
-  // Create mode
-  const tpl = document.getElementById('newRoleTemplate').value;
-  const basePerms = tpl ? JSON.parse(JSON.stringify(state.roles.find(r => r.id === tpl).perms)) : emptyPerms();
+  // Create mode — blank permissions by default
+  const basePerms = emptyPerms();
   const newRole = {
     id: 'r_' + Date.now(),
     name, system: false, users: 0, updated: 'just now',
-    client: scope || null,
+    client: scope,
     desc: desc || 'Custom role.',
     perms: basePerms
   };
@@ -2968,7 +2963,7 @@ function submitNewRole() {
   state.selectedRoleId = newRole.id;
   state.dirtyPerms = JSON.parse(JSON.stringify(basePerms));
   state.initialPerms = JSON.parse(JSON.stringify(basePerms));
-  state.roleClientFilter = scope || 'all';
+  state.roleClientFilter = scope;
   closeRoleDrawer();
   renderRoles();
   toast('Role created', 'success');
