@@ -192,13 +192,15 @@
     width: 6px; height: 6px; background: var(--danger);
     border: 1.5px solid var(--surface); border-radius: 999px;
   }
+  .notif-btn [data-lucide] { width: 18px; height: 18px; stroke-width: 1.9; }
+  .notif-btn:hover [data-lucide] { transform: rotate(-8deg); transition: transform .25s; }
   .notif-badge {
-    position: absolute; top: 4px; right: 3px;
-    min-width: 16px; height: 16px; padding: 0 4px;
+    position: absolute; top: 2px; right: 0;
+    min-width: 17px; height: 17px; padding: 0 5px;
     background: var(--danger); color: #fff;
-    font-size: 10px; font-weight: 600; line-height: 16px;
+    font-size: 10.5px; font-weight: 700; line-height: 17px;
     border-radius: 10px; text-align: center;
-    border: 1.5px solid var(--surface);
+    border: 2px solid var(--surface);
   }
 
   /* Profile chip */
@@ -1434,7 +1436,7 @@ const SVG = {
   audit:     li('activity'),
   settings:  li('settings'),
   help:      li('circle-help'),
-  bell:      li('bell-ring'),
+  bell:      li('bell-dot'),
   edit:      li('pencil'),
   trash:     li('trash-2'),
   copy:      li('copy'),
@@ -1812,7 +1814,7 @@ function renderTopbar() {
   const html = `
     <div style="display:flex;align-items:center;gap:4px">${titleHtml}</div>
     <div class="top-actions">
-      <button class="icon-btn" onclick="openNotifs(event)" title="Notifications" aria-label="Notifications">
+      <button class="icon-btn notif-btn" onclick="openNotifs(event)" title="Notifications" aria-label="Notifications">
         ${SVG.bell}${unread ? `<span class="notif-badge">${unread}</span>` : ''}
       </button>
       <div class="profile-chip" onclick="openProfile(event)" title="Account">
