@@ -1592,8 +1592,57 @@ const initialRoles = [
   { id: 'dl-admin', name: 'Admin',       system: false, client: 'Dynamic Looms', users: 2, updated: 'Apr 08', desc: 'Manage Dynamic Looms operations — users, devices, and day-to-day activities.', perms: adminPerms() },
 
   // Arvind roles
-  { id: 'av-super', name: 'Super Admin', system: false, client: 'Arvind', users: 1, updated: 'Feb 28', desc: 'Full admin rights for Arvind — manage everything within this client.', perms: fullPerms() },
-  { id: 'av-admin', name: 'Admin',       system: false, client: 'Arvind', users: 4, updated: 'today', desc: 'Manage Arvind operations — users, devices, and day-to-day activities.', perms: adminPerms() }
+  { id: 'av-super',  name: 'Super Admin',            system: false, client: 'Arvind', users: 1,   updated: 'Feb 28',   desc: 'Full admin rights for Arvind — manage everything within this client.', perms: fullPerms() },
+  { id: 'av-admin',  name: 'Admin',                  system: false, client: 'Arvind', users: 4,   updated: 'today',    desc: 'Manage Arvind operations — users, devices, and day-to-day activities.', perms: adminPerms() },
+  { id: 'av-mgr',    name: 'Plant Manager',          system: false, client: 'Arvind', users: 6,   updated: 'Apr 18',   desc: 'Oversees a specific plant — manage users, devices, and reports within that site.', perms: (() => {
+    const p = emptyPerms();
+    ['devices','alerts','reports','users','telemetry','commands'].forEach(k => { if (p[k]) { p[k].view = p[k].create = p[k].edit = true; } });
+    p.devices.delete = true;
+    return p;
+  })() },
+  { id: 'av-sup',    name: 'Shift Supervisor',       system: false, client: 'Arvind', users: 12,  updated: 'Apr 14',   desc: 'Supervises a shift — acknowledges alerts and monitors operators.', perms: (() => {
+    const p = emptyPerms();
+    p.devices.view = p.devices.edit = true;
+    p.telemetry.view = true;
+    p.commands.view = p.commands.edit = true;
+    p.alerts.view = p.alerts.edit = true;
+    p.reports.view = true;
+    p.users.view = true;
+    return p;
+  })() },
+  { id: 'av-op',     name: 'Plant Operator',         system: false, client: 'Arvind', users: 58,  updated: 'Apr 09',   desc: 'Day-to-day operator — runs devices and handles alerts on assigned lines.', perms: (() => {
+    const p = emptyPerms();
+    p.devices.view = p.devices.create = p.devices.edit = true;
+    p.telemetry.view = true;
+    p.commands.view = p.commands.edit = true;
+    p.alerts.view = true;
+    p.reports.view = true;
+    return p;
+  })() },
+  { id: 'av-tech',   name: 'Maintenance Technician', system: false, client: 'Arvind', users: 22,  updated: 'Apr 05',   desc: 'Maintenance crew — diagnoses and fixes device issues.', perms: (() => {
+    const p = emptyPerms();
+    p.devices.view = p.devices.edit = true;
+    p.telemetry.view = true;
+    p.commands.view = p.commands.edit = true;
+    p.alerts.view = p.alerts.edit = true;
+    return p;
+  })() },
+  { id: 'av-analyst',name: 'Data Analyst',           system: false, client: 'Arvind', users: 3,   updated: 'Apr 02',   desc: 'Read + export analytics and reports, no device control.', perms: (() => {
+    const p = emptyPerms();
+    ['devices','alerts','reports','telemetry'].forEach(k => p[k].view = true);
+    p.reports.create = p.reports.edit = true;
+    return p;
+  })() },
+  { id: 'av-viewer', name: 'Viewer',                 system: false, client: 'Arvind', users: 104, updated: 'Mar 28',   desc: 'Read-only access to devices, alerts, and reports.', perms: (() => {
+    const p = emptyPerms();
+    ['devices','alerts','reports','telemetry'].forEach(k => p[k].view = true);
+    return p;
+  })() },
+  { id: 'av-audit',  name: 'Compliance Auditor',     system: false, client: 'Arvind', users: 2,   updated: 'Mar 20',   desc: 'Read-only access to audit trails, logs, and compliance reports.', perms: (() => {
+    const p = emptyPerms();
+    ['devices','alerts','reports','users','telemetry','rolesRes'].forEach(k => { if (p[k]) p[k].view = true; });
+    return p;
+  })() }
 ];
 
 const state = {
