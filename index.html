@@ -1468,7 +1468,37 @@ function fullPerms() {
 }
 
 const initialRoles = [
-  { id: 'admin', name: 'Admin', system: false, users: 8, updated: 'today', desc: 'Full access to manage users, devices, and platform operations.', perms: fullPerms() }
+  { id: 'super', name: 'Super Admin', system: true, users: 2, updated: 'Mar 12', desc: 'Full platform access across all tenants. Cannot be modified.', perms: fullPerms() },
+  { id: 'owner', name: 'Owner', system: true, users: 5, updated: 'Feb 28', desc: 'Client owner with full admin rights within their organization.', perms: (() => { const p = fullPerms(); p.billing.delete = false; return p; })() },
+  { id: 'admin', name: 'Administrator', system: false, users: 20, updated: 'Apr 08', desc: 'Manages users, devices, and day-to-day operations.', perms: (() => {
+    const p = emptyPerms();
+    ['devices','alerts','reports','users','telemetry','commands'].forEach(k => { p[k].view = p[k].create = p[k].edit = true; });
+    p.devices.delete = true;
+    p.users.delete = true;
+    return p;
+  })() },
+  { id: 'operator', name: 'Plant Operator', system: false, users: 148, updated: 'today', desc: 'Day-to-day operators managing devices and acknowledging alerts on their assigned lines.', perms: (() => {
+    const p = emptyPerms();
+    p.devices.view = p.devices.create = p.devices.edit = true;
+    p.telemetry.view = true;
+    p.commands.view = p.commands.edit = true;
+    p.alerts.view = true;
+    p.reports.view = true;
+    return p;
+  })() },
+  { id: 'tech', name: 'Maintenance Technician', system: false, users: 63, updated: 'Apr 04', desc: 'Performs maintenance tasks and resolves device issues.', perms: (() => {
+    const p = emptyPerms();
+    p.devices.view = p.devices.edit = true;
+    p.telemetry.view = true;
+    p.commands.view = p.commands.edit = true;
+    p.alerts.view = true;
+    return p;
+  })() },
+  { id: 'viewer', name: 'Viewer', system: true, users: 1046, updated: 'Jan 22', desc: 'Read-only access across assigned tenants.', perms: (() => {
+    const p = emptyPerms();
+    ['devices','alerts','reports','telemetry'].forEach(k => p[k].view = true);
+    return p;
+  })() }
 ];
 
 const state = {
@@ -1522,7 +1552,13 @@ const DEVICES = [
 // Device actions and role defaults (used when no override present)
 const DEVICE_ACTIONS = ['view', 'control', 'configure'];
 const ROLE_DEVICE_DEFAULTS = {
-  'Admin': { view: true, control: true, configure: true }
+  'Super Admin':           { view: true,  control: true,  configure: true  },
+  'Owner':                 { view: true,  control: true,  configure: true  },
+  'Administrator':         { view: true,  control: true,  configure: true  },
+  'Plant Operator':        { view: true,  control: true,  configure: false },
+  'Maintenance Tech':      { view: true,  control: true,  configure: true  },
+  'Maintenance Technician':{ view: true,  control: true,  configure: true  },
+  'Viewer':                { view: true,  control: false, configure: false }
 };
 function roleDefaults(role) {
   return ROLE_DEVICE_DEFAULTS[role] || { view: false, control: false, configure: false };
@@ -1547,16 +1583,16 @@ function isOverridden(user, device, action) {
 
 const users = [
   // Dynamic Looms — platform admins
-  { name: 'Priya Sharma',   email: 'priya@dynamiclooms.com',   role: 'Admin', client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'active',   last: '2 min ago',    init: 'PS' },
-  { name: 'Aisha Patel',    email: 'aisha@dynamiclooms.com',   role: 'Admin', client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'active',   last: '1 hour ago',   init: 'AP' },
-  { name: 'Sophie Laurent', email: 'sophie@dynamiclooms.com',  role: 'Admin', client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'inactive', last: '3 weeks ago',  init: 'SL' },
+  { name: 'Priya Sharma',   email: 'priya@dynamiclooms.com',   role: 'Super Admin',    client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'active',   last: '2 min ago',    init: 'PS' },
+  { name: 'Aisha Patel',    email: 'aisha@dynamiclooms.com',   role: 'Administrator',  client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'active',   last: '1 hour ago',   init: 'AP' },
+  { name: 'Sophie Laurent', email: 'sophie@dynamiclooms.com',  role: 'Administrator',  client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'inactive', last: '3 weeks ago',  init: 'SL' },
 
-  // Arvind — client admins
-  { name: 'Marcus Chen',    email: 'marcus.chen@arvind.com',   role: 'Admin', client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '28 min ago',   init: 'MC' },
-  { name: 'David Okafor',   email: 'd.okafor@arvind.com',      role: 'Admin', client: 'Arvind', location: 'Chennai Plant',       status: 'active',   last: '3 hours ago',  init: 'DO' },
-  { name: 'Rahul Menon',    email: 'rahul@arvind.com',         role: 'Admin', client: 'Arvind', location: 'Pune Plant — Line B', status: 'active',   last: 'Yesterday',    init: 'RM' },
-  { name: 'Elena Volkova',  email: 'elena@arvind.com',         role: 'Admin', client: 'Arvind', location: 'Chennai Plant',       status: 'pending',  last: '—',            init: 'EV' },
-  { name: 'Tomás García',   email: 'tomas@arvind.com',         role: 'Admin', client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '5 min ago',    init: 'TG' }
+  // Arvind — client users
+  { name: 'Marcus Chen',    email: 'marcus.chen@arvind.com',   role: 'Owner',              client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '28 min ago',   init: 'MC' },
+  { name: 'David Okafor',   email: 'd.okafor@arvind.com',      role: 'Maintenance Tech',   client: 'Arvind', location: 'Chennai Plant',       status: 'active',   last: '3 hours ago',  init: 'DO' },
+  { name: 'Rahul Menon',    email: 'rahul@arvind.com',         role: 'Plant Operator',     client: 'Arvind', location: 'Pune Plant — Line B', status: 'active',   last: 'Yesterday',    init: 'RM' },
+  { name: 'Elena Volkova',  email: 'elena@arvind.com',         role: 'Viewer',             client: 'Arvind', location: 'Chennai Plant',       status: 'pending',  last: '—',            init: 'EV' },
+  { name: 'Tomás García',   email: 'tomas@arvind.com',         role: 'Plant Operator',     client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '5 min ago',    init: 'TG' }
 ];
 
 /* ============================================================
