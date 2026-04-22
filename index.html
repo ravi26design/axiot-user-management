@@ -1468,8 +1468,8 @@ function fullPerms() {
 }
 
 const initialRoles = [
-  { id: 'super', name: 'Super Admin', system: true, users: 2, updated: 'Mar 12', desc: 'Full platform access across all tenants. Cannot be modified.', perms: fullPerms() },
-  { id: 'owner', name: 'Owner', system: true, users: 5, updated: 'Feb 28', desc: 'Client owner with full admin rights within their organization.', perms: (() => { const p = fullPerms(); p.billing.delete = false; return p; })() },
+  { id: 'super', name: 'Super Admin', system: false, users: 2, updated: 'Mar 12', desc: 'Full platform access across all tenants. Cannot be modified.', perms: fullPerms() },
+  { id: 'owner', name: 'Owner', system: false, users: 5, updated: 'Feb 28', desc: 'Client owner with full admin rights within their organization.', perms: (() => { const p = fullPerms(); p.billing.delete = false; return p; })() },
   { id: 'admin', name: 'Administrator', system: false, users: 20, updated: 'Apr 08', desc: 'Manages users, devices, and day-to-day operations.', perms: (() => {
     const p = emptyPerms();
     ['devices','alerts','reports','users','telemetry','commands'].forEach(k => { p[k].view = p[k].create = p[k].edit = true; });
@@ -1494,7 +1494,7 @@ const initialRoles = [
     p.alerts.view = true;
     return p;
   })() },
-  { id: 'viewer', name: 'Viewer', system: true, users: 1046, updated: 'Jan 22', desc: 'Read-only access across assigned tenants.', perms: (() => {
+  { id: 'viewer', name: 'Viewer', system: false, users: 1046, updated: 'Jan 22', desc: 'Read-only access across assigned tenants.', perms: (() => {
     const p = emptyPerms();
     ['devices','alerts','reports','telemetry'].forEach(k => p[k].view = true);
     return p;
