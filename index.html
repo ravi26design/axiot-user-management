@@ -1204,7 +1204,7 @@
             </div>
             <div class="filter-wrap"><button class="chip-select" id="filterRoleBtn" onclick="toggleFilter('role', this)">Role <span class="caret">▾</span></button></div>
             <div class="filter-wrap"><button class="chip-select" id="filterStatusBtn" onclick="toggleFilter('status', this)">Status <span class="caret">▾</span></button></div>
-            <div class="filter-wrap"><button class="chip-select" id="filterTenantBtn" onclick="toggleFilter('tenant', this)">Tenant <span class="caret">▾</span></button></div>
+            <div class="filter-wrap"><button class="chip-select" id="filterClientBtn" onclick="toggleFilter('client', this)">Client <span class="caret">▾</span></button></div>
             <div class="filter-wrap"><button class="chip-select" id="filterLocationBtn" onclick="toggleFilter('location', this)">Location <span class="caret">▾</span></button></div>
             <button class="chip-select" id="clearFiltersBtn" onclick="clearAllFilters()" style="display:none;color:var(--danger);border-color:var(--danger)">Clear all</button>
             <div class="toolbar-right">
@@ -1223,7 +1223,7 @@
               <thead><tr>
                 <th style="width:36px"><input type="checkbox" class="check" onchange="toggleAll(this)" /></th>
                 <th>Name <span class="sort">▲</span></th>
-                <th>Tenant</th>
+                <th>Client</th>
                 <th>Location</th>
                 <th>Role</th>
                 <th>Status</th>
@@ -1311,23 +1311,14 @@
     <div class="form-section">
       <div class="form-section-title">Assignment</div>
       <div class="field">
-        <label class="label">Tenant <span class="req">*</span></label>
-        <select class="select" id="inviteTenant">
-          <option>Acme Industries</option>
-          <option>Northwind Energy</option>
-          <option>Contoso Energy</option>
-        </select>
-        <div class="hint">The organization this user belongs to.</div>
+        <label class="label">Client <span class="req">*</span></label>
+        <select class="select" id="inviteClient" onchange="refreshInviteLocations()"></select>
+        <div class="hint">Which client this user belongs to.</div>
       </div>
       <div class="field">
         <label class="label">Location <span class="req">*</span></label>
-        <select class="select" id="inviteLocation">
-          <option>Pune Plant — Line A</option>
-          <option>Pune Plant — Line B</option>
-          <option>Chennai Plant</option>
-          <option>Mumbai HQ</option>
-        </select>
-        <div class="hint">Site or sub-tenant within the tenant.</div>
+        <select class="select" id="inviteLocation"></select>
+        <div class="hint">Site within the selected client.</div>
       </div>
       <div class="field">
         <label class="label">Role <span class="req">*</span></label>
@@ -1446,18 +1437,9 @@ const SVG = {
 };
 
 const NAV = [
-  { section: 'Workspace' },
-  { key: 'dashboard', label: 'Dashboard', ico: SVG.dashboard },
-  { key: 'devices', label: 'Devices', ico: SVG.devices, badge: '1,284' },
-  { key: 'alerts', label: 'Alerts', ico: SVG.alerts, badge: '24', badgeClass: 'alert' },
-  { key: 'analytics', label: 'Analytics', ico: SVG.analytics },
-  { key: 'reports', label: 'Reports', ico: SVG.reports },
   { section: 'Administration' },
   { key: 'users', label: 'Users', ico: SVG.users, screen: 'users' },
-  { key: 'roles', label: 'Roles & permissions', ico: SVG.roles, screen: 'roles' },
-  { key: 'tenants', label: 'Tenants', ico: SVG.tenants },
-  { key: 'audit', label: 'Audit log', ico: SVG.audit },
-  { key: 'settings', label: 'Settings', ico: SVG.settings }
+  { key: 'roles', label: 'Roles & permissions', ico: SVG.roles, screen: 'roles' }
 ];
 
 const RESOURCES = [
@@ -1493,7 +1475,7 @@ function fullPerms() {
 
 const initialRoles = [
   { id: 'super', name: 'Super Admin', system: true, users: 2, updated: 'Mar 12', desc: 'Full platform access across all tenants. Cannot be modified.', perms: fullPerms() },
-  { id: 'owner', name: 'Owner', system: true, users: 5, updated: 'Feb 28', desc: 'Tenant owner with full admin rights within their tenant.', perms: (() => { const p = fullPerms(); p.billing.delete = false; return p; })() },
+  { id: 'owner', name: 'Owner', system: true, users: 5, updated: 'Feb 28', desc: 'Client owner with full admin rights within their organization.', perms: (() => { const p = fullPerms(); p.billing.delete = false; return p; })() },
   { id: 'admin', name: 'Administrator', system: false, users: 20, updated: 'Apr 08', desc: 'Manages users, devices, and day-to-day operations.', perms: (() => {
     const p = emptyPerms();
     ['devices','alerts','reports','users','telemetry','commands'].forEach(k => { p[k].view = p[k].create = p[k].edit = true; });
@@ -1537,52 +1519,40 @@ const state = {
 /* ============================================================
    Devices + role-based defaults
    ============================================================ */
+const CLIENTS = ['Dynamic Looms', 'Arvind'];
+const LOCATIONS_BY_CLIENT = {
+  'Dynamic Looms': ['Mumbai HQ'],
+  'Arvind':        ['Pune Plant — Line A', 'Pune Plant — Line B', 'Chennai Plant', 'Ahmedabad HQ']
+};
+
 const DEVICES = [
-  // Mumbai HQ — Acme Industries
-  { id: 'd-001', name: 'Gateway GW-HQ01',      type: 'Gateway',       tenant: 'Acme Industries', location: 'Mumbai HQ' },
-  { id: 'd-002', name: 'Network Switch NSW-42',type: 'Network',       tenant: 'Acme Industries', location: 'Mumbai HQ' },
-  { id: 'd-003', name: 'Server Rack SR-03',    type: 'Server',        tenant: 'Acme Industries', location: 'Mumbai HQ' },
-  { id: 'd-004', name: 'CCTV Cluster C-MUM',   type: 'Camera',        tenant: 'Acme Industries', location: 'Mumbai HQ' },
-  { id: 'd-005', name: 'Access Control AC-L1', type: 'Access Control',tenant: 'Acme Industries', location: 'Mumbai HQ' },
+  // Dynamic Looms — Mumbai HQ (platform ops)
+  { id: 'd-001', name: 'Platform Gateway GW-DL01',  type: 'Gateway', client: 'Dynamic Looms', location: 'Mumbai HQ' },
+  { id: 'd-002', name: 'Monitoring Server MS-01',   type: 'Server',  client: 'Dynamic Looms', location: 'Mumbai HQ' },
 
-  // Pune Plant — Line A
-  { id: 'd-010', name: 'Compressor #4',        type: 'Compressor',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
-  { id: 'd-011', name: 'Valve Cluster V12',    type: 'Valve',         tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
-  { id: 'd-012', name: 'Conveyor Motor M3',    type: 'Motor',         tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
-  { id: 'd-013', name: 'Temperature Sensor TS-A7', type: 'Sensor',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
-  { id: 'd-014', name: 'Flow Meter FM-12',     type: 'Flow meter',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
-  { id: 'd-015', name: 'Pressure Gauge PG-A1', type: 'Gauge',         tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+  // Arvind — Pune Plant — Line A
+  { id: 'd-010', name: 'Compressor #4',             type: 'Compressor', client: 'Arvind', location: 'Pune Plant — Line A' },
+  { id: 'd-011', name: 'Valve Cluster V12',         type: 'Valve',      client: 'Arvind', location: 'Pune Plant — Line A' },
+  { id: 'd-012', name: 'Conveyor Motor M3',         type: 'Motor',      client: 'Arvind', location: 'Pune Plant — Line A' },
+  { id: 'd-013', name: 'Temperature Sensor TS-A7',  type: 'Sensor',     client: 'Arvind', location: 'Pune Plant — Line A' },
+  { id: 'd-014', name: 'Flow Meter FM-12',          type: 'Flow meter', client: 'Arvind', location: 'Pune Plant — Line A' },
+  { id: 'd-015', name: 'Pressure Gauge PG-A1',      type: 'Gauge',      client: 'Arvind', location: 'Pune Plant — Line A' },
 
-  // Pune Plant — Line B
-  { id: 'd-020', name: 'Pump Station P2',      type: 'Pump',          tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
-  { id: 'd-021', name: 'Heat Exchanger H1',    type: 'Exchanger',     tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
-  { id: 'd-022', name: 'Cooling Tower CT-B2',  type: 'Cooling',       tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
-  { id: 'd-023', name: 'Conveyor Motor M5',    type: 'Motor',         tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
+  // Arvind — Pune Plant — Line B
+  { id: 'd-020', name: 'Pump Station P2',           type: 'Pump',      client: 'Arvind', location: 'Pune Plant — Line B' },
+  { id: 'd-021', name: 'Heat Exchanger H1',         type: 'Exchanger', client: 'Arvind', location: 'Pune Plant — Line B' },
+  { id: 'd-022', name: 'Cooling Tower CT-B2',       type: 'Cooling',   client: 'Arvind', location: 'Pune Plant — Line B' },
+  { id: 'd-023', name: 'Conveyor Motor M5',         type: 'Motor',     client: 'Arvind', location: 'Pune Plant — Line B' },
 
-  // Chennai Plant
-  { id: 'd-030', name: 'Press Line PR-1',      type: 'Press',         tenant: 'Acme Industries', location: 'Chennai Plant' },
-  { id: 'd-031', name: 'Boiler B-07',          type: 'Boiler',        tenant: 'Acme Industries', location: 'Chennai Plant' },
-  { id: 'd-032', name: 'Robotic Arm RA-02',    type: 'Robot',         tenant: 'Acme Industries', location: 'Chennai Plant' },
-  { id: 'd-033', name: 'Welder Station WS-14', type: 'Welder',        tenant: 'Acme Industries', location: 'Chennai Plant' },
+  // Arvind — Chennai Plant
+  { id: 'd-030', name: 'Press Line PR-1',           type: 'Press',     client: 'Arvind', location: 'Chennai Plant' },
+  { id: 'd-031', name: 'Boiler B-07',               type: 'Boiler',    client: 'Arvind', location: 'Chennai Plant' },
+  { id: 'd-032', name: 'Robotic Arm RA-02',         type: 'Robot',     client: 'Arvind', location: 'Chennai Plant' },
+  { id: 'd-033', name: 'Welder Station WS-14',      type: 'Welder',    client: 'Arvind', location: 'Chennai Plant' },
 
-  // Northwind Energy — Head Office
-  { id: 'd-040', name: 'Turbine T-22',         type: 'Turbine',       tenant: 'Northwind Energy', location: 'Head Office' },
-  { id: 'd-041', name: 'Wind Sensor WS-09',    type: 'Sensor',        tenant: 'Northwind Energy', location: 'Head Office' },
-  { id: 'd-042', name: 'Gateway NW-GW-01',     type: 'Gateway',       tenant: 'Northwind Energy', location: 'Head Office' },
-
-  // Northwind Energy — Paris HQ
-  { id: 'd-050', name: 'Solar Inverter SI-5',  type: 'Inverter',      tenant: 'Northwind Energy', location: 'Paris HQ' },
-  { id: 'd-051', name: 'Smart Meter SM-PAR',   type: 'Meter',         tenant: 'Northwind Energy', location: 'Paris HQ' },
-  { id: 'd-052', name: 'Battery Bank BB-02',   type: 'Battery',       tenant: 'Northwind Energy', location: 'Paris HQ' },
-
-  // Contoso Energy — Madrid Site
-  { id: 'd-060', name: 'Monitoring Gateway MG-MAD', type: 'Gateway',  tenant: 'Contoso Energy', location: 'Madrid Site' },
-  { id: 'd-061', name: 'Solar Array SA-01',    type: 'Solar',         tenant: 'Contoso Energy', location: 'Madrid Site' },
-  { id: 'd-062', name: 'Grid Connect GC-ES',   type: 'Grid',          tenant: 'Contoso Energy', location: 'Madrid Site' },
-
-  // Contoso Energy — Warsaw Site
-  { id: 'd-070', name: 'Backup Generator BG-WAR', type: 'Generator', tenant: 'Contoso Energy', location: 'Warsaw Site' },
-  { id: 'd-071', name: 'Transformer TR-PL-04',   type: 'Transformer',tenant: 'Contoso Energy', location: 'Warsaw Site' }
+  // Arvind — Ahmedabad HQ
+  { id: 'd-040', name: 'HQ Gateway GW-AHM01',       type: 'Gateway',   client: 'Arvind', location: 'Ahmedabad HQ' },
+  { id: 'd-041', name: 'Network Switch NSW-12',     type: 'Network',   client: 'Arvind', location: 'Ahmedabad HQ' }
 ];
 
 // Device actions and role defaults (used when no override present)
@@ -1604,7 +1574,7 @@ function deviceIcon(type) {
 }
 // Effective permission: override if set, else role default ONLY if device is in user's scope (same tenant + location)
 function deviceInScope(user, device) {
-  return device.tenant === user.tenant && device.location === user.location;
+  return device.client === user.client && device.location === user.location;
 }
 function effectivePerm(user, device, action) {
   const overrides = (user.deviceOverrides || {})[device.id];
@@ -1618,14 +1588,17 @@ function isOverridden(user, device, action) {
 }
 
 const users = [
-  { name: 'Priya Sharma', email: 'priya.sharma@acme-industries.com', role: 'Administrator', tenant: 'Acme Industries', location: 'Mumbai HQ', status: 'active', last: '2 min ago', init: 'PS' },
-  { name: 'Marcus Chen', email: 'marcus.chen@acme-industries.com', role: 'Plant Operator', tenant: 'Acme Industries', location: 'Pune Plant — Line A', status: 'active', last: '28 min ago', init: 'MC' },
-  { name: 'Aisha Patel', email: 'aisha.patel@northwind.co', role: 'Owner', tenant: 'Northwind Energy', location: 'Head Office', status: 'active', last: '1 hour ago', init: 'AP' },
-  { name: 'David Okafor', email: 'd.okafor@acme-industries.com', role: 'Maintenance Tech', tenant: 'Acme Industries', location: 'Chennai Plant', status: 'active', last: '3 hours ago', init: 'DO' },
-  { name: 'Elena Volkova', email: 'elena@contoso-energy.com', role: 'Viewer', tenant: 'Contoso Energy', location: 'Warsaw Site', status: 'pending', last: '—', init: 'EV' },
-  { name: 'Rahul Menon', email: 'rahul.m@acme-industries.com', role: 'Plant Operator', tenant: 'Acme Industries', location: 'Pune Plant — Line B', status: 'active', last: 'Yesterday', init: 'RM' },
-  { name: 'Sophie Laurent', email: 's.laurent@northwind.co', role: 'Administrator', tenant: 'Northwind Energy', location: 'Paris HQ', status: 'inactive', last: '3 weeks ago', init: 'SL' },
-  { name: 'Tomás García', email: 'tomas@contoso-energy.com', role: 'Viewer', tenant: 'Contoso Energy', location: 'Madrid Site', status: 'active', last: '5 min ago', init: 'TG' }
+  // Dynamic Looms — platform admins
+  { name: 'Priya Sharma',   email: 'priya@dynamiclooms.com',   role: 'Super Admin',    client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'active',   last: '2 min ago',    init: 'PS' },
+  { name: 'Aisha Patel',    email: 'aisha@dynamiclooms.com',   role: 'Administrator',  client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'active',   last: '1 hour ago',   init: 'AP' },
+  { name: 'Sophie Laurent', email: 'sophie@dynamiclooms.com',  role: 'Administrator',  client: 'Dynamic Looms', location: 'Mumbai HQ',           status: 'inactive', last: '3 weeks ago',  init: 'SL' },
+
+  // Arvind — client users
+  { name: 'Marcus Chen',    email: 'marcus.chen@arvind.com',   role: 'Owner',              client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '28 min ago',   init: 'MC' },
+  { name: 'David Okafor',   email: 'd.okafor@arvind.com',      role: 'Maintenance Tech',   client: 'Arvind', location: 'Chennai Plant',       status: 'active',   last: '3 hours ago',  init: 'DO' },
+  { name: 'Rahul Menon',    email: 'rahul@arvind.com',         role: 'Plant Operator',     client: 'Arvind', location: 'Pune Plant — Line B', status: 'active',   last: 'Yesterday',    init: 'RM' },
+  { name: 'Elena Volkova',  email: 'elena@arvind.com',         role: 'Viewer',             client: 'Arvind', location: 'Chennai Plant',       status: 'pending',  last: '—',            init: 'EV' },
+  { name: 'Tomás García',   email: 'tomas@arvind.com',         role: 'Plant Operator',     client: 'Arvind', location: 'Pune Plant — Line A', status: 'active',   last: '5 min ago',    init: 'TG' }
 ];
 
 /* ============================================================
@@ -1757,7 +1730,7 @@ function openProfile(evt) {
       <button onclick="profileAction('sessions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>My sessions</button>
       <button onclick="profileAction('prefs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.66.88 1.09 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Preferences</button>
       <div class="sep"></div>
-      <button onclick="profileAction('tenant')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>Switch tenant</button>
+      <button onclick="profileAction('client')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>Switch client</button>
       <button onclick="profileAction('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>Help & documentation</button>
       <div class="sep"></div>
       <button class="danger" onclick="profileAction('signout')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Sign out<span class="prof-kbd">⇧⌘Q</span></button>
@@ -1772,7 +1745,7 @@ function profileAction(kind) {
     confirmDialog('Sign out of AXIoT?', 'You will be returned to the sign-in page.', () => toast('Signed out', 'danger'));
     return;
   }
-  const labels = { profile: 'My profile', sessions: 'My sessions', prefs: 'Preferences', tenant: 'Switch tenant', help: 'Help & documentation' };
+  const labels = { profile: 'My profile', sessions: 'My sessions', prefs: 'Preferences', client: 'Switch client', help: 'Help & documentation' };
   toast('Opening: ' + labels[kind]);
 }
 
@@ -1870,7 +1843,7 @@ function switchDetailsTab(tab) { state.detailsTab = tab; renderUserDetails(); }
 function renderUserDetails() {
   const u = users[state.detailsUserIdx];
   if (!u) { switchScreen('users'); return; }
-  const deviceCount = DEVICES.filter(d => d.tenant === u.tenant && d.location === u.location).length;
+  const deviceCount = DEVICES.filter(d => d.client === u.client && d.location === u.location).length;
 
   const content = document.getElementById('userDetailsContent');
 
@@ -1992,7 +1965,7 @@ function renderOverviewTab(u) {
         </div>
       </div>
       <div class="info-rows">
-        <div class="info-row-cell"><div class="info-row-label">Tenant</div><div class="info-row-value">${u.tenant}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Client</div><div class="info-row-value">${u.client}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Role</div><div class="info-row-value">${roleTag(u.role)}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Two-factor auth</div><div class="info-row-value"><span class="chip chip-active"><span class="dot"></span>Enabled</span></div></div>
         <div class="info-row-cell"><div class="info-row-label">Active sessions</div><div class="info-row-value">3</div></div>
@@ -2017,7 +1990,7 @@ function renderOverviewTab(u) {
 
 function renderDevicesTab(u) {
   // Scope: only devices at this user's tenant + location
-  const tenantDevices = DEVICES.filter(d => d.tenant === u.tenant && d.location === u.location);
+  const tenantDevices = DEVICES.filter(d => d.client === u.client && d.location === u.location);
   const defaults = roleDefaults(u.role);
   const overrideCount = u.deviceOverrides ? Object.values(u.deviceOverrides).reduce((n, o) => n + Object.keys(o).length, 0) : 0;
 
@@ -2229,7 +2202,7 @@ function roleTag(role) {
 }
 
 const STATUS_LABELS = { active: 'Active', inactive: 'Inactive', pending: 'Pending' };
-const userFilters = { search: '', role: new Set(), status: new Set(), tenant: new Set(), location: new Set() };
+const userFilters = { search: '', role: new Set(), status: new Set(), client: new Set(), location: new Set() };
 
 function filteredUsers() {
   const q = userFilters.search.trim().toLowerCase();
@@ -2237,7 +2210,7 @@ function filteredUsers() {
     if (q && !(u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))) return false;
     if (userFilters.role.size && !userFilters.role.has(u.role)) return false;
     if (userFilters.status.size && !userFilters.status.has(u.status)) return false;
-    if (userFilters.tenant.size && !userFilters.tenant.has(u.tenant)) return false;
+    if (userFilters.client.size && !userFilters.client.has(u.client)) return false;
     if (userFilters.location.size && !userFilters.location.has(u.location)) return false;
     return true;
   });
@@ -2257,7 +2230,7 @@ function renderUsers() {
     <tr class="row-clickable" onclick="openUserDetails(${idx})">
       <td onclick="event.stopPropagation()"><input type="checkbox" class="check" onchange="rowSelect()" /></td>
       <td><div class="cell-user"><div class="avatar avatar-28">${u.init}</div><div><div class="cell-user-name">${u.name}</div><div class="cell-user-sub">${u.email}</div></div></div></td>
-      <td style="color:var(--text-muted)">${u.tenant}</td>
+      <td style="color:var(--text-muted)">${u.client}</td>
       <td style="color:var(--text-muted)">${u.location || '—'}</td>
       <td>${roleTag(u.role)}</td>
       <td>${statusChip(u.status)}</td>
@@ -2302,9 +2275,9 @@ function renderFilterChips() {
   };
   setChip('filterRoleBtn', 'Role', userFilters.role);
   setChip('filterStatusBtn', 'Status', userFilters.status);
-  setChip('filterTenantBtn', 'Tenant', userFilters.tenant);
+  setChip('filterClientBtn', 'Client', userFilters.client);
   setChip('filterLocationBtn', 'Location', userFilters.location);
-  const anyActive = userFilters.role.size + userFilters.status.size + userFilters.tenant.size + userFilters.location.size > 0;
+  const anyActive = userFilters.role.size + userFilters.status.size + userFilters.client.size + userFilters.location.size > 0;
   const clr = document.getElementById('clearFiltersBtn');
   if (clr) clr.style.display = anyActive ? 'inline-flex' : 'none';
 }
@@ -2318,7 +2291,7 @@ function toggleFilter(kind, btn) {
   let options = [];
   if (kind === 'role') options = [...new Set(users.map(u => u.role))];
   if (kind === 'status') options = ['active','inactive','pending'];
-  if (kind === 'tenant') options = [...new Set(users.map(u => u.tenant))];
+  if (kind === 'client') options = [...new Set(users.map(u => u.client))];
   if (kind === 'location') options = [...new Set(users.map(u => u.location).filter(Boolean))];
   const set = userFilters[kind];
   const counts = {};
@@ -2354,7 +2327,7 @@ function clearFilter(kind) {
   renderUsers();
 }
 function clearAllFilters() {
-  userFilters.role.clear(); userFilters.status.clear(); userFilters.tenant.clear(); userFilters.location.clear();
+  userFilters.role.clear(); userFilters.status.clear(); userFilters.client.clear(); userFilters.location.clear();
   document.querySelectorAll('.filter-pop').forEach(p => p.remove());
   renderUsers();
 }
@@ -2406,10 +2379,20 @@ function openRowMenu(evt, idx) {
 
 function openUserDrawer(idx) {
   document.querySelectorAll('.row-menu').forEach(m => m.remove());
-  const sel = document.getElementById('inviteRole');
-  sel.innerHTML = state.roles.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+  const roleSel = document.getElementById('inviteRole');
+  roleSel.innerHTML = state.roles.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+  const clientSel = document.getElementById('inviteClient');
+  clientSel.innerHTML = CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  refreshInviteLocations();
   document.getElementById('userDrawer').classList.add('open');
   document.getElementById('userDrawerBackdrop').classList.add('open');
+}
+function refreshInviteLocations() {
+  const clientSel = document.getElementById('inviteClient');
+  const locSel = document.getElementById('inviteLocation');
+  if (!clientSel || !locSel) return;
+  const locs = LOCATIONS_BY_CLIENT[clientSel.value] || [];
+  locSel.innerHTML = locs.map(l => `<option value="${l}">${l}</option>`).join('');
 }
 
 function resetPassword(idx) {
