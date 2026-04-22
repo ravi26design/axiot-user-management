@@ -738,66 +738,99 @@
 
   /* ===== User details page ===== */
   .details-header {
-    display: flex; align-items: flex-start; gap: 20px;
-    padding: 20px; margin-bottom: 20px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    display: flex; align-items: center; gap: 22px;
+    padding: 28px 24px;
+    border-bottom: 1px solid var(--border);
+    margin: 0 -28px 0;
   }
   .details-avatar {
-    width: 64px; height: 64px; border-radius: 50%;
+    width: 72px; height: 72px; border-radius: 50%;
     background: var(--primary-soft); color: var(--primary);
     display: grid; place-items: center;
-    font-size: 22px; font-weight: 700;
+    font-size: 26px; font-weight: 700;
     flex-shrink: 0;
   }
   .details-head-main { flex: 1; min-width: 0; }
+  .details-name-row {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
   .details-name {
-    font-size: 22px; font-weight: 600; letter-spacing: -0.3px;
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    font-size: 24px; font-weight: 600; letter-spacing: -0.4px;
+    line-height: 1.2;
   }
-  .details-email { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
-  .details-meta {
-    display: flex; gap: 16px; margin-top: 10px;
-    font-size: 13px; color: var(--text-muted); flex-wrap: wrap;
-  }
-  .details-meta strong { color: var(--text); font-weight: 500; }
+  .details-email { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; }
+  .details-chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .details-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
+  .details-meta-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    padding: 18px 24px;
+    margin: 0 -28px 24px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .meta-cell {
+    display: flex; flex-direction: column; gap: 4px;
+    border-right: 1px solid var(--border);
+    padding: 0 16px;
+  }
+  .meta-cell:first-child { padding-left: 0; }
+  .meta-cell:last-child { border-right: none; padding-right: 0; }
+  .meta-label {
+    font-size: 11.5px; color: var(--text-muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .meta-value { font-size: 14px; font-weight: 500; line-height: 1.3; }
+  @media (max-width: 900px) {
+    .details-meta-row { grid-template-columns: repeat(2, 1fr); gap: 16px 0; }
+    .meta-cell { border-right: none; padding: 0 16px; }
+    .meta-cell:nth-child(odd) { border-right: 1px solid var(--border); }
+  }
+
   .tabs {
-    display: flex; gap: 4px; padding: 0 4px;
-    border-bottom: 1px solid var(--border); margin-bottom: 22px;
+    display: flex; gap: 2px;
+    border-bottom: 1px solid var(--border); margin-bottom: 24px;
   }
   .tab {
-    padding: 10px 14px; font-size: 14px; font-weight: 500;
+    padding: 12px 16px; font-size: 14px; font-weight: 500;
     color: var(--text-muted); border-bottom: 2px solid transparent;
     margin-bottom: -1px; cursor: pointer;
     transition: color .12s, border-color .12s;
   }
   .tab:hover { color: var(--text); }
-  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab.active { color: var(--text); border-bottom-color: var(--text); font-weight: 600; }
   .tab-count {
-    margin-left: 5px; font-size: 11.5px; padding: 1px 7px;
+    margin-left: 6px; font-size: 11.5px; padding: 1px 7px;
     background: var(--bg-hover); color: var(--text-muted);
     border-radius: 10px; font-weight: 600;
   }
-  .tab.active .tab-count { background: var(--primary-soft); color: var(--primary); }
+  .tab.active .tab-count { background: var(--text); color: #fff; }
 
-  .info-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
-    margin-bottom: 20px;
+  /* Overview — clean two-column property lists */
+  .overview-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
   }
-  .info-card {
+  .overview-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 14px 16px;
+    border-radius: var(--radius-lg); padding: 4px 0;
   }
-  .info-label {
-    font-size: 11.5px; color: var(--text-muted); font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.5px;
+  .overview-card h4 {
+    padding: 14px 20px 12px; font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 4px;
   }
-  .info-value { font-size: 15px; font-weight: 500; margin-top: 6px; line-height: 1.3; }
-
-  @media (max-width: 1100px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px) { .info-grid { grid-template-columns: 1fr; } }
+  .kv-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 11px 20px; gap: 16px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .kv-value { font-size: 14px; font-weight: 500; text-align: right; }
+  .kv-value.muted { color: var(--text-muted); font-weight: 400; }
+  @media (max-width: 900px) { .overview-grid { grid-template-columns: 1fr; } }
 
   .perm-banner {
     background: var(--primary-soft); border: 1px solid rgba(31, 78, 158, 0.15);
@@ -1548,32 +1581,41 @@ function renderUserDetails() {
       <span class="sep">/</span> <span class="current">${u.name}</span>
     </div>
 
-    <div class="page-head" style="margin-bottom:16px">
-      <button class="btn btn-ghost" onclick="switchScreen('users')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Back to users
-      </button>
-    </div>
-
     <div class="details-header">
       <div class="details-avatar">${u.init}</div>
       <div class="details-head-main">
-        <div class="details-name">
-          ${u.name}
-          ${roleTag(u.role)}
-          ${statusChip(u.status)}
+        <div class="details-name-row">
+          <div class="details-name">${u.name}</div>
         </div>
         <div class="details-email">${u.email}</div>
-        <div class="details-meta">
-          <span><strong>Tenant:</strong> ${u.tenant}</span>
-          <span><strong>Location:</strong> ${u.location || '—'}</span>
-          <span><strong>Last active:</strong> ${u.last}</span>
+        <div class="details-chip-row">
+          ${roleTag(u.role)}
+          ${statusChip(u.status)}
         </div>
       </div>
       <div class="details-actions">
         <button class="btn btn-secondary btn-sm" onclick="openUserDrawer(${state.detailsUserIdx})">${SVG.edit} Edit</button>
         <button class="btn btn-secondary btn-sm" onclick="toggleStatus(${state.detailsUserIdx});setTimeout(renderUserDetails,50)">${u.status === 'active' ? 'Deactivate' : 'Activate'}</button>
         <button class="btn btn-danger-ghost btn-sm" onclick="deleteUserFromDetails(${state.detailsUserIdx})">${SVG.trash} Delete</button>
+      </div>
+    </div>
+
+    <div class="details-meta-row">
+      <div class="meta-cell">
+        <div class="meta-label">Tenant</div>
+        <div class="meta-value">${u.tenant}</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Location</div>
+        <div class="meta-value">${u.location || '—'}</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Joined</div>
+        <div class="meta-value">Feb 12, 2024</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Last active</div>
+        <div class="meta-value">${u.last}</div>
       </div>
     </div>
 
@@ -1600,17 +1642,37 @@ function renderDetailsTab(u) {
 
 function renderOverviewTab(u) {
   return `
-    <div class="info-grid">
-      <div class="info-card"><div class="info-label">Tenant</div><div class="info-value">${u.tenant}</div></div>
-      <div class="info-card"><div class="info-label">Location</div><div class="info-value">${u.location || '—'}</div></div>
-      <div class="info-card"><div class="info-label">Role</div><div class="info-value">${roleTag(u.role)}</div></div>
-      <div class="info-card"><div class="info-label">Status</div><div class="info-value">${statusChip(u.status)}</div></div>
-    </div>
-    <div class="info-grid">
-      <div class="info-card"><div class="info-label">Email</div><div class="info-value" style="font-size:14px">${u.email}</div></div>
-      <div class="info-card"><div class="info-label">Phone</div><div class="info-value" style="font-size:14px;color:var(--text-muted)">Not set</div></div>
-      <div class="info-card"><div class="info-label">Joined</div><div class="info-value">Feb 12, 2024</div></div>
-      <div class="info-card"><div class="info-label">Last active</div><div class="info-value">${u.last}</div></div>
+    <div class="overview-grid">
+      <div class="overview-card">
+        <h4>Personal</h4>
+        <div class="kv-row"><span class="kv-label">Full name</span><span class="kv-value">${u.name}</span></div>
+        <div class="kv-row"><span class="kv-label">Email</span><span class="kv-value">${u.email}</span></div>
+        <div class="kv-row"><span class="kv-label">Phone</span><span class="kv-value muted">Not set</span></div>
+        <div class="kv-row"><span class="kv-label">Language</span><span class="kv-value">English (US)</span></div>
+        <div class="kv-row"><span class="kv-label">Timezone</span><span class="kv-value">Asia/Kolkata (IST)</span></div>
+      </div>
+      <div class="overview-card">
+        <h4>Access</h4>
+        <div class="kv-row"><span class="kv-label">Tenant</span><span class="kv-value">${u.tenant}</span></div>
+        <div class="kv-row"><span class="kv-label">Location</span><span class="kv-value">${u.location || '—'}</span></div>
+        <div class="kv-row"><span class="kv-label">Role</span><span class="kv-value">${roleTag(u.role)}</span></div>
+        <div class="kv-row"><span class="kv-label">Status</span><span class="kv-value">${statusChip(u.status)}</span></div>
+        <div class="kv-row"><span class="kv-label">Two-factor auth</span><span class="kv-value"><span class="chip chip-active"><span class="dot"></span>Enabled</span></span></div>
+      </div>
+      <div class="overview-card">
+        <h4>Account</h4>
+        <div class="kv-row"><span class="kv-label">User ID</span><span class="kv-value" style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--text-muted)">usr_${u.init.toLowerCase()}_${1000 + state.detailsUserIdx}</span></div>
+        <div class="kv-row"><span class="kv-label">Joined</span><span class="kv-value">Feb 12, 2024</span></div>
+        <div class="kv-row"><span class="kv-label">Invited by</span><span class="kv-value">Ravi Prasad</span></div>
+        <div class="kv-row"><span class="kv-label">Last login</span><span class="kv-value">${u.last}</span></div>
+      </div>
+      <div class="overview-card">
+        <h4>Activity summary</h4>
+        <div class="kv-row"><span class="kv-label">Devices in scope</span><span class="kv-value">${DEVICES.filter(d => deviceInScope(u, d)).length}</span></div>
+        <div class="kv-row"><span class="kv-label">Custom overrides</span><span class="kv-value">${u.deviceOverrides ? Object.keys(u.deviceOverrides).length : 0}</span></div>
+        <div class="kv-row"><span class="kv-label">Active sessions</span><span class="kv-value">3</span></div>
+        <div class="kv-row"><span class="kv-label">Events last 30 days</span><span class="kv-value">148</span></div>
+      </div>
     </div>
   `;
 }
@@ -1650,23 +1712,34 @@ function renderDevicesTab(u) {
     `;
   }).join('');
 
+  const permSummary = [
+    defaults.view && 'View',
+    defaults.control && 'Control',
+    defaults.configure && 'Configure'
+  ].filter(Boolean).join(' · ') || 'No default access';
+
   return `
     <div class="perm-banner">
-      <svg class="banner-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <svg class="banner-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
       <div class="banner-body">
-        <strong>${u.role}</strong> gets <strong>${defaults.view?'View':'—'}${defaults.control?' · Control':''}${defaults.configure?' · Configure':''}</strong> on devices at <strong>${u.location || '—'}</strong> by default.
-        Click any cell to override per device. Changes to system roles affect all users; per-user overrides only affect this person.
+        <div style="font-weight:600;margin-bottom:3px">Default permissions from ${u.role}</div>
+        <div style="color:var(--text-muted);font-size:13px">
+          <strong style="color:var(--text)">${permSummary}</strong> on devices at <strong style="color:var(--text)">${u.location || '—'}</strong>. Click any cell to override.
+        </div>
       </div>
     </div>
 
     <div class="panel">
       <div class="toolbar">
         <div style="font-size:13.5px;color:var(--text-muted)">
-          <strong style="color:var(--text)">${tenantDevices.length}</strong> devices in ${u.tenant}
-          ${overrideCount > 0 ? ` · <strong style="color:var(--warn)">${overrideCount}</strong> custom override${overrideCount===1?'':'s'}` : ''}
+          <strong style="color:var(--text)">${tenantDevices.length}</strong> devices
+          ${overrideCount > 0 ? ` · <strong style="color:var(--warn)">${overrideCount}</strong> override${overrideCount===1?'':'s'}` : ''}
         </div>
-        <div class="toolbar-right">
-          ${overrideCount > 0 ? `<button class="btn btn-ghost btn-sm" onclick="resetAllOverrides(${state.detailsUserIdx})">Reset all to role defaults</button>` : ''}
+        <div class="toolbar-right" style="display:flex;gap:14px;align-items:center">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted)"><span class="perm-cell inherit-on" style="width:16px;height:16px"></span>Inherited</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted)"><span class="perm-cell on" style="width:16px;height:16px"></span>Granted</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted)"><span class="perm-cell off" style="width:16px;height:16px"></span>Revoked</span>
+          ${overrideCount > 0 ? `<button class="btn btn-ghost btn-sm" onclick="resetAllOverrides(${state.detailsUserIdx})">Reset all</button>` : ''}
         </div>
       </div>
       <div class="tbl-wrap">
@@ -1683,13 +1756,6 @@ function renderDevicesTab(u) {
           </thead>
           <tbody>${rows}</tbody>
         </table>
-      </div>
-      <div class="tbl-footer" style="border-top:1px solid var(--border)">
-        <div style="display:flex;gap:14px;align-items:center;font-size:12.5px;color:var(--text-muted)">
-          <span style="display:inline-flex;align-items:center;gap:6px"><span class="perm-cell inherit-on" style="width:18px;height:18px"></span>Inherited from role</span>
-          <span style="display:inline-flex;align-items:center;gap:6px"><span class="perm-cell on" style="width:18px;height:18px"></span>Custom (granted)</span>
-          <span style="display:inline-flex;align-items:center;gap:6px"><span class="perm-cell off" style="width:18px;height:18px"></span>Revoked</span>
-        </div>
       </div>
     </div>
   `;
