@@ -879,6 +879,8 @@
     transition: color .12s;
   }
   .name-link:hover { color: var(--primary); text-decoration: underline; }
+  .row-clickable { cursor: pointer; }
+  .row-clickable:hover .cell-user-name { color: var(--primary); }
   .empty-state {
     padding: 40px 20px; text-align: center; color: var(--text-muted);
   }
@@ -1842,15 +1844,15 @@ function renderUsers() {
   const rows = list.map((u) => {
     const idx = users.indexOf(u);
     return `
-    <tr>
-      <td><input type="checkbox" class="check" onchange="rowSelect()" /></td>
-      <td><div class="cell-user"><div class="avatar avatar-28">${u.init}</div><div><div class="cell-user-name name-link" onclick="openUserDetails(${idx})">${u.name}</div><div class="cell-user-sub">${u.email}</div></div></div></td>
+    <tr class="row-clickable" onclick="openUserDetails(${idx})">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="check" onchange="rowSelect()" /></td>
+      <td><div class="cell-user"><div class="avatar avatar-28">${u.init}</div><div><div class="cell-user-name">${u.name}</div><div class="cell-user-sub">${u.email}</div></div></div></td>
       <td style="color:var(--text-muted)">${u.tenant}</td>
       <td style="color:var(--text-muted)">${u.location || '—'}</td>
       <td>${roleTag(u.role)}</td>
       <td>${statusChip(u.status)}</td>
       <td style="color:var(--text-muted)">${u.last}</td>
-      <td><div class="row-actions">
+      <td onclick="event.stopPropagation()"><div class="row-actions">
         <button class="icon-btn" title="Edit" onclick="openUserDrawer(${idx})">${SVG.edit}</button>
         <button class="icon-btn" title="More" onclick="openRowMenu(event, ${idx})">${SVG.dots}</button>
       </div></td>
