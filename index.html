@@ -735,6 +735,150 @@
   }
 
   .ico svg { width: 100%; height: 100%; display: block; }
+
+  /* ===== User details page ===== */
+  .details-header {
+    display: flex; align-items: flex-start; gap: 20px;
+    padding: 20px; margin-bottom: 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .details-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--primary-soft); color: var(--primary);
+    display: grid; place-items: center;
+    font-size: 22px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .details-head-main { flex: 1; min-width: 0; }
+  .details-name {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.3px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .details-email { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
+  .details-meta {
+    display: flex; gap: 16px; margin-top: 10px;
+    font-size: 13px; color: var(--text-muted); flex-wrap: wrap;
+  }
+  .details-meta strong { color: var(--text); font-weight: 500; }
+  .details-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .tabs {
+    display: flex; gap: 4px; padding: 0 4px;
+    border-bottom: 1px solid var(--border); margin-bottom: 22px;
+  }
+  .tab {
+    padding: 10px 14px; font-size: 14px; font-weight: 500;
+    color: var(--text-muted); border-bottom: 2px solid transparent;
+    margin-bottom: -1px; cursor: pointer;
+    transition: color .12s, border-color .12s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab-count {
+    margin-left: 5px; font-size: 11.5px; padding: 1px 7px;
+    background: var(--bg-hover); color: var(--text-muted);
+    border-radius: 10px; font-weight: 600;
+  }
+  .tab.active .tab-count { background: var(--primary-soft); color: var(--primary); }
+
+  .info-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 20px;
+  }
+  .info-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px;
+  }
+  .info-label {
+    font-size: 11.5px; color: var(--text-muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .info-value { font-size: 15px; font-weight: 500; margin-top: 6px; line-height: 1.3; }
+
+  @media (max-width: 1100px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .info-grid { grid-template-columns: 1fr; } }
+
+  .perm-banner {
+    background: var(--primary-soft); border: 1px solid rgba(31, 78, 158, 0.15);
+    border-radius: var(--radius-lg); padding: 14px 18px;
+    margin-bottom: 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 13.5px; color: var(--text);
+  }
+  .perm-banner .banner-ico {
+    width: 20px; height: 20px; color: var(--primary); flex-shrink: 0; margin-top: 1px;
+  }
+  .perm-banner .banner-body { flex: 1; line-height: 1.5; }
+  .perm-banner strong { font-weight: 600; }
+
+  .device-tbl { width: 100%; border-collapse: collapse; }
+  .device-tbl th {
+    font-size: 11.5px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-muted);
+    text-align: left; padding: 10px 16px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+  .device-tbl th.center { text-align: center; width: 110px; padding: 10px 8px; }
+  .device-tbl td {
+    padding: 12px 16px; font-size: 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+  }
+  .device-tbl td.center { text-align: center; padding: 12px 8px; }
+  .device-tbl tr:last-child td { border-bottom: none; }
+  .device-tbl tr:hover { background: var(--bg); }
+  .dev-name { font-weight: 500; display: flex; align-items: center; gap: 10px; }
+  .dev-ico {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: var(--bg); color: var(--text-muted);
+    display: grid; place-items: center; flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+  .dev-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 1px; font-weight: 400; }
+
+  .perm-cell {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 6px;
+    cursor: pointer;
+    transition: background .12s, border-color .12s;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .perm-cell:hover { background: var(--bg); }
+  .perm-cell.on {
+    background: var(--primary); border-color: var(--primary); color: #fff;
+  }
+  .perm-cell.inherit-on {
+    background: var(--bg); border-color: var(--border);
+    color: var(--text-muted);
+  }
+  .perm-cell.inherit-on::after {
+    content: '✓'; font-size: 13px; font-weight: 700;
+  }
+  .perm-cell.on::after {
+    content: '✓'; font-size: 14px; font-weight: 700;
+  }
+  .perm-cell.off::after {
+    content: ''; width: 10px; height: 2px; background: var(--border-strong);
+  }
+  .perm-cell.off { border-color: var(--border); }
+
+  .override-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 11.5px; font-weight: 500;
+  }
+  .override-pill.inherited { background: var(--bg-hover); color: var(--text-muted); }
+  .override-pill.custom { background: var(--warn-soft); color: var(--warn); }
+  .override-pill.scope { background: var(--primary-soft); color: var(--primary); }
+  .override-pill.out { background: var(--danger-soft); color: var(--danger); }
+
+  .name-link {
+    cursor: pointer; color: var(--text);
+    transition: color .12s;
+  }
+  .name-link:hover { color: var(--primary); text-decoration: underline; }
   .empty-state {
     padding: 40px 20px; text-align: center; color: var(--text-muted);
   }
@@ -877,6 +1021,17 @@
           <div class="matrix" id="roleMatrix"></div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- USER DETAILS SCREEN -->
+<div class="screen" id="screen-userDetails">
+  <div class="app">
+    <aside class="sidebar" data-sidebar></aside>
+    <div class="main">
+      <header class="topbar" data-topbar></header>
+      <div class="content" id="userDetailsContent"></div>
     </div>
   </div>
 </div>
@@ -1104,6 +1259,54 @@ const state = {
   initialPerms: null     // snapshot for diff counting
 };
 
+/* ============================================================
+   Devices + role-based defaults
+   ============================================================ */
+const DEVICES = [
+  { id: 'd-001', name: 'Compressor #4',   type: 'Compressor', tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+  { id: 'd-002', name: 'Valve Cluster V12', type: 'Valve',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+  { id: 'd-003', name: 'Conveyor Motor M3', type: 'Motor',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+  { id: 'd-004', name: 'Pump Station P2',   type: 'Pump',     tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
+  { id: 'd-005', name: 'Heat Exchanger H1', type: 'Exchanger',tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
+  { id: 'd-006', name: 'Press Line PR-1',   type: 'Press',    tenant: 'Acme Industries', location: 'Chennai Plant' },
+  { id: 'd-007', name: 'Boiler B-07',       type: 'Boiler',   tenant: 'Acme Industries', location: 'Chennai Plant' },
+  { id: 'd-008', name: 'Gateway GW-HQ01',   type: 'Gateway',  tenant: 'Acme Industries', location: 'Mumbai HQ' },
+  { id: 'd-009', name: 'Turbine T-22',      type: 'Turbine',  tenant: 'Northwind Energy', location: 'Head Office' },
+  { id: 'd-010', name: 'Solar Inverter SI-5', type: 'Inverter', tenant: 'Northwind Energy', location: 'Paris HQ' }
+];
+
+// Device actions and role defaults (used when no override present)
+const DEVICE_ACTIONS = ['view', 'control', 'configure'];
+const ROLE_DEVICE_DEFAULTS = {
+  'Super Admin':           { view: true,  control: true,  configure: true  },
+  'Owner':                 { view: true,  control: true,  configure: true  },
+  'Administrator':         { view: true,  control: true,  configure: true  },
+  'Plant Operator':        { view: true,  control: true,  configure: false },
+  'Maintenance Tech':      { view: true,  control: true,  configure: true  },
+  'Maintenance Technician':{ view: true,  control: true,  configure: true  },
+  'Viewer':                { view: true,  control: false, configure: false }
+};
+function roleDefaults(role) {
+  return ROLE_DEVICE_DEFAULTS[role] || { view: false, control: false, configure: false };
+}
+function deviceIcon(type) {
+  return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 19h10M12 19v2"/></svg>';
+}
+// Effective permission: override if set, else role default ONLY if device is in user's scope (same tenant + location)
+function deviceInScope(user, device) {
+  return device.tenant === user.tenant && device.location === user.location;
+}
+function effectivePerm(user, device, action) {
+  const overrides = (user.deviceOverrides || {})[device.id];
+  if (overrides && overrides[action] !== undefined) return overrides[action];
+  if (!deviceInScope(user, device)) return false;
+  return roleDefaults(user.role)[action];
+}
+function isOverridden(user, device, action) {
+  const overrides = (user.deviceOverrides || {})[device.id];
+  return !!(overrides && overrides[action] !== undefined);
+}
+
 const users = [
   { name: 'Priya Sharma', email: 'priya.sharma@acme-industries.com', role: 'Administrator', tenant: 'Acme Industries', location: 'Mumbai HQ', status: 'active', last: '2 min ago', init: 'PS' },
   { name: 'Marcus Chen', email: 'marcus.chen@acme-industries.com', role: 'Plant Operator', tenant: 'Acme Industries', location: 'Pune Plant — Line A', status: 'active', last: '28 min ago', init: 'MC' },
@@ -1305,9 +1508,287 @@ function switchScreen(name) {
   state.currentScreen = name;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
-  renderSidebar(name);
+  // For userDetails screen, keep "Users" highlighted in sidebar
+  renderSidebar(name === 'userDetails' ? 'users' : name);
   if (name === 'roles') renderRoles();
   window.scrollTo(0, 0);
+}
+
+/* ============================================================
+   User details
+   ============================================================ */
+state.detailsUserIdx = null;
+state.detailsTab = 'overview';
+
+function openUserDetails(idx) {
+  state.detailsUserIdx = idx;
+  state.detailsTab = 'overview';
+  document.querySelectorAll('.row-menu').forEach(m => m.remove());
+  switchScreen('userDetails');
+  renderUserDetails();
+  // Re-render sidebar for this screen
+  const aside = document.querySelector('#screen-userDetails [data-sidebar]');
+  if (aside) aside.innerHTML = document.querySelector('#screen-users [data-sidebar]').innerHTML;
+}
+
+function switchDetailsTab(tab) { state.detailsTab = tab; renderUserDetails(); }
+
+function renderUserDetails() {
+  const u = users[state.detailsUserIdx];
+  if (!u) { switchScreen('users'); return; }
+  const deviceCount = DEVICES.filter(d => d.tenant === u.tenant).length;
+
+  const content = document.getElementById('userDetailsContent');
+  content.innerHTML = `
+    <div class="breadcrumb">
+      Administration <span class="sep">/</span>
+      <span style="cursor:pointer;color:var(--primary)" onclick="switchScreen('users')">Users</span>
+      <span class="sep">/</span> <span class="current">${u.name}</span>
+    </div>
+
+    <div class="page-head" style="margin-bottom:16px">
+      <button class="btn btn-ghost" onclick="switchScreen('users')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to users
+      </button>
+    </div>
+
+    <div class="details-header">
+      <div class="details-avatar">${u.init}</div>
+      <div class="details-head-main">
+        <div class="details-name">
+          ${u.name}
+          ${roleTag(u.role)}
+          ${statusChip(u.status)}
+        </div>
+        <div class="details-email">${u.email}</div>
+        <div class="details-meta">
+          <span><strong>Tenant:</strong> ${u.tenant}</span>
+          <span><strong>Location:</strong> ${u.location || '—'}</span>
+          <span><strong>Last active:</strong> ${u.last}</span>
+        </div>
+      </div>
+      <div class="details-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openUserDrawer(${state.detailsUserIdx})">${SVG.edit} Edit</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleStatus(${state.detailsUserIdx});setTimeout(renderUserDetails,50)">${u.status === 'active' ? 'Deactivate' : 'Activate'}</button>
+        <button class="btn btn-danger-ghost btn-sm" onclick="deleteUserFromDetails(${state.detailsUserIdx})">${SVG.trash} Delete</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab ${state.detailsTab==='overview'?'active':''}" onclick="switchDetailsTab('overview')">Overview</div>
+      <div class="tab ${state.detailsTab==='devices'?'active':''}" onclick="switchDetailsTab('devices')">Device access <span class="tab-count">${deviceCount}</span></div>
+      <div class="tab ${state.detailsTab==='sessions'?'active':''}" onclick="switchDetailsTab('sessions')">Sessions</div>
+      <div class="tab ${state.detailsTab==='activity'?'active':''}" onclick="switchDetailsTab('activity')">Activity</div>
+    </div>
+
+    <div id="detailsTabContent">
+      ${renderDetailsTab(u)}
+    </div>
+  `;
+}
+
+function renderDetailsTab(u) {
+  if (state.detailsTab === 'overview') return renderOverviewTab(u);
+  if (state.detailsTab === 'devices')  return renderDevicesTab(u);
+  if (state.detailsTab === 'sessions') return renderSessionsTab(u);
+  if (state.detailsTab === 'activity') return renderActivityTab(u);
+  return '';
+}
+
+function renderOverviewTab(u) {
+  return `
+    <div class="info-grid">
+      <div class="info-card"><div class="info-label">Tenant</div><div class="info-value">${u.tenant}</div></div>
+      <div class="info-card"><div class="info-label">Location</div><div class="info-value">${u.location || '—'}</div></div>
+      <div class="info-card"><div class="info-label">Role</div><div class="info-value">${roleTag(u.role)}</div></div>
+      <div class="info-card"><div class="info-label">Status</div><div class="info-value">${statusChip(u.status)}</div></div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="info-label">Email</div><div class="info-value" style="font-size:14px">${u.email}</div></div>
+      <div class="info-card"><div class="info-label">Phone</div><div class="info-value" style="font-size:14px;color:var(--text-muted)">Not set</div></div>
+      <div class="info-card"><div class="info-label">Joined</div><div class="info-value">Feb 12, 2024</div></div>
+      <div class="info-card"><div class="info-label">Last active</div><div class="info-value">${u.last}</div></div>
+    </div>
+  `;
+}
+
+function renderDevicesTab(u) {
+  // Show all devices in user's tenant. In-scope (same location) inherit role defaults; out-of-scope start as no access.
+  const tenantDevices = DEVICES.filter(d => d.tenant === u.tenant);
+  const defaults = roleDefaults(u.role);
+  const overrideCount = u.deviceOverrides ? Object.values(u.deviceOverrides).reduce((n, o) => n + Object.keys(o).length, 0) : 0;
+
+  const rows = tenantDevices.map(d => {
+    const inScope = deviceInScope(u, d);
+    return `
+      <tr>
+        <td>
+          <div class="dev-name">
+            <div class="dev-ico">${deviceIcon(d.type)}</div>
+            <div>
+              ${d.name}
+              <div class="dev-sub">${d.type} · ${d.location}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="override-pill ${inScope?'scope':'out'}">${inScope?'In user location':'Other location'}</span>
+        </td>
+        ${DEVICE_ACTIONS.map(a => {
+          const on = effectivePerm(u, d, a);
+          const overridden = isOverridden(u, d, a);
+          const cls = on ? (overridden ? 'on' : 'inherit-on') : 'off';
+          return `<td class="center"><span class="perm-cell ${cls}" title="${overridden?'Custom':'Inherited from role'}: ${a} ${on?'granted':'revoked'}" onclick="toggleDevicePerm(${state.detailsUserIdx},'${d.id}','${a}')"></span></td>`;
+        }).join('')}
+        <td class="center">
+          ${u.deviceOverrides && u.deviceOverrides[d.id] ? `<button class="btn btn-ghost btn-sm" onclick="resetDeviceOverride(${state.detailsUserIdx},'${d.id}')" title="Reset to role defaults">Reset</button>` : '<span style="color:var(--text-subtle);font-size:12px">—</span>'}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <div class="perm-banner">
+      <svg class="banner-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <div class="banner-body">
+        <strong>${u.role}</strong> gets <strong>${defaults.view?'View':'—'}${defaults.control?' · Control':''}${defaults.configure?' · Configure':''}</strong> on devices at <strong>${u.location || '—'}</strong> by default.
+        Click any cell to override per device. Changes to system roles affect all users; per-user overrides only affect this person.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="toolbar">
+        <div style="font-size:13.5px;color:var(--text-muted)">
+          <strong style="color:var(--text)">${tenantDevices.length}</strong> devices in ${u.tenant}
+          ${overrideCount > 0 ? ` · <strong style="color:var(--warn)">${overrideCount}</strong> custom override${overrideCount===1?'':'s'}` : ''}
+        </div>
+        <div class="toolbar-right">
+          ${overrideCount > 0 ? `<button class="btn btn-ghost btn-sm" onclick="resetAllOverrides(${state.detailsUserIdx})">Reset all to role defaults</button>` : ''}
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="device-tbl">
+          <thead>
+            <tr>
+              <th>Device</th>
+              <th>Scope</th>
+              <th class="center">View</th>
+              <th class="center">Control</th>
+              <th class="center">Configure</th>
+              <th class="center" style="width:80px"></th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="tbl-footer" style="border-top:1px solid var(--border)">
+        <div style="display:flex;gap:14px;align-items:center;font-size:12.5px;color:var(--text-muted)">
+          <span style="display:inline-flex;align-items:center;gap:6px"><span class="perm-cell inherit-on" style="width:18px;height:18px"></span>Inherited from role</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><span class="perm-cell on" style="width:18px;height:18px"></span>Custom (granted)</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><span class="perm-cell off" style="width:18px;height:18px"></span>Revoked</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleDevicePerm(userIdx, deviceId, action) {
+  const u = users[userIdx];
+  if (!u.deviceOverrides) u.deviceOverrides = {};
+  if (!u.deviceOverrides[deviceId]) u.deviceOverrides[deviceId] = {};
+  const cur = effectivePerm(u, DEVICES.find(d => d.id === deviceId), action);
+  u.deviceOverrides[deviceId][action] = !cur;
+  renderUserDetails();
+}
+function resetDeviceOverride(userIdx, deviceId) {
+  const u = users[userIdx];
+  if (u.deviceOverrides) {
+    delete u.deviceOverrides[deviceId];
+    if (Object.keys(u.deviceOverrides).length === 0) delete u.deviceOverrides;
+  }
+  renderUserDetails();
+  toast('Device reset to role defaults');
+}
+function resetAllOverrides(userIdx) {
+  confirmDialog('Reset all device overrides?', 'This user will return to default permissions from their role.', () => {
+    delete users[userIdx].deviceOverrides;
+    renderUserDetails();
+    toast('All overrides cleared', 'success');
+  });
+}
+
+function renderSessionsTab(u) {
+  const sessions = [
+    { device: 'MacBook Pro', browser: 'Chrome 131', ip: '10.2.3.4', location: 'Pune, IN', last: '2 min ago', current: true },
+    { device: 'iPhone 15', browser: 'Safari Mobile', ip: '49.207.x.x', location: 'Pune, IN', last: '3 hours ago', current: false },
+    { device: 'Windows PC', browser: 'Edge 121', ip: '10.2.3.12', location: 'Chennai, IN', last: '2 days ago', current: false }
+  ];
+  return `
+    <div class="panel">
+      <div class="toolbar">
+        <div style="font-size:13.5px;color:var(--text-muted)">
+          <strong style="color:var(--text)">${sessions.length}</strong> active sessions
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-danger-ghost btn-sm">Revoke all sessions</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Device</th><th>Browser</th><th>IP address</th><th>Location</th><th>Last active</th><th></th>
+        </tr></thead>
+        <tbody>
+          ${sessions.map(s => `
+            <tr>
+              <td><strong>${s.device}</strong>${s.current?' <span class="chip chip-active" style="margin-left:6px">Current</span>':''}</td>
+              <td style="color:var(--text-muted)">${s.browser}</td>
+              <td style="color:var(--text-muted);font-family:ui-monospace,Menlo,monospace;font-size:13px">${s.ip}</td>
+              <td style="color:var(--text-muted)">${s.location}</td>
+              <td style="color:var(--text-muted)">${s.last}</td>
+              <td style="text-align:right">${s.current?'':'<button class="btn btn-ghost btn-sm">Revoke</button>'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderActivityTab(u) {
+  const activity = [
+    { when: '2 min ago', what: 'Logged in from MacBook Pro · Pune, IN' },
+    { when: '1 hour ago', what: 'Acknowledged alert "Compressor #4 pressure high"' },
+    { when: '3 hours ago', what: 'Updated device configuration: Valve Cluster V12' },
+    { when: 'Yesterday', what: 'Exported report: Line A Weekly Summary' },
+    { when: '3 days ago', what: 'Role changed from Plant Operator to Administrator by R. Prasad' }
+  ];
+  return `
+    <div class="panel">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);font-weight:600">Recent activity</div>
+      <div>
+        ${activity.map(a => `
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border-subtle);display:flex;gap:14px;align-items:flex-start">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--primary);margin-top:7px;flex-shrink:0"></div>
+            <div style="flex:1">
+              <div style="font-size:14px">${a.what}</div>
+              <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">${a.when}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function deleteUserFromDetails(idx) {
+  const u = users[idx];
+  confirmDialog(`Delete ${u.name}?`, `This permanently removes the user and revokes all access.`, () => {
+    users.splice(idx, 1);
+    switchScreen('users');
+    renderUsers();
+    toast('User deleted', 'danger');
+  });
 }
 
 /* ============================================================
@@ -1363,7 +1844,7 @@ function renderUsers() {
     return `
     <tr>
       <td><input type="checkbox" class="check" onchange="rowSelect()" /></td>
-      <td><div class="cell-user"><div class="avatar avatar-28">${u.init}</div><div><div class="cell-user-name">${u.name}</div><div class="cell-user-sub">${u.email}</div></div></div></td>
+      <td><div class="cell-user"><div class="avatar avatar-28">${u.init}</div><div><div class="cell-user-name name-link" onclick="openUserDetails(${idx})">${u.name}</div><div class="cell-user-sub">${u.email}</div></div></div></td>
       <td style="color:var(--text-muted)">${u.tenant}</td>
       <td style="color:var(--text-muted)">${u.location || '—'}</td>
       <td>${roleTag(u.role)}</td>
