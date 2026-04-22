@@ -2795,7 +2795,7 @@ function renderRoles() {
     ` : visible.map(r => `
       <div class="role-item ${r.id === state.selectedRoleId ? 'active' : ''}" onclick="selectRole('${r.id}')">
         <div class="name">${r.name}</div>
-        <div style="margin-top:4px">${scopeBadge(r.client)}</div>
+        ${VIEW_CLIENT ? '' : `<div style="margin-top:4px">${scopeBadge(r.client)}</div>`}
         <div class="meta">${r.users.toLocaleString()} user${r.users === 1 ? '' : 's'} · Updated ${r.updated}</div>
         <div class="item-actions" onclick="event.stopPropagation()">
           <button class="icon-btn" title="Edit" onclick="editRole('${r.id}')">${SVG.edit}</button>
