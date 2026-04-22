@@ -658,13 +658,14 @@
   .scope-chip.client     { background: #F0EBFB;              color: #5B21B6;            border-color: #DCCEF3; }
 
   .role-filter-bar { padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg); }
-  .role-filter-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+  .role-filter-row { display: flex; gap: 6px; align-items: center; }
   .rf-chip {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 5px 10px; border-radius: 999px;
     font-size: 12px; font-weight: 500; color: var(--text-muted);
     background: var(--surface); border: 1px solid var(--border);
     cursor: pointer; transition: background .12s, color .12s, border-color .12s;
+    white-space: nowrap;
   }
   .rf-chip:hover { color: var(--text); border-color: var(--border-strong); }
   .rf-chip.active { background: var(--text); color: #fff; border-color: var(--text); }
@@ -676,6 +677,37 @@
     border-radius: 8px;
   }
   .rf-chip.active .rf-count { background: rgba(255,255,255,.2); color: #fff; }
+  .rf-chip .rf-x { margin-left: 2px; opacity: 0.7; padding: 0 2px; }
+  .rf-chip .rf-x:hover { opacity: 1; }
+  .rf-chip .rf-caret { color: var(--text-subtle); font-size: 9px; }
+  .rf-chip.active .rf-caret { color: rgba(255,255,255,0.7); }
+
+  .rf-pop {
+    position: absolute; margin-top: 4px;
+    width: 240px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: var(--shadow-md); z-index: 50;
+    overflow: hidden;
+  }
+  .rf-pop-search {
+    padding: 8px 10px; border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; gap: 6px;
+    background: var(--bg);
+  }
+  .rf-pop-search input {
+    flex: 1; border: none; outline: none; background: transparent;
+    font-size: 13px;
+  }
+  .rf-pop-list { max-height: 280px; overflow-y: auto; padding: 4px; }
+  .rf-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 5px; cursor: pointer;
+    font-size: 13px;
+  }
+  .rf-opt:hover { background: var(--bg); }
+  .rf-opt.selected { background: var(--primary-soft); color: var(--primary); font-weight: 500; }
+  .rf-opt .opt-count { margin-left: auto; font-size: 11.5px; color: var(--text-subtle); }
+  .rf-pop-empty { padding: 16px 12px; text-align: center; color: var(--text-muted); font-size: 12.5px; }
   .matrix {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-lg); overflow: hidden;
@@ -2565,6 +2597,62 @@ function filteredRoles() {
   return state.roles.filter(r => r.client === f);
 }
 
+function toggleClientPop(evt) {
+  evt.stopPropagation();
+  const existing = document.getElementById('rfClientPop');
+  if (existing) { existing.remove(); return; }
+  const btn = document.getElementById('rfClientBtn');
+  if (!btn) return;
+  const bar = btn.closest('.role-filter-bar');
+  const allClients = [...new Set(state.roles.map(r => r.client).filter(Boolean))].sort();
+  const pop = document.createElement('div');
+  pop.className = 'rf-pop';
+  pop.id = 'rfClientPop';
+  pop.innerHTML = `
+    <div class="rf-pop-search">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input id="rfClientSearch" placeholder="Search clients…" oninput="filterClientPop()" autofocus />
+    </div>
+    <div class="rf-pop-list" id="rfClientList">
+      ${allClients.map(c => {
+        const count = state.roles.filter(r => r.client === c).length;
+        const sel = state.roleClientFilter === c ? 'selected' : '';
+        return `<div class="rf-opt ${sel}" data-client="${c}" onclick="setRoleFilter('${c}');document.getElementById('rfClientPop').remove();">
+          ${c}<span class="opt-count">${count}</span>
+        </div>`;
+      }).join('') || '<div class="rf-pop-empty">No clients yet</div>'}
+    </div>
+  `;
+  // Position the pop under the button
+  const rect = btn.getBoundingClientRect();
+  const barRect = bar.getBoundingClientRect();
+  pop.style.left = (rect.left - barRect.left) + 'px';
+  pop.style.top = (rect.bottom - barRect.top + 4) + 'px';
+  bar.appendChild(pop);
+  // Close on outside click
+  setTimeout(() => {
+    const closer = (e) => {
+      if (!e.target.closest('#rfClientPop') && !e.target.closest('#rfClientBtn')) {
+        const p = document.getElementById('rfClientPop'); if (p) p.remove();
+        document.removeEventListener('click', closer);
+      }
+    };
+    document.addEventListener('click', closer);
+  }, 0);
+}
+function filterClientPop() {
+  const q = (document.getElementById('rfClientSearch')?.value || '').toLowerCase().trim();
+  const list = document.getElementById('rfClientList');
+  if (!list) return;
+  let visible = 0;
+  list.querySelectorAll('.rf-opt').forEach(el => {
+    const c = (el.dataset.client || '').toLowerCase();
+    const match = !q || c.includes(q);
+    el.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+}
+
 function setRoleFilter(val) {
   state.roleClientFilter = val;
   // If currently selected role is filtered out, jump to the first visible one
@@ -2594,15 +2682,23 @@ function renderRoles() {
 
   document.getElementById('roleCount').textContent = `${visible.length} of ${state.roles.length}`;
 
-  // Render filter chip + list
+  // Resolve active client selection for the Client dropdown chip
+  const f = state.roleClientFilter;
+  const isClientPicked = f !== 'all' && f !== 'global';
+  const clientCount = isClientPicked ? state.roles.filter(r => r.client === f).length : 0;
+
   document.getElementById('roleList').innerHTML = `
-    <div class="role-filter-bar">
-      <div class="role-filter-chips">
-        <button class="rf-chip ${state.roleClientFilter === 'all' ? 'active' : ''}" onclick="setRoleFilter('all')">All <span class="rf-count">${state.roles.length}</span></button>
-        <button class="rf-chip ${state.roleClientFilter === 'global' ? 'active' : ''}" onclick="setRoleFilter('global')">Global <span class="rf-count">${state.roles.filter(r => !r.client).length}</span></button>
-        ${allClients.map(c => `
-          <button class="rf-chip ${state.roleClientFilter === c ? 'active' : ''}" onclick="setRoleFilter('${c}')">${c} <span class="rf-count">${state.roles.filter(r => r.client === c).length}</span></button>
-        `).join('')}
+    <div class="role-filter-bar" style="position:relative">
+      <div class="role-filter-row">
+        <button class="rf-chip ${f === 'all' ? 'active' : ''}" onclick="setRoleFilter('all')">
+          All <span class="rf-count">${state.roles.length}</span>
+        </button>
+        <button class="rf-chip ${f === 'global' ? 'active' : ''}" onclick="setRoleFilter('global')">
+          Global <span class="rf-count">${state.roles.filter(r => !r.client).length}</span>
+        </button>
+        <button class="rf-chip ${isClientPicked ? 'active' : ''}" onclick="toggleClientPop(event)" id="rfClientBtn">
+          ${isClientPicked ? `${f} <span class="rf-count">${clientCount}</span> <span class="rf-x" onclick="event.stopPropagation();setRoleFilter('all')">✕</span>` : `Client <span class="rf-caret">▾</span>`}
+        </button>
       </div>
     </div>
     ${visible.length === 0 ? `
