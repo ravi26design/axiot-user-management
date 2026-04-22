@@ -802,38 +802,84 @@
   .profile-kv .v.muted { color: var(--text-muted); font-weight: 400; }
   .profile-kv .v.mono { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--text-muted); }
 
-  /* Modern segmented tabs */
+  /* Modern underline tabs with icons (blue active) */
   .tabs {
-    display: inline-flex; gap: 2px; padding: 4px;
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 10px; margin-bottom: 20px;
-    max-width: 100%; overflow-x: auto;
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow-x: auto;
   }
   .tab {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 14px; border-radius: 7px;
-    font-size: 13.5px; font-weight: 500;
-    color: var(--text-muted); cursor: pointer;
-    transition: color .12s, background .12s, box-shadow .12s;
+    padding: 14px 18px; font-size: 14px; font-weight: 500;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px; cursor: pointer;
     white-space: nowrap; flex-shrink: 0;
-    position: relative;
+    transition: color .12s, border-color .12s;
   }
+  .tab:first-child { padding-left: 4px; }
   .tab:hover { color: var(--text); }
-  .tab:hover:not(.active) { background: var(--bg-hover); }
   .tab.active {
-    background: var(--surface); color: var(--text);
-    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 0 rgba(16, 24, 40, 0.04);
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    font-weight: 600;
   }
-  .tab .tab-ico { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.85; }
-  .tab.active .tab-ico { opacity: 1; color: var(--primary); }
+  .tab .tab-ico { width: 16px; height: 16px; flex-shrink: 0; }
   .tab-count {
     display: inline-flex; align-items: center; justify-content: center;
-    min-width: 18px; height: 18px; padding: 0 6px;
-    font-size: 11px; font-weight: 600;
+    min-width: 20px; height: 20px; padding: 0 7px;
+    font-size: 11.5px; font-weight: 600;
     background: var(--bg-hover); color: var(--text-muted);
     border-radius: 10px;
   }
-  .tab.active .tab-count { background: var(--primary); color: #fff; }
+  .tab.active .tab-count { background: var(--primary-soft); color: var(--primary); }
+
+  /* Info section card (like the Personal Information reference) */
+  .info-section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .info-section-head {
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .info-section-head .ico-box {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--primary-soft); color: var(--primary);
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .info-section-head .ico-box svg { width: 18px; height: 18px; }
+  .info-section-title { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+  .info-section-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+  .info-rows {
+    display: grid; grid-template-columns: 1fr 1fr;
+  }
+  .info-row-cell {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+    border-right: 1px solid var(--border-subtle);
+  }
+  .info-row-cell:nth-child(even) { border-right: none; }
+  .info-rows > .info-row-cell:nth-last-child(-n+2) { border-bottom: none; }
+  .info-rows > .info-row-cell:last-child:nth-child(odd) { border-right: none; }
+  .info-row-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--text-subtle); text-transform: uppercase;
+    letter-spacing: 0.6px; margin-bottom: 6px;
+  }
+  .info-row-value { font-size: 15px; color: var(--text); font-weight: 500; line-height: 1.3; }
+  .info-row-value.muted { color: var(--text-muted); font-weight: 400; }
+
+  @media (max-width: 720px) {
+    .info-rows { grid-template-columns: 1fr; }
+    .info-row-cell { border-right: none !important; }
+  }
 
   /* Overview — clean two-column property lists */
   .overview-grid {
@@ -1583,6 +1629,7 @@ function switchScreen(name) {
 state.detailsUserIdx = null;
 state.detailsTab = 'overview';
 
+
 function openUserDetails(idx) {
   state.detailsUserIdx = idx;
   state.detailsTab = 'overview';
@@ -1602,8 +1649,6 @@ function renderUserDetails() {
   const deviceCount = DEVICES.filter(d => d.tenant === u.tenant).length;
 
   const content = document.getElementById('userDetailsContent');
-  // Default details tab is now devices (main info is in the left rail)
-  if (state.detailsTab === 'overview') state.detailsTab = 'devices';
 
   content.innerHTML = `
     <div class="breadcrumb">
@@ -1668,6 +1713,10 @@ function renderUserDetails() {
       <!-- RIGHT CONTENT -->
       <section>
         <div class="tabs">
+          <div class="tab ${state.detailsTab==='overview'?'active':''}" onclick="switchDetailsTab('overview')">
+            <svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+            Overview
+          </div>
           <div class="tab ${state.detailsTab==='devices'?'active':''}" onclick="switchDetailsTab('devices')">
             <svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 19h10M12 19v2"/></svg>
             Device access
@@ -1700,37 +1749,58 @@ function renderDetailsTab(u) {
 }
 
 function renderOverviewTab(u) {
+  const [first, ...rest] = u.name.split(' ');
+  const last = rest.join(' ') || '—';
   return `
-    <div class="overview-grid">
-      <div class="overview-card">
-        <h4>Personal</h4>
-        <div class="kv-row"><span class="kv-label">Full name</span><span class="kv-value">${u.name}</span></div>
-        <div class="kv-row"><span class="kv-label">Email</span><span class="kv-value">${u.email}</span></div>
-        <div class="kv-row"><span class="kv-label">Phone</span><span class="kv-value muted">Not set</span></div>
-        <div class="kv-row"><span class="kv-label">Language</span><span class="kv-value">English (US)</span></div>
-        <div class="kv-row"><span class="kv-label">Timezone</span><span class="kv-value">Asia/Kolkata (IST)</span></div>
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></div>
+        <div>
+          <div class="info-section-title">Personal information</div>
+          <div class="info-section-sub">Basic details about this user</div>
+        </div>
       </div>
-      <div class="overview-card">
-        <h4>Access</h4>
-        <div class="kv-row"><span class="kv-label">Tenant</span><span class="kv-value">${u.tenant}</span></div>
-        <div class="kv-row"><span class="kv-label">Location</span><span class="kv-value">${u.location || '—'}</span></div>
-        <div class="kv-row"><span class="kv-label">Role</span><span class="kv-value">${roleTag(u.role)}</span></div>
-        <div class="kv-row"><span class="kv-label">Status</span><span class="kv-value">${statusChip(u.status)}</span></div>
-        <div class="kv-row"><span class="kv-label">Two-factor auth</span><span class="kv-value"><span class="chip chip-active"><span class="dot"></span>Enabled</span></span></div>
+      <div class="info-rows">
+        <div class="info-row-cell"><div class="info-row-label">First name</div><div class="info-row-value">${first}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Last name</div><div class="info-row-value">${last}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Email</div><div class="info-row-value">${u.email}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Phone</div><div class="info-row-value muted">Not set</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Language</div><div class="info-row-value">English (US)</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Timezone</div><div class="info-row-value">Asia/Kolkata (IST)</div></div>
       </div>
-      <div class="overview-card">
-        <h4>Account</h4>
-        <div class="kv-row"><span class="kv-label">User ID</span><span class="kv-value" style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--text-muted)">usr_${u.init.toLowerCase()}_${1000 + state.detailsUserIdx}</span></div>
-        <div class="kv-row"><span class="kv-label">Joined</span><span class="kv-value">Feb 12, 2024</span></div>
-        <div class="kv-row"><span class="kv-label">Invited by</span><span class="kv-value">Ravi Prasad</span></div>
-        <div class="kv-row"><span class="kv-label">Last login</span><span class="kv-value">${u.last}</span></div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div>
+          <div class="info-section-title">Access & role</div>
+          <div class="info-section-sub">Where this user belongs and what they can do</div>
+        </div>
       </div>
-      <div class="overview-card">
-        <h4>Activity summary</h4>
-        <div class="kv-row"><span class="kv-label">Devices in scope</span><span class="kv-value">${DEVICES.filter(d => deviceInScope(u, d)).length}</span></div>
-        <div class="kv-row"><span class="kv-label">Custom overrides</span><span class="kv-value">${u.deviceOverrides ? Object.keys(u.deviceOverrides).length : 0}</span></div>
-        <div class="kv-row"><span class="kv-label">Active sessions</span><span class="kv-value">3</span></div>
-        <div class="kv-row"><span class="kv-label">Events last 30 days</span><span class="kv-value">148</span></div>
+      <div class="info-rows">
+        <div class="info-row-cell"><div class="info-row-label">Tenant</div><div class="info-row-value">${u.tenant}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Location</div><div class="info-row-value">${u.location || '—'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Role</div><div class="info-row-value">${roleTag(u.role)}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Status</div><div class="info-row-value">${statusChip(u.status)}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Two-factor auth</div><div class="info-row-value"><span class="chip chip-active"><span class="dot"></span>Enabled</span></div></div>
+        <div class="info-row-cell"><div class="info-row-label">Last login</div><div class="info-row-value">${u.last}</div></div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div>
+          <div class="info-section-title">Account</div>
+          <div class="info-section-sub">System and lifecycle info</div>
+        </div>
+      </div>
+      <div class="info-rows">
+        <div class="info-row-cell"><div class="info-row-label">User ID</div><div class="info-row-value" style="font-family:ui-monospace,Menlo,monospace;font-size:13px">usr_${u.init.toLowerCase()}_${1000 + state.detailsUserIdx}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Joined</div><div class="info-row-value">Feb 12, 2024</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Invited by</div><div class="info-row-value">Ravi Prasad</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Active sessions</div><div class="info-row-value">3</div></div>
       </div>
     </div>
   `;
