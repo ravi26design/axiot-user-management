@@ -1169,7 +1169,12 @@
   /* Client view — hide client-level UI since everything is scoped to one client */
   body.client-view #filterClientBtn,
   body.client-view .client-col,
-  body.client-view .role-filter-bar { display: none !important; }
+  body.client-view .role-filter-bar,
+  body.client-view .invite-client-field,
+  body.client-view #newRoleScope,
+  body.client-view #newRoleScope + .hint,
+  body.client-view #newRoleScope,
+  body.client-view .field:has(#newRoleScope) { display: none !important; }
 
   /* ===== Grouped action bar for user details ===== */
   .action-bar {
@@ -1404,7 +1409,7 @@
     </div>
     <div class="form-section">
       <div class="form-section-title">Assignment</div>
-      <div class="field">
+      <div class="field invite-client-field">
         <label class="label">Client <span class="req">*</span></label>
         <select class="select" id="inviteClient" onchange="refreshInviteLocations()"></select>
         <div class="hint">Which client this user belongs to.</div>
