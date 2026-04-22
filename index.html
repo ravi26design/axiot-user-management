@@ -1949,14 +1949,12 @@ function renderOverviewTab(u) {
         <div class="ico-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></div>
         <div>
           <div class="info-section-title">Personal information</div>
-          <div class="info-section-sub">Basic details about this user</div>
+          <div class="info-section-sub">Preferences and identity details</div>
         </div>
       </div>
       <div class="info-rows">
         <div class="info-row-cell"><div class="info-row-label">First name</div><div class="info-row-value">${first}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Last name</div><div class="info-row-value">${last}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Email</div><div class="info-row-value">${u.email}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Phone</div><div class="info-row-value muted">Not set</div></div>
         <div class="info-row-cell"><div class="info-row-label">Language</div><div class="info-row-value">English (US)</div></div>
         <div class="info-row-cell"><div class="info-row-label">Timezone</div><div class="info-row-value">Asia/Kolkata (IST)</div></div>
       </div>
@@ -1972,11 +1970,9 @@ function renderOverviewTab(u) {
       </div>
       <div class="info-rows">
         <div class="info-row-cell"><div class="info-row-label">Tenant</div><div class="info-row-value">${u.tenant}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Location</div><div class="info-row-value">${u.location || '—'}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Role</div><div class="info-row-value">${roleTag(u.role)}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Status</div><div class="info-row-value">${statusChip(u.status)}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Two-factor auth</div><div class="info-row-value"><span class="chip chip-active"><span class="dot"></span>Enabled</span></div></div>
-        <div class="info-row-cell"><div class="info-row-label">Last login</div><div class="info-row-value">${u.last}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Active sessions</div><div class="info-row-value">3</div></div>
       </div>
     </div>
 
@@ -1985,14 +1981,12 @@ function renderOverviewTab(u) {
         <div class="ico-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
         <div>
           <div class="info-section-title">Account</div>
-          <div class="info-section-sub">System and lifecycle info</div>
+          <div class="info-section-sub">System identifiers</div>
         </div>
       </div>
       <div class="info-rows">
         <div class="info-row-cell"><div class="info-row-label">User ID</div><div class="info-row-value" style="font-family:ui-monospace,Menlo,monospace;font-size:13px">usr_${u.init.toLowerCase()}_${1000 + state.detailsUserIdx}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Joined</div><div class="info-row-value">Feb 12, 2024</div></div>
         <div class="info-row-cell"><div class="info-row-label">Invited by</div><div class="info-row-value">Ravi Prasad</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Active sessions</div><div class="info-row-value">3</div></div>
       </div>
     </div>
   `;
