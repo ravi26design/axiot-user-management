@@ -308,34 +308,7 @@
       <h1>Sign in to AXIoT</h1>
       <p class="sub">Select your account type and enter your credentials.</p>
 
-      <!-- Tabs -->
-      <div class="tabs" role="tablist">
-        <button class="tab active" id="tab-enterprise" role="tab" onclick="switchTab('enterprise')">
-          <i data-lucide="briefcase-business"></i>
-          Enterprise
-        </button>
-        <button class="tab" id="tab-client" role="tab" onclick="switchTab('client')">
-          <i data-lucide="building-2"></i>
-          Client
-        </button>
-      </div>
-
-      <!-- Context banner updates per tab -->
-      <div class="context-banner" id="contextBanner">
-        <i data-lucide="info"></i>
-        <div id="contextText"></div>
-      </div>
-
       <form id="loginForm" onsubmit="submitLogin(event)">
-        <!-- Optional "Client" workspace field, visible only in Client tab -->
-        <div class="field" id="workspaceField" style="display:none">
-          <label class="label">Client workspace</label>
-          <div class="input-wrap">
-            <i data-lucide="building-2"></i>
-            <input class="input" id="workspace" type="text" placeholder="e.g. arvind" autocomplete="organization" />
-          </div>
-        </div>
-
         <div class="field">
           <label class="label">Work email</label>
           <div class="input-wrap">
@@ -367,13 +340,6 @@
           Sign in
           <i data-lucide="arrow-right"></i>
         </button>
-
-        <div class="divider">or</div>
-
-        <button class="btn btn-secondary" type="button" onclick="alert('SSO demo')">
-          <i data-lucide="shield-check"></i>
-          Continue with SAML SSO
-        </button>
       </form>
 
       <!-- Demo quick-fill -->
@@ -393,61 +359,25 @@
 </div>
 
 <script>
-const TAB_CONFIG = {
-  enterprise: {
-    title: 'Enterprise admin',
-    context: 'Sign in as an <strong>Enterprise admin</strong> to manage the AXIoT platform and onboard clients. Example: <strong>Dynamic Looms</strong>.',
-    demos: [
-      { label: 'Super Admin', email: 'priya@dynamiclooms.com' },
-      { label: 'Administrator', email: 'aisha@dynamiclooms.com' }
-    ],
-    showWorkspace: false
-  },
-  client: {
-    title: 'Client user',
-    context: 'Sign in to your <strong>Client workspace</strong> to manage your sites, devices, and team. Example: <strong>Arvind</strong>.',
-    demos: [
-      { label: 'Owner (Arvind)', email: 'marcus.chen@arvind.com', workspace: 'arvind' },
-      { label: 'Operator (Arvind)', email: 'rahul@arvind.com', workspace: 'arvind' },
-      { label: 'Maintenance (Arvind)', email: 'd.okafor@arvind.com', workspace: 'arvind' }
-    ],
-    showWorkspace: true
-  }
-};
+const DEMOS = [
+  { label: 'Dynamic Looms — Super Admin', email: 'priya@dynamiclooms.com',   target: 'enterprise.html' },
+  { label: 'Dynamic Looms — Admin',       email: 'aisha@dynamiclooms.com',   target: 'enterprise.html' },
+  { label: 'Arvind — Super Admin',        email: 'marcus.chen@arvind.com',   target: 'arvind.html' },
+  { label: 'Arvind — Admin',              email: 'd.okafor@arvind.com',      target: 'arvind.html' }
+];
 
-let activeTab = 'enterprise';
-
-function switchTab(tab) {
-  activeTab = tab;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-
-  const cfg = TAB_CONFIG[tab];
-  document.getElementById('contextText').innerHTML = cfg.context;
-  document.getElementById('workspaceField').style.display = cfg.showWorkspace ? 'block' : 'none';
-
-  // Render demo pills
-  document.getElementById('demoPills').innerHTML = cfg.demos.map(d => `
-    <button class="demo-pill" type="button" onclick="fillDemo('${d.email}', '${d.workspace || ''}')">
+function renderDemos() {
+  document.getElementById('demoPills').innerHTML = DEMOS.map(d => `
+    <button class="demo-pill" type="button" onclick="fillDemo('${d.email}')">
       <i data-lucide="user"></i> ${d.label}
     </button>
   `).join('');
-
-  // Clear form
-  document.getElementById('email').value = '';
-  document.getElementById('password').value = '';
-  if (cfg.showWorkspace) document.getElementById('workspace').value = '';
-
   if (window.lucide) window.lucide.createIcons();
 }
 
-function fillDemo(email, workspace) {
+function fillDemo(email) {
   document.getElementById('email').value = email;
   document.getElementById('password').value = 'demo123456';
-  if (workspace) {
-    const w = document.getElementById('workspace');
-    if (w) w.value = workspace;
-  }
 }
 
 function togglePw() {
@@ -455,39 +385,28 @@ function togglePw() {
   pw.type = pw.type === 'password' ? 'text' : 'password';
 }
 
+// Route based on email domain
+function routeForEmail(email) {
+  const e = (email || '').toLowerCase();
+  if (e.endsWith('@arvind.com')) return 'arvind.html';
+  return 'enterprise.html';
+}
+
 function submitLogin(evt) {
   evt.preventDefault();
-  const email = document.getElementById('email').value;
+  const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
   if (!email || !password) return;
-
-  // Persist context (for demo)
   try {
     localStorage.setItem('axiot-login', JSON.stringify({
-      type: activeTab,
-      email,
-      workspace: activeTab === 'client' ? document.getElementById('workspace').value : null,
-      signedInAt: new Date().toISOString()
+      email, signedInAt: new Date().toISOString()
     }));
   } catch (e) {}
-
-  // Redirect — pick the right clean URL per mode
-  if (activeTab === 'client') {
-    const workspace = (document.getElementById('workspace').value.trim() || 'arvind').toLowerCase();
-    // Known client files: arvind.html. Fallback to query param for other workspaces.
-    if (workspace === 'arvind') {
-      window.location.href = 'arvind.html';
-    } else {
-      const nice = workspace.charAt(0).toUpperCase() + workspace.slice(1);
-      window.location.href = 'index.html?client=' + encodeURIComponent(nice);
-    }
-  } else {
-    window.location.href = 'enterprise.html';
-  }
+  window.location.href = routeForEmail(email);
 }
 
 // Init
-switchTab('enterprise');
+renderDemos();
 if (window.lucide) window.lucide.createIcons();
 </script>
 </body>
