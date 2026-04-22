@@ -1166,6 +1166,11 @@
   .row-clickable { cursor: pointer; }
   .row-clickable:hover .cell-user-name { color: var(--primary); }
 
+  /* Client view — hide client-level UI since everything is scoped to one client */
+  body.client-view #filterClientBtn,
+  body.client-view .client-col,
+  body.client-view .role-filter-bar { display: none !important; }
+
   /* ===== Grouped action bar for user details ===== */
   .action-bar {
     display: inline-flex; align-items: center;
@@ -1312,7 +1317,7 @@
               <thead><tr>
                 <th style="width:36px"><input type="checkbox" class="check" onchange="toggleAll(this)" /></th>
                 <th>Name <span class="sort">▲</span></th>
-                <th>Client</th>
+                <th class="client-col">Client</th>
                 <th>Location</th>
                 <th>Role</th>
                 <th>Status</th>
@@ -1476,6 +1481,16 @@
 /* ============================================================
    Data
    ============================================================ */
+// View mode — URL ?client=<Name> scopes the whole app to that client
+const VIEW_CLIENT = (() => {
+  try {
+    const q = new URLSearchParams(window.location.search).get('client');
+    if (!q) return null;
+    return q.charAt(0).toUpperCase() + q.slice(1).toLowerCase();
+  } catch (e) { return null; }
+})();
+if (VIEW_CLIENT) document.body.classList.add('client-view');
+
 const li = (name) => `<i data-lucide="${name}"></i>`;
 // Render any <i data-lucide> placeholders into SVGs — debounced to avoid feedback loops
 let _iconsTick = null;
@@ -1665,13 +1680,14 @@ const users = [
    Rendering — shared shell
    ============================================================ */
 function renderSidebar(activeScreen) {
+  const workspaceLabel = VIEW_CLIENT ? `${VIEW_CLIENT} workspace` : 'Dynamic Looms';
   const html = `
     <button class="sidebar-collapse" onclick="toggleSidebar()" title="Collapse sidebar" aria-label="Toggle sidebar">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
     </button>
     <div class="brand">
       <div class="brand-mark">AX</div>
-      <div>AXIoT<div class="brand-sub">Dynamic Looms</div></div>
+      <div>AXIoT<div class="brand-sub">${workspaceLabel}</div></div>
     </div>
     ${NAV.map(item => {
       if (item.section) return `<div class="nav-section">${item.section}</div>`;
@@ -2268,6 +2284,7 @@ const userFilters = { search: '', role: new Set(), status: new Set(), client: ne
 function filteredUsers() {
   const q = userFilters.search.trim().toLowerCase();
   return users.filter(u => {
+    if (VIEW_CLIENT && u.client !== VIEW_CLIENT) return false;
     if (q && !(u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))) return false;
     if (userFilters.role.size && !userFilters.role.has(u.role)) return false;
     if (userFilters.status.size && !userFilters.status.has(u.status)) return false;
@@ -2291,7 +2308,7 @@ function renderUsers() {
     <tr class="row-clickable" onclick="openUserDetails(${idx})">
       <td onclick="event.stopPropagation()"><input type="checkbox" class="check" onchange="rowSelect()" /></td>
       <td><div class="cell-user"><div class="avatar avatar-28">${u.init}</div><div><div class="cell-user-name">${u.name}</div><div class="cell-user-sub">${u.email}</div></div></div></td>
-      <td style="color:var(--text-muted)">${u.client}</td>
+      <td class="client-col" style="color:var(--text-muted)">${u.client}</td>
       <td style="color:var(--text-muted)">${u.location || '—'}</td>
       <td>${roleTag(u.role)}</td>
       <td>${statusChip(u.status)}</td>
@@ -2440,10 +2457,18 @@ function openRowMenu(evt, idx) {
 
 function openUserDrawer(idx) {
   document.querySelectorAll('.row-menu').forEach(m => m.remove());
+  // Scope roles/clients based on view mode
   const roleSel = document.getElementById('inviteRole');
-  roleSel.innerHTML = state.roles.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+  const rolesForScope = VIEW_CLIENT ? state.roles.filter(r => r.client === VIEW_CLIENT) : state.roles;
+  roleSel.innerHTML = rolesForScope.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
   const clientSel = document.getElementById('inviteClient');
   clientSel.innerHTML = CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  if (VIEW_CLIENT) {
+    clientSel.value = VIEW_CLIENT;
+    clientSel.disabled = true;
+  } else {
+    clientSel.disabled = false;
+  }
   refreshInviteLocations();
   document.getElementById('userDrawer').classList.add('open');
   document.getElementById('userDrawerBackdrop').classList.add('open');
@@ -2577,6 +2602,7 @@ function deleteRole(id) {
 }
 
 function filteredRoles() {
+  if (VIEW_CLIENT) return state.roles.filter(r => r.client === VIEW_CLIENT);
   const f = state.roleClientFilter;
   if (f === 'all') return state.roles;
   if (f === 'global') return state.roles.filter(r => !r.client);
@@ -2891,12 +2917,16 @@ function openNewRoleDrawer() {
   document.getElementById('newRoleDesc').value = '';
   const scope = document.getElementById('newRoleScope');
   scope.innerHTML = '<option value="" disabled>Select a client…</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
-  scope.disabled = false;
-  // Preselect scope matching current filter, else leave placeholder
-  if (state.roleClientFilter && state.roleClientFilter !== 'all' && state.roleClientFilter !== 'global') {
-    scope.value = state.roleClientFilter;
+  if (VIEW_CLIENT) {
+    scope.value = VIEW_CLIENT;
+    scope.disabled = true;
   } else {
-    scope.value = '';
+    scope.disabled = false;
+    if (state.roleClientFilter && state.roleClientFilter !== 'all' && state.roleClientFilter !== 'global') {
+      scope.value = state.roleClientFilter;
+    } else {
+      scope.value = '';
+    }
   }
   // Change submit button label
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
@@ -2916,7 +2946,7 @@ function editRole(id) {
   const scope = document.getElementById('newRoleScope');
   scope.innerHTML = '<option value="" disabled>Select a client…</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
   scope.value = r.client || '';
-  scope.disabled = false;
+  scope.disabled = !!VIEW_CLIENT;
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
   if (submitBtn) submitBtn.textContent = 'Save changes';
   document.getElementById('roleDrawer').classList.add('open');
