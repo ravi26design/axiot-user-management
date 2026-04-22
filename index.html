@@ -2722,6 +2722,7 @@ function renderRoles() {
         <div style="margin-top:4px">${scopeBadge(r.client)}</div>
         <div class="meta">${r.users.toLocaleString()} user${r.users === 1 ? '' : 's'} · Updated ${r.updated}</div>
         <div class="item-actions" onclick="event.stopPropagation()">
+          <button class="icon-btn" title="Edit" onclick="editRole('${r.id}')">${SVG.edit}</button>
           <button class="icon-btn" title="Duplicate" onclick="duplicateRole('${r.id}')">${SVG.copy}</button>
           <button class="icon-btn" title="Delete" onclick="deleteRole('${r.id}')" style="color:var(--danger)">${SVG.trash}</button>
         </div>
@@ -2827,6 +2828,7 @@ function renderMatrix() {
         <div class="matrix-sub">${r.desc}</div>
       </div>
       <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="editRole('${r.id}')">${SVG.edit} Edit</button>
         <button class="btn btn-secondary btn-sm" onclick="duplicateRole('${r.id}')">${SVG.copy} Duplicate</button>
         ${isSystem ? '' : `<button class="btn btn-danger-ghost btn-sm" onclick="deleteRole('${r.id}')">${SVG.trash} Delete</button>`}
       </div>
@@ -2891,16 +2893,43 @@ function submitInvite() {
 }
 
 function openNewRoleDrawer() {
+  state.editingRoleId = null;
+  document.getElementById('roleDrawerTitle').textContent = 'Create new role';
   document.getElementById('newRoleName').value = '';
   document.getElementById('newRoleDesc').value = '';
-  const sel = document.getElementById('newRoleTemplate');
-  sel.innerHTML = '<option value="">Blank — no permissions</option>' + state.roles.map(r => `<option value="${r.id}">Copy from: ${r.name}</option>`).join('');
+  const tpl = document.getElementById('newRoleTemplate');
+  tpl.parentElement.style.display = '';
+  tpl.innerHTML = '<option value="">Blank — no permissions</option>' + state.roles.map(r => `<option value="${r.id}">Copy from: ${r.name}</option>`).join('');
   const scope = document.getElementById('newRoleScope');
   scope.innerHTML = '<option value="">Global — all clients</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
-  // Preselect scope matching current filter
+  scope.disabled = false;
   if (state.roleClientFilter && state.roleClientFilter !== 'all' && state.roleClientFilter !== 'global') {
     scope.value = state.roleClientFilter;
   }
+  // Change submit button label
+  const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
+  if (submitBtn) submitBtn.textContent = 'Create role';
+  document.getElementById('roleDrawer').classList.add('open');
+  document.getElementById('roleDrawerBackdrop').classList.add('open');
+  setTimeout(() => document.getElementById('newRoleName').focus(), 250);
+}
+
+function editRole(id) {
+  const r = state.roles.find(x => x.id === id);
+  if (!r) return;
+  state.editingRoleId = id;
+  document.getElementById('roleDrawerTitle').textContent = 'Edit role';
+  document.getElementById('newRoleName').value = r.name;
+  document.getElementById('newRoleDesc').value = r.desc || '';
+  // Hide "Start from template" in edit mode
+  const tpl = document.getElementById('newRoleTemplate');
+  tpl.parentElement.style.display = 'none';
+  const scope = document.getElementById('newRoleScope');
+  scope.innerHTML = '<option value="">Global — all clients</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  scope.value = r.client || '';
+  scope.disabled = false;
+  const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
+  if (submitBtn) submitBtn.textContent = 'Save changes';
   document.getElementById('roleDrawer').classList.add('open');
   document.getElementById('roleDrawerBackdrop').classList.add('open');
   setTimeout(() => document.getElementById('newRoleName').focus(), 250);
@@ -2912,9 +2941,27 @@ function closeRoleDrawer() {
 function submitNewRole() {
   const name = document.getElementById('newRoleName').value.trim();
   const desc = document.getElementById('newRoleDesc').value.trim();
-  const tpl = document.getElementById('newRoleTemplate').value;
   const scope = document.getElementById('newRoleScope').value;  // '' → global, or client name
   if (!name) { toast('Role name is required', 'danger'); return; }
+
+  // Edit mode — update existing role
+  if (state.editingRoleId) {
+    const r = state.roles.find(x => x.id === state.editingRoleId);
+    if (r) {
+      r.name = name;
+      r.desc = desc || r.desc;
+      r.client = scope || null;
+      r.updated = 'just now';
+    }
+    state.editingRoleId = null;
+    closeRoleDrawer();
+    renderRoles();
+    toast('Role updated', 'success');
+    return;
+  }
+
+  // Create mode
+  const tpl = document.getElementById('newRoleTemplate').value;
   const basePerms = tpl ? JSON.parse(JSON.stringify(state.roles.find(r => r.id === tpl).perms)) : emptyPerms();
   const newRole = {
     id: 'r_' + Date.now(),
@@ -2927,8 +2974,7 @@ function submitNewRole() {
   state.selectedRoleId = newRole.id;
   state.dirtyPerms = JSON.parse(JSON.stringify(basePerms));
   state.initialPerms = JSON.parse(JSON.stringify(basePerms));
-  // Auto-filter to the new role's scope so user sees it
-  state.roleClientFilter = scope || 'global';
+  state.roleClientFilter = scope || 'all';
   closeRoleDrawer();
   renderRoles();
   toast('Role created', 'success');
