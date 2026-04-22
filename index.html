@@ -2650,8 +2650,8 @@ function toggleClientPop(evt) {
       <input id="rfClientSearch" placeholder="Search clients…" oninput="filterClientPop()" autofocus />
     </div>
     <div class="rf-pop-list" id="rfClientList">
-      <div class="rf-opt ${cur === 'all' ? 'selected' : ''}" data-client="All clients" onclick="setRoleFilter('all');closeRfPop()">
-        All clients<span class="opt-count">${allCount}</span>
+      <div class="rf-opt ${cur === 'all' ? 'selected' : ''}" data-client="All" onclick="setRoleFilter('all');closeRfPop()">
+        All<span class="opt-count">${allCount}</span>
       </div>
       ${allClients.length ? '<div style="height:1px;background:var(--border-subtle);margin:4px 2px"></div>' : ''}
       ${allClients.map(c => {
@@ -2732,7 +2732,7 @@ function renderRoles() {
   const f = state.roleClientFilter;
   const visibleCount = visible.length;
   let label;
-  if (f === 'all' || f === 'global') label = `All clients <small>(${state.roles.length})</small>`;
+  if (f === 'all' || f === 'global') label = `All <small>(${state.roles.length})</small>`;
   else label = `${f} <small>(${visibleCount})</small>`;
 
   document.getElementById('roleList').innerHTML = `
