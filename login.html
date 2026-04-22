@@ -471,13 +471,18 @@ function submitLogin(evt) {
     }));
   } catch (e) {}
 
-  // Redirect — client users go to their scoped workspace
+  // Redirect — pick the right clean URL per mode
   if (activeTab === 'client') {
-    const workspace = document.getElementById('workspace').value.trim() || 'Arvind';
-    const nice = workspace.charAt(0).toUpperCase() + workspace.slice(1).toLowerCase();
-    window.location.href = 'index.html?client=' + encodeURIComponent(nice);
+    const workspace = (document.getElementById('workspace').value.trim() || 'arvind').toLowerCase();
+    // Known client files: arvind.html. Fallback to query param for other workspaces.
+    if (workspace === 'arvind') {
+      window.location.href = 'arvind.html';
+    } else {
+      const nice = workspace.charAt(0).toUpperCase() + workspace.slice(1);
+      window.location.href = 'index.html?client=' + encodeURIComponent(nice);
+    }
   } else {
-    window.location.href = 'index.html';
+    window.location.href = 'enterprise.html';
   }
 }
 
