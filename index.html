@@ -1712,7 +1712,11 @@ function renderUserDetails() {
   })[u.status];
 
   content.innerHTML = `
-    <div style="display:flex;justify-content:flex-end;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+      <div>
+        <div class="page-title">User details</div>
+        <div class="page-sub">Profile, device access, and activity for this user.</div>
+      </div>
       <div style="display:flex;gap:12px;flex-shrink:0;align-items:center">
         <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-muted);user-select:none" title="${u.status === 'active' ? 'Deactivate user' : 'Activate user'}">
           <span>${u.status === 'active' ? 'Active' : 'Inactive'}</span>
