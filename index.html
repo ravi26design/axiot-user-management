@@ -1534,16 +1534,51 @@ const state = {
    Devices + role-based defaults
    ============================================================ */
 const DEVICES = [
-  { id: 'd-001', name: 'Compressor #4',   type: 'Compressor', tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
-  { id: 'd-002', name: 'Valve Cluster V12', type: 'Valve',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
-  { id: 'd-003', name: 'Conveyor Motor M3', type: 'Motor',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
-  { id: 'd-004', name: 'Pump Station P2',   type: 'Pump',     tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
-  { id: 'd-005', name: 'Heat Exchanger H1', type: 'Exchanger',tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
-  { id: 'd-006', name: 'Press Line PR-1',   type: 'Press',    tenant: 'Acme Industries', location: 'Chennai Plant' },
-  { id: 'd-007', name: 'Boiler B-07',       type: 'Boiler',   tenant: 'Acme Industries', location: 'Chennai Plant' },
-  { id: 'd-008', name: 'Gateway GW-HQ01',   type: 'Gateway',  tenant: 'Acme Industries', location: 'Mumbai HQ' },
-  { id: 'd-009', name: 'Turbine T-22',      type: 'Turbine',  tenant: 'Northwind Energy', location: 'Head Office' },
-  { id: 'd-010', name: 'Solar Inverter SI-5', type: 'Inverter', tenant: 'Northwind Energy', location: 'Paris HQ' }
+  // Mumbai HQ — Acme Industries
+  { id: 'd-001', name: 'Gateway GW-HQ01',      type: 'Gateway',       tenant: 'Acme Industries', location: 'Mumbai HQ' },
+  { id: 'd-002', name: 'Network Switch NSW-42',type: 'Network',       tenant: 'Acme Industries', location: 'Mumbai HQ' },
+  { id: 'd-003', name: 'Server Rack SR-03',    type: 'Server',        tenant: 'Acme Industries', location: 'Mumbai HQ' },
+  { id: 'd-004', name: 'CCTV Cluster C-MUM',   type: 'Camera',        tenant: 'Acme Industries', location: 'Mumbai HQ' },
+  { id: 'd-005', name: 'Access Control AC-L1', type: 'Access Control',tenant: 'Acme Industries', location: 'Mumbai HQ' },
+
+  // Pune Plant — Line A
+  { id: 'd-010', name: 'Compressor #4',        type: 'Compressor',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+  { id: 'd-011', name: 'Valve Cluster V12',    type: 'Valve',         tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+  { id: 'd-012', name: 'Conveyor Motor M3',    type: 'Motor',         tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+  { id: 'd-013', name: 'Temperature Sensor TS-A7', type: 'Sensor',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+  { id: 'd-014', name: 'Flow Meter FM-12',     type: 'Flow meter',    tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+  { id: 'd-015', name: 'Pressure Gauge PG-A1', type: 'Gauge',         tenant: 'Acme Industries', location: 'Pune Plant — Line A' },
+
+  // Pune Plant — Line B
+  { id: 'd-020', name: 'Pump Station P2',      type: 'Pump',          tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
+  { id: 'd-021', name: 'Heat Exchanger H1',    type: 'Exchanger',     tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
+  { id: 'd-022', name: 'Cooling Tower CT-B2',  type: 'Cooling',       tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
+  { id: 'd-023', name: 'Conveyor Motor M5',    type: 'Motor',         tenant: 'Acme Industries', location: 'Pune Plant — Line B' },
+
+  // Chennai Plant
+  { id: 'd-030', name: 'Press Line PR-1',      type: 'Press',         tenant: 'Acme Industries', location: 'Chennai Plant' },
+  { id: 'd-031', name: 'Boiler B-07',          type: 'Boiler',        tenant: 'Acme Industries', location: 'Chennai Plant' },
+  { id: 'd-032', name: 'Robotic Arm RA-02',    type: 'Robot',         tenant: 'Acme Industries', location: 'Chennai Plant' },
+  { id: 'd-033', name: 'Welder Station WS-14', type: 'Welder',        tenant: 'Acme Industries', location: 'Chennai Plant' },
+
+  // Northwind Energy — Head Office
+  { id: 'd-040', name: 'Turbine T-22',         type: 'Turbine',       tenant: 'Northwind Energy', location: 'Head Office' },
+  { id: 'd-041', name: 'Wind Sensor WS-09',    type: 'Sensor',        tenant: 'Northwind Energy', location: 'Head Office' },
+  { id: 'd-042', name: 'Gateway NW-GW-01',     type: 'Gateway',       tenant: 'Northwind Energy', location: 'Head Office' },
+
+  // Northwind Energy — Paris HQ
+  { id: 'd-050', name: 'Solar Inverter SI-5',  type: 'Inverter',      tenant: 'Northwind Energy', location: 'Paris HQ' },
+  { id: 'd-051', name: 'Smart Meter SM-PAR',   type: 'Meter',         tenant: 'Northwind Energy', location: 'Paris HQ' },
+  { id: 'd-052', name: 'Battery Bank BB-02',   type: 'Battery',       tenant: 'Northwind Energy', location: 'Paris HQ' },
+
+  // Contoso Energy — Madrid Site
+  { id: 'd-060', name: 'Monitoring Gateway MG-MAD', type: 'Gateway',  tenant: 'Contoso Energy', location: 'Madrid Site' },
+  { id: 'd-061', name: 'Solar Array SA-01',    type: 'Solar',         tenant: 'Contoso Energy', location: 'Madrid Site' },
+  { id: 'd-062', name: 'Grid Connect GC-ES',   type: 'Grid',          tenant: 'Contoso Energy', location: 'Madrid Site' },
+
+  // Contoso Energy — Warsaw Site
+  { id: 'd-070', name: 'Backup Generator BG-WAR', type: 'Generator', tenant: 'Contoso Energy', location: 'Warsaw Site' },
+  { id: 'd-071', name: 'Transformer TR-PL-04',   type: 'Transformer',tenant: 'Contoso Energy', location: 'Warsaw Site' }
 ];
 
 // Device actions and role defaults (used when no override present)
