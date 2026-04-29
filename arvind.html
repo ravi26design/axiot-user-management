@@ -1580,12 +1580,14 @@
     </div>
     <div class="form-section">
       <div class="form-section-title">Status</div>
-      <div class="toggle-row">
-        <div>
-          <div class="name">Active</div>
-          <div class="desc">Inactive industries don't appear in user/role assignment dropdowns.</div>
+      <div class="field">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+          <div>
+            <div style="font-size:14px;font-weight:500">Active</div>
+            <div class="hint" style="margin-top:4px">Inactive industries don't appear in user/role assignment dropdowns.</div>
+          </div>
+          <div class="switch on" id="industryActive" onclick="this.classList.toggle('on')"></div>
         </div>
-        <div class="switch on" id="industryActive" onclick="this.classList.toggle('on')"></div>
       </div>
     </div>
   </div>
