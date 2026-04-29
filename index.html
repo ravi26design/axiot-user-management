@@ -1172,6 +1172,8 @@
   body.client-view .role-filter-bar,
   body.client-view .invite-client-field,
   body.client-view .field:has(#newRoleScope),
+  body.client-view .industry-client-col,
+  body.client-view .industry-client-filter,
   body.client-view .enterprise-only { display: none !important; }
 
   /* ===== Grouped action bar for user details ===== */
@@ -1374,6 +1376,59 @@
   </div>
 </div>
 
+<!-- INDUSTRIES SCREEN -->
+<div class="screen" id="screen-industries">
+  <div class="app">
+    <aside class="sidebar" data-sidebar></aside>
+    <div class="main">
+      <header class="topbar" data-topbar></header>
+      <div class="content">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Industries <span id="industriesCount" style="color:var(--text-muted);font-weight:500;font-size:18px"></span></div>
+            <div class="page-sub">Manage industries (locations) where clients operate. Each industry can host users and devices.</div>
+          </div>
+          <button class="btn btn-primary" onclick="openIndustryDrawer()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Add industry
+          </button>
+        </div>
+
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search-box">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+              <input id="industrySearch" placeholder="Search industries…" oninput="renderIndustries()" />
+            </div>
+            <div class="filter-wrap industry-client-filter">
+              <button class="chip-select" id="filterIndustryClientBtn" onclick="toggleIndustryClientFilter(event)">Client <span class="caret">▾</span></button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Industry</th>
+                  <th class="industry-client-col">Client</th>
+                  <th>Address</th>
+                  <th>Users</th>
+                  <th>Devices</th>
+                  <th>Status</th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+              <tbody id="industryRows"></tbody>
+            </table>
+          </div>
+          <div class="tbl-footer">
+            <div id="industryListMeta">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- USER DETAILS SCREEN -->
 <div class="screen" id="screen-userDetails">
   <div class="app">
@@ -1470,6 +1525,76 @@
   </div>
 </aside>
 
+<!-- ==== Industry drawer ==== -->
+<div class="drawer-backdrop" id="industryDrawerBackdrop" onclick="closeIndustryDrawer()"></div>
+<aside class="drawer" id="industryDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-title" id="industryDrawerTitle">Add industry</div>
+      <div class="drawer-sub">An industry represents a physical or business location for a client.</div>
+    </div>
+    <button class="icon-btn" onclick="closeIndustryDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="drawer-body">
+    <div class="form-section">
+      <div class="form-section-title">Details</div>
+      <div class="field">
+        <label class="label">Industry name <span class="req">*</span></label>
+        <input class="input" id="industryName" placeholder="e.g. Pune Plant — Line A" />
+        <div class="hint">A clear name that identifies this location.</div>
+      </div>
+      <div class="field invite-client-field">
+        <label class="label">Client <span class="req">*</span></label>
+        <select class="select" id="industryClient"></select>
+        <div class="hint">Which client this industry belongs to.</div>
+      </div>
+      <div class="field">
+        <label class="label">Industry type</label>
+        <select class="select" id="industryType">
+          <option value="Textiles & Apparel">Textiles & Apparel</option>
+          <option value="Manufacturing">Manufacturing</option>
+          <option value="Automotive">Automotive</option>
+          <option value="Energy & Utilities">Energy & Utilities</option>
+          <option value="Oil & Gas">Oil & Gas</option>
+          <option value="Chemicals">Chemicals</option>
+          <option value="Pharmaceuticals">Pharmaceuticals</option>
+          <option value="Food & Beverage">Food & Beverage</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Aerospace">Aerospace</option>
+          <option value="Mining & Metals">Mining & Metals</option>
+          <option value="Logistics & Warehousing">Logistics & Warehousing</option>
+        </select>
+        <div class="hint">Vertical or sector this industry operates in.</div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Address</div>
+      <div class="field">
+        <label class="label">Address line</label>
+        <input class="input" id="industryAddress" placeholder="Street, area" />
+      </div>
+      <div class="field-row">
+        <div class="field"><label class="label">City</label><input class="input" id="industryCity" placeholder="City" /></div>
+        <div class="field"><label class="label">Country</label><input class="input" id="industryCountry" placeholder="Country" /></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Status</div>
+      <div class="toggle-row">
+        <div>
+          <div class="name">Active</div>
+          <div class="desc">Inactive industries don't appear in user/role assignment dropdowns.</div>
+        </div>
+        <div class="switch on" id="industryActive" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-ghost" onclick="closeIndustryDrawer()">Cancel</button>
+    <button class="btn btn-primary" onclick="submitIndustry()" id="industrySubmitBtn">Create industry</button>
+  </div>
+</aside>
+
 <!-- ==== Confirm modal ==== -->
 <div class="modal-backdrop" id="confirmModal">
   <div class="modal">
@@ -1542,13 +1667,15 @@ const SVG = {
   edit:      li('pencil'),
   trash:     li('trash-2'),
   copy:      li('copy'),
-  dots:      li('ellipsis-vertical')
+  dots:      li('ellipsis-vertical'),
+  industries:li('map-pin')
 };
 
 const NAV = [
   { section: 'Administration' },
-  { key: 'users', label: 'Users', ico: SVG.users, screen: 'users' },
-  { key: 'roles', label: 'Roles & permissions', ico: SVG.roles, screen: 'roles' }
+  { key: 'users',      label: 'Users',                ico: SVG.users,      screen: 'users' },
+  { key: 'roles',      label: 'Roles & permissions',  ico: SVG.roles,      screen: 'roles' },
+  { key: 'industries', label: 'Industries',           ico: SVG.industries, screen: 'industries' }
 ];
 
 const RESOURCES = [
@@ -1594,13 +1721,24 @@ const initialRoles = [
   { id: 'av-super', name: 'Super Admin', system: false, client: 'Arvind',        industry: 'Textiles & Apparel', users: 1, updated: 'Feb 28', desc: 'Full admin rights — manage everything in the workspace.', perms: fullPerms() }
 ];
 
+const initialIndustries = [
+  { id: 'i-1', name: 'Mumbai HQ',           client: 'Dynamic Looms', type: 'Textiles & Apparel', address: 'Nariman Point', city: 'Mumbai',     country: 'India', active: true,  users: 1, devices: 2 },
+  { id: 'i-2', name: 'Pune Plant — Line A', client: 'Arvind',        type: 'Textiles & Apparel', address: 'MIDC Hinjewadi', city: 'Pune',      country: 'India', active: true,  users: 1, devices: 6 },
+  { id: 'i-3', name: 'Pune Plant — Line B', client: 'Arvind',        type: 'Textiles & Apparel', address: 'MIDC Hinjewadi', city: 'Pune',      country: 'India', active: true,  users: 0, devices: 4 },
+  { id: 'i-4', name: 'Chennai Plant',       client: 'Arvind',        type: 'Manufacturing',      address: 'Sriperumbudur',  city: 'Chennai',   country: 'India', active: true,  users: 0, devices: 4 },
+  { id: 'i-5', name: 'Ahmedabad HQ',        client: 'Arvind',        type: 'Textiles & Apparel', address: 'Naroda',         city: 'Ahmedabad', country: 'India', active: false, users: 0, devices: 2 }
+];
+
 const state = {
   currentScreen: 'users',
   roles: JSON.parse(JSON.stringify(initialRoles)),
+  industries: JSON.parse(JSON.stringify(initialIndustries)),
   selectedRoleId: 'dl-super',
   expanded: { devices: true, alerts: true },
-  dirtyPerms: null,      // deep copy of selected role's perms while editing
-  initialPerms: null     // snapshot for diff counting
+  dirtyPerms: null,
+  initialPerms: null,
+  editingIndustryId: null,
+  industryClientFilter: 'all'
 };
 
 /* ============================================================
@@ -1863,6 +2001,7 @@ function renderTopbar() {
   const titles = {
     users: 'Users',
     roles: 'Roles & permissions',
+    industries: 'Industries',
     userDetails: ''
   };
   const title = titles[state.currentScreen] || '';
@@ -1900,6 +2039,159 @@ function renderTopbar() {
   document.querySelectorAll('[data-topbar]').forEach(el => el.innerHTML = html);
 }
 
+/* ============================================================
+   Industries module
+   ============================================================ */
+function visibleIndustries() {
+  const q = (document.getElementById('industrySearch')?.value || '').toLowerCase().trim();
+  return state.industries.filter(i => {
+    if (VIEW_CLIENT && i.client !== VIEW_CLIENT) return false;
+    if (!VIEW_CLIENT && state.industryClientFilter !== 'all' && i.client !== state.industryClientFilter) return false;
+    if (q && !(i.name.toLowerCase().includes(q) || (i.city||'').toLowerCase().includes(q) || (i.address||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function renderIndustries() {
+  const list = visibleIndustries();
+  document.getElementById('industriesCount').textContent = `(${list.length})`;
+  const meta = document.getElementById('industryListMeta');
+  if (meta) meta.textContent = `${list.length} of ${state.industries.length} industries`;
+
+  // Filter chip label
+  const f = state.industryClientFilter;
+  const fbtn = document.getElementById('filterIndustryClientBtn');
+  if (fbtn && !VIEW_CLIENT) {
+    fbtn.classList.toggle('active', f !== 'all');
+    fbtn.innerHTML = (f === 'all' ? 'Client' : `${f} <span class="chip-select-count" style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">1</span>`) + ' <span class="caret">▾</span>';
+  }
+
+  const tbody = document.getElementById('industryRows');
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
+      <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">No industries yet</div>
+      <div style="font-size:13px;color:var(--text-muted)">Add an industry to get started.</div>
+      <div style="margin-top:14px"><button class="btn btn-primary btn-sm" onclick="openIndustryDrawer()">+ Add industry</button></div>
+    </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(i => `
+    <tr class="row-clickable" onclick="openIndustryDrawer('${i.id}')">
+      <td>
+        <div class="cell-user">
+          <div class="dev-ico">${SVG.industries}</div>
+          <div>
+            <div class="cell-user-name">${i.name}</div>
+            <div class="cell-user-sub">${i.type || '—'}</div>
+          </div>
+        </div>
+      </td>
+      <td class="industry-client-col" style="color:var(--text-muted)">${i.client}</td>
+      <td style="color:var(--text-muted)">${[i.address, i.city, i.country].filter(Boolean).join(', ') || '—'}</td>
+      <td style="color:var(--text-muted)">${i.users || 0}</td>
+      <td style="color:var(--text-muted)">${i.devices || 0}</td>
+      <td>${i.active ? '<span class="chip chip-active"><span class="dot"></span>Active</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Inactive</span>'}</td>
+      <td onclick="event.stopPropagation()">
+        <div class="row-actions">
+          <button class="icon-btn" title="Edit" onclick="openIndustryDrawer('${i.id}')">${SVG.edit}</button>
+          <button class="icon-btn" title="Delete" onclick="deleteIndustry('${i.id}')" style="color:var(--danger)">${SVG.trash}</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openIndustryDrawer(id) {
+  state.editingIndustryId = id || null;
+  const i = id ? state.industries.find(x => x.id === id) : null;
+  document.getElementById('industryDrawerTitle').textContent = id ? 'Edit industry' : 'Add industry';
+  document.getElementById('industrySubmitBtn').textContent = id ? 'Save changes' : 'Create industry';
+  document.getElementById('industryName').value = i ? i.name : '';
+  document.getElementById('industryAddress').value = i ? (i.address || '') : '';
+  document.getElementById('industryCity').value = i ? (i.city || '') : '';
+  document.getElementById('industryCountry').value = i ? (i.country || '') : '';
+  document.getElementById('industryType').value = i ? (i.type || 'Textiles & Apparel') : 'Textiles & Apparel';
+  const cs = document.getElementById('industryClient');
+  cs.innerHTML = CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  if (VIEW_CLIENT) { cs.value = VIEW_CLIENT; cs.disabled = true; }
+  else { cs.value = i ? i.client : (state.industryClientFilter !== 'all' ? state.industryClientFilter : CLIENTS[0]); cs.disabled = false; }
+  const sw = document.getElementById('industryActive');
+  if (i) sw.classList.toggle('on', !!i.active);
+  else sw.classList.add('on');
+  document.getElementById('industryDrawer').classList.add('open');
+  document.getElementById('industryDrawerBackdrop').classList.add('open');
+  setTimeout(() => document.getElementById('industryName').focus(), 250);
+}
+function closeIndustryDrawer() {
+  document.getElementById('industryDrawer').classList.remove('open');
+  document.getElementById('industryDrawerBackdrop').classList.remove('open');
+  state.editingIndustryId = null;
+}
+function submitIndustry() {
+  const name = document.getElementById('industryName').value.trim();
+  const client = document.getElementById('industryClient').value;
+  if (!name) { toast('Industry name is required', 'danger'); return; }
+  if (!client) { toast('Please select a client', 'danger'); return; }
+  const data = {
+    name, client,
+    type:    document.getElementById('industryType').value,
+    address: document.getElementById('industryAddress').value.trim(),
+    city:    document.getElementById('industryCity').value.trim(),
+    country: document.getElementById('industryCountry').value.trim(),
+    active:  document.getElementById('industryActive').classList.contains('on')
+  };
+  if (state.editingIndustryId) {
+    Object.assign(state.industries.find(x => x.id === state.editingIndustryId), data);
+    toast('Industry updated', 'success');
+  } else {
+    state.industries.push({ id: 'i-' + Date.now(), users: 0, devices: 0, ...data });
+    toast('Industry created', 'success');
+  }
+  closeIndustryDrawer();
+  renderIndustries();
+}
+function deleteIndustry(id) {
+  const i = state.industries.find(x => x.id === id);
+  if (!i) return;
+  confirmDialog(`Delete industry "${i.name}"?`,
+    `This removes the industry and unassigns it from any users or devices currently linked to it.`,
+    () => {
+      state.industries = state.industries.filter(x => x.id !== id);
+      renderIndustries();
+      toast('Industry deleted', 'danger');
+    });
+}
+
+function toggleIndustryClientFilter(evt) {
+  evt.stopPropagation();
+  const existing = document.getElementById('indClientPop');
+  if (existing) { existing.remove(); return; }
+  const btn = evt.currentTarget;
+  const wrap = btn.parentElement;
+  const opts = ['all', ...CLIENTS];
+  const html = `
+    <div class="filter-pop open" id="indClientPop" style="min-width:200px">
+      <div class="filter-pop-head"><span>Filter by client</span></div>
+      ${opts.map(c => `
+        <label class="filter-opt" onclick="state.industryClientFilter='${c}';document.getElementById('indClientPop').remove();renderIndustries()">
+          <span>${c === 'all' ? 'All clients' : c}</span>
+        </label>
+      `).join('')}
+    </div>
+  `;
+  wrap.insertAdjacentHTML('beforeend', html);
+  setTimeout(() => {
+    const closer = (e) => {
+      if (!e.target.closest('#indClientPop') && !e.target.closest('#filterIndustryClientBtn')) {
+        const p = document.getElementById('indClientPop'); if (p) p.remove();
+        document.removeEventListener('click', closer);
+      }
+    };
+    document.addEventListener('click', closer);
+  }, 0);
+}
+
 function switchScreen(name) {
   if (state.dirtyChanges && countChanges() > 0) {
     if (!confirm('You have unsaved changes. Leave without saving?')) return;
@@ -1911,6 +2203,7 @@ function switchScreen(name) {
   renderSidebar(name === 'userDetails' ? 'users' : name);
   renderTopbar();
   if (name === 'roles') renderRoles();
+  if (name === 'industries') renderIndustries();
   window.scrollTo(0, 0);
 }
 
@@ -3066,9 +3359,11 @@ function toast(msg, type = '') {
    ============================================================ */
 renderSidebar('users');
 renderSidebar('roles');
+renderSidebar('industries');
 renderTopbar();
 renderUsers();
 renderRoles();
+renderIndustries();
 if (window.lucide) window.lucide.createIcons();
 
 document.addEventListener('keydown', e => {
