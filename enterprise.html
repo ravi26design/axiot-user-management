@@ -2553,14 +2553,6 @@ function renderDeviceDetails() {
             ${onlineChipHtml}
             <div class="meta">${d.active !== false ? 'Just now' : (d.lastSeen || '—')}</div>
           </div>
-          <div class="dd-alarm">
-            <div class="dd-alarm-ico">${li('bell')}</div>
-            <div>
-              <div class="dd-alarm-name">Source Alarms</div>
-              <div class="dd-alarm-sub">${isCritical ? 'Needs attention' : 'All clear'}</div>
-            </div>
-            <div class="dd-alarm-count ${isCritical ? '' : 'zero'}">${isCritical ? '1' : '0'}</div>
-          </div>
         </div>
       </div>
 
