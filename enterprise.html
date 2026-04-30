@@ -2725,19 +2725,7 @@ state.detailsMsgTab = state.detailsMsgTab || 'summary';
 function switchMsgTab(t) { state.detailsMsgTab = t; renderDeviceDetails(); }
 
 function renderDeviceMessagesTab(d) {
-  const sub = state.detailsMsgTab;
-  return `
-    <div class="msg-tabs-wrap">
-      <div class="msg-tabs">
-        <div class="msg-tab ${sub==='summary'?'active':''}" onclick="switchMsgTab('summary')">Summary</div>
-        <div class="msg-tab ${sub==='live'?'active':''}" onclick="switchMsgTab('live')">Live Messages</div>
-        <div class="msg-tab ${sub==='historic'?'active':''}" onclick="switchMsgTab('historic')">Historic Messages</div>
-      </div>
-    </div>
-    ${sub === 'summary' ? renderMessagesSummary() :
-      sub === 'live' ? renderMessagesLive() :
-      renderMessagesHistoric()}
-  `;
+  return renderMessagesSummary();
 }
 
 function msgStat({ title, num, delta, deltaDir, prev, prevLbl }) {
