@@ -2591,7 +2591,66 @@ function renderDeviceDetails() {
       <button class="btn btn-secondary btn-sm">Actions <span class="caret" style="font-size:10px">▾</span></button>
     </div>
 
-    ${state.detailsDeviceTab === 'overview' ? renderDeviceOverview(d, isCritical) : renderDeviceTabPlaceholder(state.detailsDeviceTab)}
+    ${
+      state.detailsDeviceTab === 'overview' ? renderDeviceOverview(d, isCritical)
+      : state.detailsDeviceTab === 'details' ? renderDeviceDetailsTab(d)
+      : renderDeviceTabPlaceholder(state.detailsDeviceTab)
+    }
+  `;
+}
+
+function renderDeviceDetailsTab(d) {
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('cpu')}</div>
+        <div>
+          <div class="info-section-title">Device details</div>
+          <div class="info-section-sub">Identification and firmware</div>
+        </div>
+      </div>
+      <div class="info-rows">
+        <div class="info-row-cell"><div class="info-row-label">Device name</div><div class="info-row-value">${d.name}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Type</div><div class="info-row-value">${d.type}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Serial number</div><div class="info-row-value" style="font-family:ui-monospace,Menlo,monospace;font-size:14px">${d.serial || '—'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Firmware version</div><div class="info-row-value">v${d.firmware || '—'}</div></div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('map-pin')}</div>
+        <div>
+          <div class="info-section-title">Assignment</div>
+          <div class="info-section-sub">Where this device belongs</div>
+        </div>
+      </div>
+      <div class="info-rows">
+        <div class="info-row-cell"><div class="info-row-label">Client</div><div class="info-row-value">${d.client}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Industry</div><div class="info-row-value">${d.location}</div></div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('activity')}</div>
+        <div>
+          <div class="info-section-title">Status</div>
+          <div class="info-section-sub">Operational state</div>
+        </div>
+      </div>
+      <div class="info-rows">
+        <div class="info-row-cell">
+          <div class="info-row-label">Status</div>
+          <div class="info-row-value">${d.active !== false ? '<span class="chip chip-active"><span class="dot"></span>Active</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Inactive</span>'}</div>
+        </div>
+        <div class="info-row-cell"><div class="info-row-label">Last seen</div><div class="info-row-value">${d.lastSeen || '—'}</div></div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+      <button class="btn btn-secondary btn-sm" onclick="openDeviceDrawer('${d.id}')">${SVG.edit} Edit details</button>
+    </div>
   `;
 }
 
