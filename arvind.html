@@ -1784,71 +1784,69 @@
     color: var(--text);
   }
 
-  /* Rail center is at: feed.padding-left = 40 → rail at left: 15, width 2 → center at 16. All dots are absolutely positioned to share that center. */
-  .tl-feed {
-    position: relative;
-    padding-left: 40px;
-  }
-  .tl-feed::before {
-    content: ''; position: absolute;
-    top: 12px; bottom: 12px;
-    left: 15px; width: 2px;
+  /* Single grid where the first column hosts both the rail and the dots, so they always share the same x-axis. */
+  .tl-feed { position: relative; padding: 8px 0; }
+  .tl-rail {
+    position: absolute;
+    left: 18px;            /* center of the 36px marker column */
+    top: 14px; bottom: 14px;
+    width: 2px;
     background: var(--border);
+    transform: translateX(-50%);
     border-radius: 1px;
   }
 
   .tl-day {
-    position: relative;
-    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    align-items: center;
+    column-gap: 14px;
+    padding: 6px 0;
+    margin-top: 24px;
   }
   .tl-day:first-child { margin-top: 0; }
-  .tl-day-head {
-    position: relative;
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 0; margin-bottom: 4px;
-  }
-  .tl-day-dot {
-    /* box-sizing border-box → width 16 IS the outer. Half = 8. Rail center at left 16 of feed. Head starts at left 40, so dot.left = (16 - 8) - 40 = -32 */
-    position: absolute;
-    left: -32px;
-    top: 50%; transform: translateY(-50%);
-    width: 16px; height: 16px; border-radius: 50%;
+  .tl-day-marker {
+    justify-self: center;
+    width: 18px; height: 18px;
+    border-radius: 50%;
     background: var(--surface);
     border: 3px solid var(--primary);
-    box-sizing: border-box;
-    flex-shrink: 0;
-    z-index: 1;
+    position: relative; z-index: 1;
   }
-  .tl-day-head .label {
+  .tl-day-text {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .tl-day-text .label {
     font-size: var(--fs-base); font-weight: var(--fw-semi);
     color: var(--text); letter-spacing: -0.1px;
   }
-  .tl-day-head .count {
+  .tl-day-text .date {
+    color: var(--text-muted); font-size: var(--fs-sm); font-weight: var(--fw-med);
+  }
+  .tl-day-text .count {
     font-size: var(--fs-xxs); padding: 2px 8px; border-radius: 999px;
     background: var(--bg-hover); color: var(--text-muted); font-weight: var(--fw-semi);
   }
 
   .tl-event {
-    position: relative;
-    display: grid; grid-template-columns: 90px 1fr;
-    align-items: center; column-gap: 14px;
-    padding: 8px 0;
+    display: grid;
+    grid-template-columns: 36px 90px 1fr;
+    align-items: center;
+    column-gap: 14px;
+    padding: 6px 0;
   }
-  .tl-event::before {
-    /* box-sizing border-box → width 8 IS the outer. Half = 4. Rail center at left 16 of feed. Event starts at left 40, so dot.left = (16 - 4) - 40 = -28 */
-    content: ''; position: absolute;
-    left: -28px; top: 50%;
-    width: 8px; height: 8px; border-radius: 50%;
+  .tl-event-marker {
+    justify-self: center;
+    width: 12px; height: 12px;
+    border-radius: 50%;
     background: var(--surface);
     border: 2px solid var(--text-subtle);
-    box-sizing: border-box;
-    transform: translateY(-50%);
-    z-index: 1;
+    position: relative; z-index: 1;
   }
-  .tl-event.connection-up::before { border-color: var(--success); background: var(--success); }
-  .tl-event.connection-down::before { border-color: var(--danger); background: var(--danger); }
-  .tl-event.status-up::before { border-color: var(--success); }
-  .tl-event.status-down::before { border-color: var(--danger); }
+  .tl-event.connection-up   .tl-event-marker { border-color: var(--success); background: var(--success); }
+  .tl-event.connection-down .tl-event-marker { border-color: var(--danger);  background: var(--danger);  }
+  .tl-event.status-up   .tl-event-marker { border-color: var(--success); }
+  .tl-event.status-down .tl-event-marker { border-color: var(--danger); }
 
   .tl-time {
     font-size: var(--fs-xs); color: var(--text-muted);
@@ -3207,6 +3205,7 @@ function renderDeviceTimelineTab(d) {
          <span class="tl-pill ${e.to}">${cap(e.to)}</span>`;
     return `
       <div class="tl-event ${dirClass}">
+        <div class="tl-event-marker"></div>
         <div class="tl-time">${e.time}</div>
         <div class="tl-card ${dirClass}">
           <div class="ev-ico">${icon}</div>
@@ -3226,16 +3225,17 @@ function renderDeviceTimelineTab(d) {
     </div>
 
     <div class="tl-feed">
+      <div class="tl-rail"></div>
       ${days.map(day => `
         <div class="tl-day">
-          <div class="tl-day-head">
-            <span class="tl-day-dot"></span>
+          <div class="tl-day-marker"></div>
+          <div class="tl-day-text">
             <span class="label">${day.label}</span>
-            <span style="color:var(--text-muted);font-size:13.5px;font-weight:500">${day.date}</span>
+            <span class="date">${day.date}</span>
             <span class="count">${day.events.length}</span>
           </div>
-          ${day.events.map(renderEvent).join('')}
         </div>
+        ${day.events.map(renderEvent).join('')}
       `).join('')}
     </div>
   `;
