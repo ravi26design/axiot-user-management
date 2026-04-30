@@ -2562,7 +2562,7 @@ function renderDeviceDetails() {
           <div class="val mono">${d.serial || ('801800000' + (parseInt(d.id.replace(/\D/g,'')) + 218000))}</div>
         </div>
         <div class="dd-meta-cell">
-          <div class="lbl">${li('map-pin')} Located At</div>
+          <div class="lbl">${li('map-pin')} Industries at</div>
           <div class="val">${d.location}<span class="sub">Client: ${d.client}</span></div>
         </div>
         <div class="dd-meta-cell">
@@ -2624,7 +2624,7 @@ function renderDeviceOverview(d, isCritical) {
         <div class="val">${d.type}</div>
       </div>
       <div class="dd-stat">
-        <div class="head">${li('map-pin')} Located at</div>
+        <div class="head">${li('map-pin')} Industries at</div>
         <div class="val lg">${d.location}</div>
       </div>
       <div class="dd-stat">
