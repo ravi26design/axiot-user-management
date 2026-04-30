@@ -1493,6 +1493,35 @@
     white-space: nowrap; transform-origin: center;
   }
 
+  /* Historic messages table */
+  .hist-msg-tbl { width: 100%; border-collapse: collapse; }
+  .hist-msg-tbl th {
+    font-size: var(--fs-xs); font-weight: var(--fw-med); color: var(--text-muted);
+    text-align: left; padding: 12px 18px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+  .hist-msg-tbl td {
+    padding: 16px 18px; font-size: var(--fs-sm);
+    border-bottom: 1px solid var(--border-subtle); vertical-align: middle;
+  }
+  .hist-msg-tbl tr:nth-child(even) td { background: var(--bg); }
+  .hist-msg-tbl tr:last-child td { border-bottom: none; }
+  .hist-msg-tbl tr:hover td { background: var(--bg-hover); }
+  .hist-date { display: flex; align-items: center; gap: 10px; font-weight: var(--fw-semi); white-space: nowrap; }
+  .hist-cal-ico { color: var(--text-muted); flex-shrink: 0; }
+  .hist-cal-ico [data-lucide] { width: 14px; height: 14px; }
+  .hist-time { font-size: var(--fs-xs); color: var(--text-muted); font-weight: var(--fw-reg); margin-top: 2px; }
+  .hist-msg-id {
+    font-family: ui-monospace, Menlo, monospace; font-weight: var(--fw-semi);
+    color: var(--text); font-size: 13.5px;
+  }
+  .hist-msg-body {
+    font-family: ui-monospace, Menlo, monospace; font-size: 13px;
+    color: var(--text-muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 100%;
+  }
+
   /* Power consumption card */
   .dd-power {
     display: flex; align-items: center; gap: 16px;
@@ -2810,6 +2839,64 @@ function renderMessagesSummary() {
             ${days.map(day => `<div>${day.label}</div>`).join('')}
           </div>
         </div>
+      </div>
+    </div>
+
+    ${renderHistoricMessages()}
+  `;
+}
+
+function renderHistoricMessages() {
+  // Generate ~14 sample messages spanning the last 7 days
+  const now = new Date('2026-04-30T14:35:42');
+  const baseId = '4473-11f1-8490-5354002aa8b9';
+  const prefixes = ['c3df5fc1','abfb58a1','94327aa1','7c557861','5e809951','3a912b40','19fa6c22','f2bb1d04','d05ee9b6','b87a4528','9d6f8e3a','7b2c1145','5e3f9d27','3a4c8b15'];
+  const payloadSuffixes = [
+    'EzNQ25MzUNwAABDb', 'GZmQ26ZmkNwAABDb', 'JmaQ2yZmkNuszNDbQ', 'JmaQ26AAENwgABDb',
+    'JmaQ24ZmkNxTM1DcA', 'KzMQ25YmkBxAABEd', 'LbNF24WmkAyABDe', 'PqRT26XmkRtPQbCm'
+  ];
+  const rows = prefixes.map((p, i) => {
+    const t = new Date(now.getTime() - i * 40 * 1000 - Math.floor(i / 3) * 24 * 60 * 60 * 1000);
+    const date = t.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const time = t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    const payload = `{"raw_payload":"AAEDPBVASExsQEhfMiZHsQAAAAAAAAAAA${payloadSuffixes[i % payloadSuffixes.length]}...`;
+    return { date, time, id: `${p}-${baseId}`, payload };
+  });
+  return `
+    <div class="trend-panel" style="margin-top:14px">
+      <div class="trend-head">
+        <div class="l">Historic Messages</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted)">
+          <span>Last 7 days · ${rows.length} messages</span>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="hist-msg-tbl">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Message Id</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td>
+                  <div class="hist-date">
+                    <span class="hist-cal-ico">${li('calendar')}</span>
+                    <div>
+                      <div>${r.date}</div>
+                      <div class="hist-time">${r.time}</div>
+                    </div>
+                  </div>
+                </td>
+                <td><div class="hist-msg-id">${r.id}</div></td>
+                <td><div class="hist-msg-body">${r.payload}</div></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
       </div>
     </div>
   `;
