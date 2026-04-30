@@ -1166,6 +1166,189 @@
   .row-clickable { cursor: pointer; }
   .row-clickable:hover .cell-user-name { color: var(--primary); }
 
+  /* ===== Device details page (Zoho-IoT-inspired) ===== */
+  .dd-layout { display: grid; grid-template-columns: 280px 1fr; gap: 16px; align-items: flex-start; }
+  @media (max-width: 1100px) { .dd-layout { grid-template-columns: 1fr; } }
+
+  .dd-rail {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 18px;
+    position: sticky; top: 16px;
+  }
+  @media (max-width: 1100px) { .dd-rail { position: static; } }
+  .dd-icon {
+    width: 100%; aspect-ratio: 1.4 / 1; max-height: 180px;
+    background: linear-gradient(135deg, var(--primary-soft), var(--bg));
+    border-radius: var(--radius); margin-bottom: 14px;
+    display: grid; place-items: center;
+  }
+  .dd-icon svg { width: 60%; height: 60%; }
+  .dd-name { font-size: var(--fs-xl); font-weight: var(--fw-semi); letter-spacing: -0.3px; line-height: 1.2; }
+  .dd-type {
+    margin-top: 4px; font-size: var(--fs-xxs); font-weight: var(--fw-semi);
+    text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted);
+  }
+  .dd-status-row {
+    display: flex; gap: 8px; margin: 12px 0 14px;
+  }
+  .dd-status-pill {
+    flex: 1; padding: 8px 10px; border-radius: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    text-align: center;
+  }
+  .dd-status-pill .chip { display: inline-flex; }
+  .dd-status-pill .meta { font-size: var(--fs-xxs); color: var(--text-muted); margin-top: 4px; }
+
+  .dd-alarm {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 14px;
+    cursor: pointer; transition: background .1s;
+  }
+  .dd-alarm:hover { background: var(--bg); }
+  .dd-alarm-l { display: flex; align-items: center; gap: 10px; }
+  .dd-alarm-ico {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--danger-soft); color: var(--danger);
+    display: grid; place-items: center;
+  }
+  .dd-alarm-ico [data-lucide] { width: 16px; height: 16px; }
+  .dd-alarm-name { font-size: var(--fs-sm); font-weight: var(--fw-med); }
+  .dd-alarm-count { font-size: var(--fs-md); font-weight: var(--fw-bold); }
+
+  .dd-meta-rows { display: flex; flex-direction: column; gap: 14px; }
+  .dd-meta-row { display: flex; gap: 10px; align-items: flex-start; }
+  .dd-meta-row .ico {
+    width: 22px; height: 22px; border-radius: 5px;
+    background: var(--bg); display: grid; place-items: center;
+    color: var(--text-muted); flex-shrink: 0;
+  }
+  .dd-meta-row .ico [data-lucide] { width: 13px; height: 13px; }
+  .dd-meta-row .lbl { font-size: var(--fs-xs); color: var(--text-muted); margin-bottom: 2px; }
+  .dd-meta-row .val { font-size: var(--fs-sm); color: var(--text); font-weight: var(--fw-med); line-height: 1.45; }
+  .dd-meta-row .val .sub { font-size: var(--fs-xs); color: var(--text-muted); font-weight: var(--fw-reg); }
+
+  /* Right content tabs (horizontal underline) */
+  .dd-tabs-wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border); margin-bottom: 16px;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .dd-tabs { display: flex; gap: 0; flex-wrap: wrap; }
+  .dd-tab {
+    padding: 14px 16px; font-size: var(--fs-base); font-weight: var(--fw-med);
+    color: var(--text-muted); cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: color .12s, border-color .12s;
+  }
+  .dd-tab:hover { color: var(--text); }
+  .dd-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: var(--fw-semi); }
+  .dd-tab .badge {
+    padding: 1px 7px; font-size: var(--fs-xxs); font-weight: var(--fw-semi);
+    background: var(--bg-hover); color: var(--text-muted); border-radius: 10px;
+  }
+  .dd-tab.active .badge { background: var(--primary-soft); color: var(--primary); }
+
+  .dd-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+  }
+  .dd-toolbar .left {
+    display: flex; align-items: center; gap: 8px;
+    font-size: var(--fs-base); font-weight: var(--fw-semi);
+  }
+  .dd-toolbar .left .caret { color: var(--text-subtle); font-size: 11px; }
+  .dd-toolbar .right { display: flex; align-items: center; gap: 12px; }
+  .dd-toolbar .right .link {
+    color: var(--primary); font-size: var(--fs-sm); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .dd-toolbar .right .link:hover { text-decoration: underline; }
+
+  /* Stat cards row */
+  .dd-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 1280px) { .dd-stats { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .dd-stats { grid-template-columns: 1fr; } }
+  .dd-stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px;
+    min-height: 96px;
+    display: flex; flex-direction: column;
+  }
+  .dd-stat .head {
+    font-size: var(--fs-xs); color: var(--text-muted); font-weight: var(--fw-med);
+    margin-bottom: 8px;
+  }
+  .dd-stat .val { font-size: var(--fs-xl); font-weight: var(--fw-semi); letter-spacing: -0.3px; line-height: 1.2; }
+  .dd-stat .sub { font-size: var(--fs-xs); color: var(--text-muted); margin-top: auto; padding-top: 6px; }
+
+  /* Chart panels */
+  .dd-panels {
+    display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 12px;
+    align-items: flex-start;
+  }
+  @media (max-width: 1280px) { .dd-panels { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 800px) { .dd-panels { grid-template-columns: 1fr; } }
+  .dd-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px;
+  }
+  .dd-panel .panel-title {
+    font-size: var(--fs-base); font-weight: var(--fw-semi); margin-bottom: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .dd-panel .panel-title .menu-trigger {
+    color: var(--text-subtle); font-size: var(--fs-sm); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+
+  /* Pie chart (SVG conic) */
+  .dd-pie {
+    display: flex; align-items: center; gap: 16px; margin-top: 8px;
+  }
+  .dd-pie svg { width: 140px; height: 140px; flex-shrink: 0; }
+  .dd-pie .legend { font-size: var(--fs-sm); color: var(--text-muted); }
+  .dd-pie .legend-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+  .dd-pie .legend-row .dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* Metrics table inside panel */
+  .dd-metrics-tbl { width: 100%; border-collapse: collapse; }
+  .dd-metrics-tbl th {
+    font-size: var(--fs-xs); font-weight: var(--fw-med); color: var(--text-muted);
+    text-align: left; padding: 8px 12px;
+    background: var(--bg);
+  }
+  .dd-metrics-tbl td {
+    padding: 10px 12px; font-size: var(--fs-sm);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .dd-metrics-tbl tr:last-child td { border-bottom: none; }
+  .dd-metric-name { display: flex; align-items: center; gap: 8px; }
+  .dd-metric-name .ico { color: var(--text-subtle); }
+  .dd-metric-name .ico [data-lucide] { width: 13px; height: 13px; }
+  .dd-metric-name .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--danger); display: inline-block; margin-left: 4px; }
+  .dd-metric-sub { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; font-style: italic; }
+  .dd-metric-val { font-weight: var(--fw-semi); }
+  .dd-metric-val .ts { font-size: var(--fs-xs); color: var(--text-muted); font-weight: var(--fw-reg); display: block; }
+
+  /* Power consumption card */
+  .dd-power {
+    display: flex; align-items: center; gap: 14px; padding: 8px 4px;
+  }
+  .dd-power .pico {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--primary-soft); color: var(--primary);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .dd-power .pico [data-lucide] { width: 22px; height: 22px; }
+  .dd-power .pval { font-size: 22px; font-weight: var(--fw-bold); letter-spacing: -0.3px; }
+  .dd-power .punit { font-size: var(--fs-xs); color: var(--text-muted); margin-left: 4px; font-weight: var(--fw-med); }
+  .dd-power .plbl { font-size: var(--fs-xs); color: var(--text-muted); }
+
   /* Client view — hide client-level UI since everything is scoped to one client */
   body.client-view #filterClientBtn,
   body.client-view .client-col,
@@ -1374,6 +1557,17 @@
           <div class="matrix" id="roleMatrix"></div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEVICE DETAILS SCREEN -->
+<div class="screen" id="screen-deviceDetails">
+  <div class="app">
+    <aside class="sidebar" data-sidebar></aside>
+    <div class="main">
+      <header class="topbar" data-topbar></header>
+      <div class="content" id="deviceDetailsContent"></div>
     </div>
   </div>
 </div>
@@ -2145,7 +2339,8 @@ function renderTopbar() {
     roles: 'Roles & permissions',
     industries: 'Industries',
     devices: 'Devices',
-    userDetails: ''
+    userDetails: '',
+    deviceDetails: ''
   };
   const title = titles[state.currentScreen] || '';
   // User details uses a back arrow + user name
@@ -2159,6 +2354,16 @@ function renderTopbar() {
       <span style="font-weight:600;font-size:15px;color:var(--text-muted)">Users</span>
       <span style="color:var(--text-subtle);margin:0 2px">/</span>
       <span style="font-weight:600;font-size:15px">${u ? u.name : ''}</span>
+    `;
+  } else if (state.currentScreen === 'deviceDetails') {
+    const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+    titleHtml = `
+      <button class="icon-btn" onclick="switchScreen('devices')" title="Back to devices" style="width:32px;height:32px;margin-right:2px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <span style="font-weight:600;font-size:15px;color:var(--text-muted)">Devices</span>
+      <span style="color:var(--text-subtle);margin:0 2px">/</span>
+      <span style="font-weight:600;font-size:15px">${d ? d.name : ''}</span>
     `;
   } else {
     titleHtml = `<span style="font-weight:600;font-size:16px;letter-spacing:-0.2px">${title}</span>`;
@@ -2228,7 +2433,7 @@ function renderDevicesPage() {
   }
 
   tbody.innerHTML = list.map(d => `
-    <tr class="row-clickable" onclick="openDeviceDrawer('${d.id}')">
+    <tr class="row-clickable" onclick="openDeviceDetails('${d.id}')">
       <td>
         <div class="cell-user">
           <div class="dev-ico">${SVG.devices}</div>
@@ -2251,6 +2456,272 @@ function renderDevicesPage() {
       </td>
     </tr>
   `).join('');
+}
+
+/* ============================================================
+   Device details page (Zoho-IoT-style overview)
+   ============================================================ */
+state.detailsDeviceId = null;
+state.detailsDeviceTab = 'overview';
+
+function openDeviceDetails(id) {
+  state.detailsDeviceId = id;
+  state.detailsDeviceTab = 'overview';
+  switchScreen('deviceDetails');
+  renderDeviceDetails();
+  // Mirror sidebar from devices screen
+  const aside = document.querySelector('#screen-deviceDetails [data-sidebar]');
+  const src = document.querySelector('#screen-devices [data-sidebar]');
+  if (aside && src) aside.innerHTML = src.innerHTML;
+}
+function switchDeviceTab(tab) { state.detailsDeviceTab = tab; renderDeviceDetails(); }
+
+function renderDeviceDetails() {
+  const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+  if (!d) { switchScreen('devices'); return; }
+  const c = document.getElementById('deviceDetailsContent');
+  const isCritical = d.active === false || (state.detailsDeviceId && state.detailsDeviceId.endsWith('1'));
+  const statusChipHtml = isCritical
+    ? '<span class="chip chip-pending" style="background:var(--danger-soft);color:var(--danger)">Critical</span>'
+    : '<span class="chip chip-active"><span class="dot"></span>Active</span>';
+  const onlineChipHtml = d.active !== false
+    ? '<span class="chip chip-active"><span class="dot"></span>Online</span>'
+    : '<span class="chip chip-inactive"><span class="dot"></span>Offline</span>';
+
+  c.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="breadcrumb" style="margin-bottom:0">
+        <span style="cursor:pointer;color:var(--primary)" onclick="switchScreen('devices')">Devices</span>
+        <span class="sep">/</span>
+        <span class="current">${d.name}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn btn-secondary btn-sm" onclick="openDeviceDrawer('${d.id}')">${SVG.edit} Edit</button>
+        <button class="btn btn-danger-ghost btn-sm" onclick="deleteDevice('${d.id}')">${SVG.trash} Delete</button>
+      </div>
+    </div>
+
+    <div class="dd-layout">
+      <!-- LEFT RAIL -->
+      <aside class="dd-rail">
+        <div class="dd-icon">
+          <svg viewBox="0 0 100 100" fill="none">
+            <rect x="20" y="40" width="60" height="32" rx="6" fill="#fff" stroke="#1F4E9E" stroke-width="3"/>
+            <circle cx="35" cy="56" r="4" fill="#1F4E9E"/>
+            <circle cx="50" cy="56" r="4" fill="#8B5CF6"/>
+            <circle cx="65" cy="56" r="4" fill="#1F4E9E"/>
+            <path d="M50 40v-8" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round"/>
+            <path d="M40 30 Q50 15 60 30" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M44 24 Q50 18 56 24" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <rect x="38" y="76" width="24" height="3" rx="1.5" fill="#1F4E9E"/>
+          </svg>
+        </div>
+        <div class="dd-name">${d.name}</div>
+        <div class="dd-type">${(d.type || '').toUpperCase()}</div>
+        <div class="dd-status-row">
+          <div class="dd-status-pill">
+            ${statusChipHtml}
+            <div class="meta">${d.lastSeen || '—'}</div>
+          </div>
+          <div class="dd-status-pill">
+            ${onlineChipHtml}
+            <div class="meta">${d.lastSeen === 'just now' ? 'Just now' : (d.lastSeen || '—')}</div>
+          </div>
+        </div>
+
+        <div class="dd-alarm">
+          <div class="dd-alarm-l">
+            <div class="dd-alarm-ico">${li('bell')}</div>
+            <div class="dd-alarm-name">Source Alarms</div>
+          </div>
+          <div class="dd-alarm-count">${isCritical ? '1' : '0'}</div>
+        </div>
+
+        <div class="dd-meta-rows">
+          <div class="dd-meta-row">
+            <div class="ico">${li('hash')}</div>
+            <div>
+              <div class="lbl">Device ID</div>
+              <div class="val">${d.serial || ('801800000' + (parseInt(d.id.replace(/\D/g,'')) + 218000))}</div>
+            </div>
+          </div>
+          <div class="dd-meta-row">
+            <div class="ico">${li('map-pin')}</div>
+            <div>
+              <div class="lbl">Located At</div>
+              <div class="val">
+                Site: ${d.location}
+                <div class="sub">Client: ${d.client}</div>
+              </div>
+            </div>
+          </div>
+          <div class="dd-meta-row">
+            <div class="ico">${li('file-text')}</div>
+            <div>
+              <div class="lbl">Description</div>
+              <div class="val" style="color:var(--text-muted)">—</div>
+            </div>
+          </div>
+          <div class="dd-meta-row">
+            <div class="ico">${li('cpu')}</div>
+            <div>
+              <div class="lbl">Firmware</div>
+              <div class="val">v${d.firmware || '—'}</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT CONTENT -->
+      <section>
+        <div class="dd-tabs-wrap">
+          <div class="dd-tabs">
+            ${ddTab('overview', 'Overview')}
+            ${ddTab('details', 'Details')}
+            ${ddTab('messages', 'Messages')}
+            ${ddTab('alarms', 'Alarms')}
+            ${ddTab('explorer', 'Data Explorer')}
+            ${ddTab('timeline', 'Timeline')}
+            ${ddTab('relations', 'Relations', 5)}
+            ${ddTab('attachments', 'Attachments')}
+          </div>
+          <button class="btn btn-secondary btn-sm">Actions <span class="caret" style="font-size:10px">▾</span></button>
+        </div>
+
+        ${state.detailsDeviceTab === 'overview' ? renderDeviceOverview(d, isCritical) : renderDeviceTabPlaceholder(state.detailsDeviceTab)}
+      </section>
+    </div>
+  `;
+}
+
+function ddTab(key, label, count) {
+  const active = state.detailsDeviceTab === key;
+  return `<div class="dd-tab ${active ? 'active' : ''}" onclick="switchDeviceTab('${key}')">${label}${count ? ` <span class="badge">${count}</span>` : ''}</div>`;
+}
+
+function renderDeviceOverview(d, isCritical) {
+  return `
+    <div class="dd-toolbar">
+      <div class="left">
+        Overview Dashboard <span class="caret">▾</span>
+        <button class="icon-btn" title="Refresh" style="width:28px;height:28px">${li('rotate-cw')}</button>
+      </div>
+      <div class="right">
+        <span class="link">${li('circle-help')} Help</span>
+        <button class="icon-btn" title="Expand" style="width:28px;height:28px">${li('maximize-2')}</button>
+        <button class="btn btn-secondary btn-sm">Dashboard Actions <span class="caret" style="font-size:10px">▾</span></button>
+      </div>
+    </div>
+
+    <div class="dd-stats">
+      <div class="dd-stat">
+        <div class="head">Status</div>
+        <div class="val">${isCritical ? '<span class="chip" style="background:var(--danger-soft);color:var(--danger);font-size:14px;padding:4px 12px">Critical</span>' : '<span class="chip chip-active" style="font-size:14px;padding:4px 12px"><span class="dot"></span>Healthy</span>'}</div>
+        <div class="sub">Status</div>
+      </div>
+      <div class="dd-stat">
+        <div class="head">Device Type</div>
+        <div class="val">${d.type}</div>
+        <div class="sub">Type</div>
+      </div>
+      <div class="dd-stat">
+        <div class="head">Located At</div>
+        <div class="val" style="font-size:18px">${d.location}</div>
+        <div class="sub">Located At</div>
+      </div>
+      <div class="dd-stat">
+        <div class="head">Last Activity Time</div>
+        <div class="val" style="font-size:16px">${d.lastSeen === 'just now' ? 'Just now' : (d.lastSeen || '—')}</div>
+        <div class="sub">Last Activity Time</div>
+      </div>
+    </div>
+
+    <div class="dd-panels">
+      <div class="dd-panel">
+        <div class="panel-title">Alarms by Severity <span class="menu-trigger">${li('ellipsis')}</span></div>
+        ${renderAlarmsPie(isCritical)}
+      </div>
+
+      <div class="dd-panel" style="padding:0;overflow:hidden">
+        <div class="panel-title" style="padding:14px 16px 12px;margin-bottom:0">Phase1 Voltage <span class="menu-trigger">${li('ellipsis')}</span></div>
+        <table class="dd-metrics-tbl">
+          <thead><tr><th>Metrics</th><th style="text-align:right">Values</th></tr></thead>
+          <tbody>
+            ${[
+              ['Phase_R VL_R_N', '(V)', '—'],
+              ['Phase_R_VL_R_Y', '(V)', '429.8'],
+              ['Phase_R_CUR_R',  '(V)', '0'],
+              ['Phase_Y_VL_Y_N', '(V)', '249.3'],
+              ['Phase_Y_VL_Y_B', '(V)', '0'],
+              ['PHASE_Y_CUR_Y',  '(V)', '0'],
+              ['Phase_B_VL_B_N', '(V)', '248.2']
+            ].map(([m, u, v]) => `
+              <tr>
+                <td>
+                  <div class="dd-metric-name">
+                    <span class="ico">${li('zap')}</span>
+                    ${m} <span style="color:var(--text-muted);margin-left:2px">${u}</span>
+                    <span class="live-dot"></span>
+                  </div>
+                  <div class="dd-metric-sub">${d.name}</div>
+                </td>
+                <td style="text-align:right">
+                  <div class="dd-metric-val">${v}</div>
+                  <div class="dd-metric-val ts">${v === '—' ? '' : 'Just now'}</div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="dd-panel">
+        <div class="panel-title">Power Consumption <span class="menu-trigger" style="color:var(--primary);font-weight:500;font-size:13px">Today <span class="caret" style="font-size:9px">▾</span></span></div>
+        <div class="dd-power">
+          <div class="pico">${li('zap')}</div>
+          <div>
+            <div><span class="pval">192,680,482</span> <span class="punit">kWh</span></div>
+            <div class="plbl">kWh</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAlarmsPie(isCritical) {
+  const clear = 5, critical = isCritical ? 5 : 0;
+  const total = Math.max(1, clear + critical);
+  const clearPct = (clear / total) * 100;
+  // SVG donut using stroke-dasharray
+  const r = 50, cx = 70, cy = 70;
+  const circ = 2 * Math.PI * r;
+  const clearLen = (clearPct / 100) * circ;
+  const critLen = circ - clearLen;
+  return `
+    <div class="dd-pie">
+      <svg viewBox="0 0 140 140">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#C89B69" stroke-width="40"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1F4E9E" stroke-width="40"
+          stroke-dasharray="${clearLen} ${critLen}" stroke-dashoffset="${circ * 0.25}" transform="rotate(-90 ${cx} ${cy})"/>
+        <text x="${cx-25}" y="${cy+4}" font-size="14" font-weight="600" fill="#0B1220">${clear}</text>
+        <text x="${cx+15}" y="${cy+4}" font-size="14" font-weight="600" fill="#0B1220">${critical}</text>
+      </svg>
+      <div class="legend">
+        <div class="legend-row"><span class="dot" style="background:#1F4E9E"></span> Clear</div>
+        <div class="legend-row"><span class="dot" style="background:#C89B69"></span> Critical</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDeviceTabPlaceholder(tab) {
+  const labels = { details: 'Details', messages: 'Messages', alarms: 'Alarms', explorer: 'Data Explorer', timeline: 'Timeline', relations: 'Relations', attachments: 'Attachments' };
+  return `<div class="dd-panel" style="text-align:center;padding:60px 20px;color:var(--text-muted)">
+    <div style="font-size:48px;opacity:.4;margin-bottom:8px">${li('layers')}</div>
+    <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px">${labels[tab] || tab}</div>
+    <div style="font-size:13px">This tab's content lives here. Hook up real data when you're ready.</div>
+  </div>`;
 }
 
 function openDeviceDrawer(id) {
@@ -2545,8 +3016,11 @@ function switchScreen(name) {
   state.currentScreen = name;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
-  // For userDetails screen, keep "Users" highlighted in sidebar
-  renderSidebar(name === 'userDetails' ? 'users' : name);
+  // Keep parent module highlighted on detail screens
+  let activeForSidebar = name;
+  if (name === 'userDetails') activeForSidebar = 'users';
+  if (name === 'deviceDetails') activeForSidebar = 'devices';
+  renderSidebar(activeForSidebar);
   renderTopbar();
   if (name === 'roles') renderRoles();
   if (name === 'industries') renderIndustries();
