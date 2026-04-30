@@ -1764,66 +1764,141 @@
   }
   .de-chart-legend .swatch { width: 14px; height: 14px; border-radius: 3px; }
 
-  /* Timeline tab */
-  .tl-title {
-    font-size: var(--fs-lg); font-weight: var(--fw-semi);
-    color: var(--text-muted); margin-bottom: 22px;
+  /* Timeline tab — refined */
+  .tl-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
   }
-  .tl-day {
-    font-size: var(--fs-base); font-weight: var(--fw-bold);
-    color: var(--text); margin: 24px 0 14px;
+  .tl-head h3 {
+    font-size: var(--fs-xl); font-weight: var(--fw-semi);
+    letter-spacing: -0.3px; line-height: 1.2;
   }
-  .tl-day:first-of-type { margin-top: 0; }
-  .tl-event {
-    display: grid; grid-template-columns: 80px 44px 1fr;
-    align-items: center; column-gap: 0;
-    padding: 10px 0; position: relative;
+  .tl-head .sub {
+    font-size: var(--fs-sm); color: var(--text-muted); margin-top: 4px;
   }
-  .tl-time {
-    font-size: var(--fs-sm); color: var(--text); font-weight: var(--fw-med);
+  .tl-period {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--bg); border: 1px solid var(--border);
+    font-size: var(--fs-sm); font-weight: var(--fw-med);
+    color: var(--text);
   }
-  .tl-ico-wrap {
+
+  .tl-feed {
     position: relative;
-    display: grid; place-items: center;
+    padding-left: 16px;
   }
-  .tl-ico {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: #DCEFE6; color: #2F8C66;
-    display: grid; place-items: center;
+  .tl-feed::before {
+    content: ''; position: absolute;
+    top: 8px; bottom: 8px;
+    left: 16px; width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--border) 20px, var(--border) calc(100% - 20px), transparent);
+    border-radius: 1px;
+  }
+
+  .tl-day {
+    position: relative;
+    margin-top: 28px;
+  }
+  .tl-day:first-child { margin-top: 0; }
+  .tl-day-head {
+    display: inline-flex; align-items: center; gap: 10px;
+    margin-bottom: 4px;
+    padding: 6px 14px 6px 8px;
+    background: var(--surface);
+    border-radius: 999px;
+    position: relative; z-index: 1;
+    margin-left: -8px;
+  }
+  .tl-day-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--surface);
+    border: 3px solid var(--primary);
     flex-shrink: 0;
+  }
+  .tl-day-head .label {
+    font-size: var(--fs-base); font-weight: var(--fw-semi);
+    color: var(--text); letter-spacing: -0.1px;
+  }
+  .tl-day-head .count {
+    font-size: var(--fs-xxs); padding: 2px 8px; border-radius: 999px;
+    background: var(--bg-hover); color: var(--text-muted); font-weight: var(--fw-semi);
+  }
+
+  .tl-event {
+    position: relative;
+    display: grid; grid-template-columns: 28px 90px 1fr;
+    align-items: center; column-gap: 14px;
+    padding: 8px 0;
+  }
+  .tl-event::before {
+    content: ''; position: absolute;
+    left: 8px; top: 50%;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--text-subtle);
+    transform: translateY(-50%);
     z-index: 1;
   }
-  .tl-ico [data-lucide] { width: 16px; height: 16px; }
-  .tl-event:not(:last-child) .tl-ico-wrap::after {
-    content: ''; position: absolute;
-    top: 50%; bottom: -100%;
-    left: 50%; width: 1px;
-    background: var(--border);
+  .tl-event.connection-up::before { border-color: var(--success); background: var(--success); }
+  .tl-event.connection-down::before { border-color: var(--danger); background: var(--danger); }
+  .tl-event.status-up::before { border-color: var(--success); }
+  .tl-event.status-down::before { border-color: var(--danger); }
+
+  .tl-time {
+    font-size: var(--fs-xs); color: var(--text-muted);
+    font-weight: var(--fw-med); padding-left: 18px;
+    font-variant-numeric: tabular-nums;
   }
-  .tl-text {
-    font-size: var(--fs-base); color: var(--text);
+  .tl-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+    transition: border-color .12s, box-shadow .12s, transform .12s;
+  }
+  .tl-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-sm);
+  }
+  .tl-card .ev-ico {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--bg-hover); color: var(--text-muted);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .tl-card.connection-up   .ev-ico { background: var(--success-soft); color: var(--success); }
+  .tl-card.connection-down .ev-ico { background: var(--danger-soft); color: var(--danger); }
+  .tl-card.status-up   .ev-ico { background: var(--success-soft); color: var(--success); }
+  .tl-card.status-down .ev-ico { background: var(--danger-soft); color: var(--danger); }
+  .tl-card .ev-ico [data-lucide] { width: 16px; height: 16px; }
+  .tl-body {
+    flex: 1; min-width: 0;
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    padding-left: 12px;
+    font-size: var(--fs-sm);
   }
-  .tl-text .conj { color: var(--text-muted); }
+  .tl-body .label { color: var(--text); font-weight: var(--fw-med); }
+  .tl-body .conj  { color: var(--text-subtle); font-size: var(--fs-xs); }
+  .tl-body .arrow { color: var(--text-subtle); }
+  .tl-body .arrow [data-lucide] { width: 12px; height: 12px; }
+
   .tl-status {
     display: inline-flex; align-items: center; gap: 6px;
-    font-weight: var(--fw-semi);
+    font-size: var(--fs-sm); font-weight: var(--fw-semi);
+    padding: 2px 9px; border-radius: 999px;
   }
-  .tl-status .dot { width: 8px; height: 8px; border-radius: 50%; }
-  .tl-status.online  { color: var(--success); }
-  .tl-status.online .dot  { background: var(--success); }
-  .tl-status.offline { color: var(--danger); }
+  .tl-status .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .tl-status.online  { background: var(--success-soft); color: var(--success); }
+  .tl-status.online .dot { background: var(--success); }
+  .tl-status.offline { background: var(--danger-soft); color: var(--danger); }
   .tl-status.offline .dot { background: var(--danger); }
   .tl-pill {
     display: inline-flex; align-items: center;
-    padding: 4px 14px; border-radius: 6px;
-    font-size: var(--fs-sm); font-weight: var(--fw-semi);
-    color: #fff;
+    padding: 3px 11px; border-radius: 999px;
+    font-size: var(--fs-xs); font-weight: var(--fw-semi);
+    border: 1px solid transparent;
   }
-  .tl-pill.clear    { background: #6FBB99; }
-  .tl-pill.critical { background: #E08585; }
-  .tl-pill.warn     { background: #E3A55D; }
+  .tl-pill.clear    { background: var(--success-soft); color: var(--success); border-color: rgba(4,112,72,0.18); }
+  .tl-pill.critical { background: var(--danger-soft);  color: var(--danger);  border-color: rgba(159,26,15,0.18); }
+  .tl-pill.warn     { background: var(--warn-soft);    color: var(--warn);    border-color: rgba(138,58,5,0.18); }
 
   /* Historic messages table */
   .hist-msg-tbl { width: 100%; border-collapse: collapse; }
@@ -3085,64 +3160,80 @@ function renderDeviceDetails() {
 
 function renderDeviceTimelineTab(d) {
   const days = [
-    {
-      label: 'Today, Apr 30, 2026',
+    { label: 'Today',           date: 'Apr 30, 2026',
       events: [
         { time: '11:51 AM', kind: 'connection', from: 'offline', to: 'online' },
-        { time: '10:09 AM', kind: 'connection', from: 'online', to: 'offline' }
-      ]
-    },
-    {
-      label: 'Monday, Apr 27, 2026',
+        { time: '10:09 AM', kind: 'connection', from: 'online',  to: 'offline' }
+      ]},
+    { label: 'Monday',          date: 'Apr 27, 2026',
       events: [
         { time: '06:05 PM', kind: 'connection', from: 'offline', to: 'online' }
-      ]
-    },
-    {
-      label: 'Saturday, Apr 25, 2026',
+      ]},
+    { label: 'Saturday',        date: 'Apr 25, 2026',
       events: [
-        { time: '12:46 AM', kind: 'connection', from: 'online', to: 'offline' }
-      ]
-    },
-    {
-      label: 'Friday, Apr 24, 2026',
+        { time: '12:46 AM', kind: 'connection', from: 'online',  to: 'offline' }
+      ]},
+    { label: 'Friday',          date: 'Apr 24, 2026',
       events: [
-        { time: '11:42 AM', kind: 'status', from: 'clear', to: 'critical' },
-        { time: '11:40 AM', kind: 'status', from: 'critical', to: 'clear' }
-      ]
-    }
+        { time: '11:42 AM', kind: 'status', from: 'clear',    to: 'critical' },
+        { time: '11:40 AM', kind: 'status', from: 'critical', to: 'clear'    }
+      ]}
   ];
 
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const totalEvents = days.reduce((n, day) => n + day.events.length, 0);
+
   function renderEvent(e) {
-    let body = '';
-    if (e.kind === 'connection') {
-      body = `Connection Status was updated from
-        <span class="tl-status ${e.from}"><span class="dot"></span>${cap(e.from)}</span>
-        <span class="conj">to</span>
-        <span class="tl-status ${e.to}"><span class="dot"></span>${cap(e.to)}</span>`;
-    } else if (e.kind === 'status') {
-      body = `Status was updated from
-        <span class="tl-pill ${e.from}">${cap(e.from)}</span>
-        <span class="conj">to</span>
-        <span class="tl-pill ${e.to}">${cap(e.to)}</span>`;
-    }
+    const dirClass = (e.kind === 'connection')
+      ? (e.to === 'online' ? 'connection-up' : 'connection-down')
+      : (e.to === 'clear' ? 'status-up' : 'status-down');
+    const icon = e.kind === 'connection'
+      ? (e.to === 'online' ? li('plug') : li('plug-zap'))
+      : li('shield');
+    const arrow = `<span class="arrow">${li('arrow-right')}</span>`;
+    const body = e.kind === 'connection'
+      ? `<span class="label">Connection</span>
+         <span class="tl-status ${e.from}"><span class="dot"></span>${cap(e.from)}</span>
+         ${arrow}
+         <span class="tl-status ${e.to}"><span class="dot"></span>${cap(e.to)}</span>`
+      : `<span class="label">Status</span>
+         <span class="tl-pill ${e.from}">${cap(e.from)}</span>
+         ${arrow}
+         <span class="tl-pill ${e.to}">${cap(e.to)}</span>`;
     return `
-      <div class="tl-event">
+      <div class="tl-event ${dirClass}">
+        <div></div>
         <div class="tl-time">${e.time}</div>
-        <div class="tl-ico-wrap"><div class="tl-ico">${li('pencil')}</div></div>
-        <div class="tl-text">${body}</div>
+        <div class="tl-card ${dirClass}">
+          <div class="ev-ico">${icon}</div>
+          <div class="tl-body">${body}</div>
+        </div>
       </div>
     `;
   }
 
-  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
   return `
-    <div class="tl-title">Recent Activity - Last 7 Days</div>
-    ${days.map(day => `
-      <div class="tl-day">${day.label}</div>
-      ${day.events.map(renderEvent).join('')}
-    `).join('')}
+    <div class="tl-head">
+      <div>
+        <h3>Recent activity</h3>
+        <div class="sub">${totalEvents} events across the last 7 days</div>
+      </div>
+      <span class="tl-period">${li('calendar')} Last 7 days <span style="color:var(--text-subtle);font-size:10px">▾</span></span>
+    </div>
+
+    <div class="tl-feed">
+      ${days.map(day => `
+        <div class="tl-day">
+          <div class="tl-day-head">
+            <span class="tl-day-dot"></span>
+            <span class="label">${day.label}</span>
+            <span style="color:var(--text-muted);font-size:13.5px;font-weight:500">${day.date}</span>
+            <span class="count">${day.events.length}</span>
+          </div>
+          ${day.events.map(renderEvent).join('')}
+        </div>
+      `).join('')}
+    </div>
   `;
 }
 
