@@ -1493,6 +1493,129 @@
     white-space: nowrap; transform-origin: center;
   }
 
+  /* Alarms tab */
+  .alarms-toolbar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .alarms-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 1100px) { .alarms-stats { grid-template-columns: repeat(2, 1fr); } }
+  .alarm-stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .alarm-stat-ico {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: grid; place-items: center; flex-shrink: 0;
+    color: var(--text-muted); background: var(--bg);
+  }
+  .alarm-stat.critical .alarm-stat-ico { background: var(--danger-soft); color: var(--danger); }
+  .alarm-stat.major .alarm-stat-ico    { background: var(--warn-soft); color: var(--warn); }
+  .alarm-stat.minor .alarm-stat-ico    { background: var(--primary-soft); color: var(--primary); }
+  .alarm-stat.cleared .alarm-stat-ico  { background: var(--success-soft); color: var(--success); }
+  .alarm-stat-num { font-size: 22px; font-weight: var(--fw-bold); letter-spacing: -0.4px; line-height: 1; }
+  .alarm-stat-lbl { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
+
+  .alarms-list { display: flex; flex-direction: column; gap: 10px; }
+  .alarm-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+    border-left: 4px solid var(--text-subtle);
+    transition: box-shadow .12s, border-color .12s;
+  }
+  .alarm-card.severity-critical { border-left-color: var(--danger); }
+  .alarm-card.severity-major    { border-left-color: var(--warn); }
+  .alarm-card.severity-minor    { border-left-color: var(--primary); }
+  .alarm-card.severity-cleared  { border-left-color: var(--success); }
+  .alarm-card:hover { box-shadow: var(--shadow-sm); }
+
+  .alarm-head {
+    padding: 14px 18px;
+    display: flex; align-items: flex-start; gap: 14px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .alarm-head-main { flex: 1; min-width: 0; }
+  .alarm-head-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .alarm-name { font-size: var(--fs-base); font-weight: var(--fw-semi); }
+  .alarm-source { font-size: var(--fs-xs); color: var(--text-muted); }
+  .alarm-msg { font-size: var(--fs-sm); color: var(--text); margin-top: 6px; line-height: 1.5; }
+
+  .sev-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 9px; border-radius: 4px;
+    font-size: var(--fs-xxs); font-weight: var(--fw-bold);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .sev-pill.critical { background: var(--danger-soft); color: var(--danger); }
+  .sev-pill.major    { background: var(--warn-soft); color: var(--warn); }
+  .sev-pill.minor    { background: var(--primary-soft); color: var(--primary); }
+  .sev-pill.cleared  { background: var(--success-soft); color: var(--success); }
+  .sev-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .state-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 9px; border-radius: 4px;
+    font-size: var(--fs-xxs); font-weight: var(--fw-semi);
+    background: var(--bg-hover); color: var(--text-muted);
+  }
+  .state-pill.open    { background: var(--danger-soft); color: var(--danger); }
+  .state-pill.ack     { background: var(--warn-soft); color: var(--warn); }
+  .state-pill.resolved{ background: var(--success-soft); color: var(--success); }
+  .state-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .alarm-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    background: var(--bg);
+  }
+  @media (max-width: 1100px) { .alarm-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px)  { .alarm-grid { grid-template-columns: 1fr; } }
+  .alarm-cell {
+    padding: 12px 16px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .alarm-cell:last-child { border-right: none; }
+  .alarm-grid > .alarm-cell:nth-last-child(-n+4) { border-bottom: none; }
+  @media (max-width: 1100px) {
+    .alarm-cell { border-right: none; }
+    .alarm-cell:nth-child(odd) { border-right: 1px solid var(--border); }
+    .alarm-grid > .alarm-cell:nth-last-child(-n+2) { border-bottom: none; }
+  }
+  .alarm-cell .lbl {
+    font-size: var(--fs-xxs); font-weight: var(--fw-semi); color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .alarm-cell .lbl [data-lucide] { width: 12px; height: 12px; }
+  .alarm-cell .val { font-size: var(--fs-sm); color: var(--text); font-weight: var(--fw-med); line-height: 1.4; }
+  .alarm-cell .val.muted { color: var(--text-muted); font-weight: var(--fw-reg); font-style: italic; }
+
+  .alarm-foot {
+    padding: 10px 16px;
+    background: var(--bg);
+    border-top: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    font-size: var(--fs-sm);
+  }
+  .alarm-foot .ack-yes { color: var(--success); display: inline-flex; align-items: center; gap: 6px; font-weight: var(--fw-semi); }
+  .alarm-foot .ack-no  { color: var(--danger);  display: inline-flex; align-items: center; gap: 6px; font-weight: var(--fw-semi); }
+  .alarm-foot .ack-meta { color: var(--text-muted); font-weight: var(--fw-reg); margin-left: 4px; }
+
+  .assignee {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-weight: var(--fw-med);
+  }
+  .assignee .av {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--primary-soft); color: var(--primary);
+    display: inline-grid; place-items: center;
+    font-size: 10px; font-weight: var(--fw-bold);
+  }
+
   /* Historic messages table */
   .hist-msg-tbl { width: 100%; border-collapse: collapse; }
   .hist-msg-tbl th {
@@ -2743,8 +2866,114 @@ function renderDeviceDetails() {
       state.detailsDeviceTab === 'overview' ? renderDeviceOverview(d, isCritical)
       : state.detailsDeviceTab === 'details' ? renderDeviceDetailsTab(d)
       : state.detailsDeviceTab === 'messages' ? renderDeviceMessagesTab(d)
+      : state.detailsDeviceTab === 'alarms' ? renderDeviceAlarmsTab(d)
       : renderDeviceTabPlaceholder(state.detailsDeviceTab)
     }
+  `;
+}
+
+function renderDeviceAlarmsTab(d) {
+  const alarms = [
+    { sev:'critical', name:'Phase R voltage out of range', msg:'Phase R line-to-neutral voltage exceeded threshold of 440V (current: 458.2V). Trip may occur if not addressed.', source:'Voltage monitor', state:'open', stateLbl:'Open', modified:'Apr 30, 2026 02:35 PM', assignedInit:'MC', assignedName:'Marcus Chen', prevSev:'major', unresolved:'2h 15m', model:'CMPR-X7', occurred:'Apr 30, 2026 12:20 PM', acknowledged:false },
+    { sev:'major', name:'Compressor pressure spike', msg:'Pressure crossed warning threshold (78 psi) on Compressor #4. Operator review recommended.', source:'Pressure sensor', state:'ack', stateLbl:'Acknowledged', modified:'Apr 30, 2026 11:48 AM', assignedInit:'DO', assignedName:'David Okafor', prevSev:'minor', unresolved:'5h 02m', model:'PRS-12', occurred:'Apr 30, 2026 09:46 AM', acknowledged:true, ackBy:'David Okafor', ackAt:'Apr 30, 2026 10:14 AM' },
+    { sev:'minor', name:'Network latency elevated', msg:'Round-trip time to gateway exceeded 250ms for 3 consecutive samples.', source:'Gateway link', state:'ack', stateLbl:'Acknowledged', modified:'Apr 30, 2026 09:12 AM', assignedInit:'PS', assignedName:'Priya Sharma', prevSev:'cleared', unresolved:'7h 38m', model:'NET-GW-01', occurred:'Apr 30, 2026 07:34 AM', acknowledged:true, ackBy:'Priya Sharma', ackAt:'Apr 30, 2026 08:01 AM' },
+    { sev:'cleared', name:'Temperature returned to normal', msg:'Bearing temperature recovered below 65°C. Alarm auto-cleared after 12-minute stable window.', source:'Temp sensor TS-A7', state:'resolved', stateLbl:'Resolved', modified:'Apr 29, 2026 10:42 PM', assignedInit:'RM', assignedName:'Rahul Menon', prevSev:'major', unresolved:'45m 18s', model:'TMP-A7', occurred:'Apr 29, 2026 09:57 PM', acknowledged:true, ackBy:'Rahul Menon', ackAt:'Apr 29, 2026 10:10 PM' }
+  ];
+
+  const counts = alarms.reduce((acc, a) => (acc[a.sev] = (acc[a.sev]||0)+1, acc), {});
+
+  return `
+    <div class="alarms-stats">
+      <div class="alarm-stat critical">
+        <div class="alarm-stat-ico">${li('triangle-alert')}</div>
+        <div><div class="alarm-stat-num">${counts.critical||0}</div><div class="alarm-stat-lbl">Critical</div></div>
+      </div>
+      <div class="alarm-stat major">
+        <div class="alarm-stat-ico">${li('alert-circle')}</div>
+        <div><div class="alarm-stat-num">${counts.major||0}</div><div class="alarm-stat-lbl">Major</div></div>
+      </div>
+      <div class="alarm-stat minor">
+        <div class="alarm-stat-ico">${li('info')}</div>
+        <div><div class="alarm-stat-num">${counts.minor||0}</div><div class="alarm-stat-lbl">Minor</div></div>
+      </div>
+      <div class="alarm-stat cleared">
+        <div class="alarm-stat-ico">${li('check-circle-2')}</div>
+        <div><div class="alarm-stat-num">${counts.cleared||0}</div><div class="alarm-stat-lbl">Cleared</div></div>
+      </div>
+    </div>
+
+    <div class="alarms-toolbar">
+      <div class="search-box" style="flex:0 0 320px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input placeholder="Search alarms…" />
+      </div>
+      <button class="chip-select">Severity <span class="caret">▾</span></button>
+      <button class="chip-select">State <span class="caret">▾</span></button>
+      <button class="chip-select">Assignee <span class="caret">▾</span></button>
+      <div style="margin-left:auto;font-size:13px;color:var(--text-muted)">${alarms.length} alarms</div>
+    </div>
+
+    <div class="alarms-list">
+      ${alarms.map(a => `
+        <div class="alarm-card severity-${a.sev}">
+          <div class="alarm-head">
+            <div class="alarm-head-main">
+              <div class="alarm-head-row">
+                <span class="sev-pill ${a.sev}"><span class="dot"></span>${a.sev.toUpperCase()}</span>
+                <span class="state-pill ${a.state}"><span class="dot"></span>${a.stateLbl}</span>
+                <span class="alarm-source">Source: ${a.source} · ${d.name}</span>
+              </div>
+              <div class="alarm-name">${a.name}</div>
+              <div class="alarm-msg">${a.msg}</div>
+            </div>
+          </div>
+
+          <div class="alarm-grid">
+            <div class="alarm-cell">
+              <div class="lbl">${li('clock')} Modified time</div>
+              <div class="val">${a.modified}</div>
+            </div>
+            <div class="alarm-cell">
+              <div class="lbl">${li('user')} Assigned to</div>
+              <div class="val">
+                <span class="assignee"><span class="av">${a.assignedInit}</span>${a.assignedName}</span>
+              </div>
+            </div>
+            <div class="alarm-cell">
+              <div class="lbl">${li('history')} Previous severity</div>
+              <div class="val"><span class="sev-pill ${a.prevSev}"><span class="dot"></span>${a.prevSev.toUpperCase()}</span></div>
+            </div>
+            <div class="alarm-cell">
+              <div class="lbl">${li('timer')} Unresolved time</div>
+              <div class="val">${a.unresolved}</div>
+            </div>
+
+            <div class="alarm-cell">
+              <div class="lbl">${li('cpu')} Model</div>
+              <div class="val" style="font-family:ui-monospace,Menlo,monospace;font-size:13px">${a.model}</div>
+            </div>
+            <div class="alarm-cell">
+              <div class="lbl">${li('calendar-clock')} Incident occurred</div>
+              <div class="val">${a.occurred}</div>
+            </div>
+            <div class="alarm-cell" style="grid-column:span 2">
+              <div class="lbl">${li('message-square')} Source</div>
+              <div class="val">${a.source}</div>
+            </div>
+          </div>
+
+          <div class="alarm-foot">
+            ${a.acknowledged
+              ? `<span class="ack-yes">${li('check-circle-2')} Acknowledged <span class="ack-meta">by ${a.ackBy} · ${a.ackAt}</span></span>`
+              : `<span class="ack-no">${li('circle-alert')} Not acknowledged yet</span>`}
+            <div style="display:flex;gap:8px">
+              ${!a.acknowledged ? `<button class="btn btn-primary btn-sm">${li('check')} Acknowledge</button>` : ''}
+              ${a.state !== 'resolved' ? `<button class="btn btn-secondary btn-sm">Resolve</button>` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
   `;
 }
 
