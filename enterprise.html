@@ -1373,6 +1373,126 @@
   .dd-metric-val .num.muted { color: var(--text-subtle); font-weight: var(--fw-reg); }
   .dd-metric-val .ts { font-size: var(--fs-xxs); color: var(--text-muted); display: block; margin-top: 2px; }
 
+  /* Messages tab */
+  .msg-tabs {
+    display: inline-flex; padding: 4px; gap: 2px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; margin: 0 auto 20px;
+  }
+  .msg-tabs-wrap { display: flex; justify-content: center; }
+  .msg-tab {
+    padding: 8px 18px; font-size: var(--fs-sm); font-weight: var(--fw-med);
+    color: var(--text-muted); border-radius: 7px; cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .msg-tab:hover:not(.active) { background: var(--bg-hover); color: var(--text); }
+  .msg-tab.active {
+    background: var(--surface); color: var(--primary);
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+    font-weight: var(--fw-semi);
+  }
+
+  .msg-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+  @media (max-width: 1100px) { .msg-stats { grid-template-columns: 1fr; } }
+  .msg-stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 18px;
+    display: flex; align-items: center; gap: 16px;
+    position: relative;
+  }
+  .msg-stat-period {
+    position: absolute; top: 16px; right: 18px;
+    font-size: var(--fs-sm); color: var(--text-muted);
+    display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+  }
+  .msg-stat-period .caret { font-size: 10px; }
+  .msg-stat-head {
+    position: absolute; top: 18px; left: 18px;
+    font-size: var(--fs-base); font-weight: var(--fw-semi);
+    color: var(--text);
+  }
+  .msg-stat-ico {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--primary-soft); color: var(--primary);
+    display: grid; place-items: center; flex-shrink: 0;
+    margin-top: 18px;
+  }
+  .msg-stat-ico [data-lucide] { width: 26px; height: 26px; }
+  .msg-stat-body { padding-top: 28px; }
+  .msg-stat-row { display: flex; align-items: baseline; gap: 8px; }
+  .msg-stat-num { font-size: 32px; font-weight: var(--fw-bold); letter-spacing: -0.6px; line-height: 1; }
+  .msg-stat-delta {
+    display: inline-flex; align-items: center; gap: 2px;
+    font-size: var(--fs-sm); font-weight: var(--fw-semi);
+  }
+  .msg-stat-delta.down { color: var(--danger); }
+  .msg-stat-delta.up { color: var(--success); }
+  .msg-stat-delta.flat { color: var(--text-muted); }
+  .msg-stat-prev {
+    margin-top: 10px; font-size: var(--fs-base);
+    color: var(--text); font-weight: var(--fw-semi);
+  }
+  .msg-stat-prev-lbl {
+    font-size: var(--fs-sm); color: var(--text-muted); font-weight: var(--fw-reg);
+    display: block; margin-top: 1px;
+  }
+
+  /* Trend panel */
+  .trend-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+  }
+  .trend-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+  }
+  .trend-head .l {
+    display: flex; align-items: center; gap: 10px;
+    font-size: var(--fs-base); font-weight: var(--fw-semi);
+  }
+  .trend-summary {
+    background: var(--bg);
+    padding: 14px 18px;
+    display: flex; justify-content: center; gap: 56px;
+    border-bottom: 1px solid var(--border);
+  }
+  .trend-stat .num { font-size: 22px; font-weight: var(--fw-bold); letter-spacing: -0.4px; }
+  .trend-stat .lbl { font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 8px; }
+  .trend-stat .delta { color: var(--danger); font-weight: var(--fw-semi); }
+  .trend-stat.muted .num { color: var(--text-muted); }
+  .trend-chart { padding: 28px 24px 24px; }
+  .trend-bar-row {
+    display: flex; align-items: flex-end; gap: 12px;
+    height: 240px; padding-left: 50px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .trend-bar-row .y-axis {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    display: flex; flex-direction: column; justify-content: space-between;
+    font-size: var(--fs-xxs); color: var(--text-muted); padding: 4px 0;
+  }
+  .trend-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; position: relative; }
+  .trend-bar-val { font-size: var(--fs-xs); color: var(--text); font-weight: var(--fw-semi); }
+  .trend-bar {
+    width: 60%; min-width: 30px; max-width: 60px;
+    background: linear-gradient(180deg, #8B7DD8, #6B5FC8);
+    border-radius: 4px 4px 0 0;
+    transition: transform .15s;
+  }
+  .trend-bar:hover { transform: translateY(-2px); }
+  .trend-x-axis {
+    display: flex; gap: 12px; padding-left: 50px; padding-top: 8px;
+    font-size: var(--fs-xs); color: var(--text-muted);
+  }
+  .trend-x-axis > div { flex: 1; text-align: center; }
+  .trend-y-label {
+    position: absolute; left: -8px; top: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    font-size: var(--fs-xxs); color: var(--text-muted);
+    white-space: nowrap; transform-origin: center;
+  }
+
   /* Power consumption card */
   .dd-power {
     display: flex; align-items: center; gap: 16px;
@@ -2594,8 +2714,152 @@ function renderDeviceDetails() {
     ${
       state.detailsDeviceTab === 'overview' ? renderDeviceOverview(d, isCritical)
       : state.detailsDeviceTab === 'details' ? renderDeviceDetailsTab(d)
+      : state.detailsDeviceTab === 'messages' ? renderDeviceMessagesTab(d)
       : renderDeviceTabPlaceholder(state.detailsDeviceTab)
     }
+  `;
+}
+
+/* Messages tab */
+state.detailsMsgTab = state.detailsMsgTab || 'summary';
+function switchMsgTab(t) { state.detailsMsgTab = t; renderDeviceDetails(); }
+
+function renderDeviceMessagesTab(d) {
+  const sub = state.detailsMsgTab;
+  return `
+    <div class="msg-tabs-wrap">
+      <div class="msg-tabs">
+        <div class="msg-tab ${sub==='summary'?'active':''}" onclick="switchMsgTab('summary')">Summary</div>
+        <div class="msg-tab ${sub==='live'?'active':''}" onclick="switchMsgTab('live')">Live Messages</div>
+        <div class="msg-tab ${sub==='historic'?'active':''}" onclick="switchMsgTab('historic')">Historic Messages</div>
+      </div>
+    </div>
+    ${sub === 'summary' ? renderMessagesSummary() :
+      sub === 'live' ? renderMessagesLive() :
+      renderMessagesHistoric()}
+  `;
+}
+
+function msgStat({ title, num, delta, deltaDir, prev, prevLbl }) {
+  return `
+    <div class="msg-stat">
+      <div class="msg-stat-head">${title}</div>
+      <div class="msg-stat-period">Today <span class="caret">▾</span></div>
+      <div class="msg-stat-ico">${li('message-square')}</div>
+      <div class="msg-stat-body">
+        <div class="msg-stat-row">
+          <div class="msg-stat-num">${num.toLocaleString()}</div>
+          <span class="msg-stat-delta ${deltaDir}">${deltaDir === 'down' ? '↓' : deltaDir === 'up' ? '↑' : '—'} ${delta}%</span>
+        </div>
+        <div class="msg-stat-prev">${prev.toLocaleString()}<span class="msg-stat-prev-lbl">${prevLbl}</span></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderMessagesSummary() {
+  // Sample data
+  const days = [
+    { label: 'Apr 24', value: 2011 },
+    { label: 'Apr 25', value: 0 },
+    { label: 'Apr 26', value: 0 },
+    { label: 'Apr 27', value: 512 },
+    { label: 'Apr 28', value: 2002 },
+    { label: 'Apr 29', value: 2005 },
+    { label: 'Apr 30', value: 1057 }
+  ];
+  const max = Math.max(...days.map(d => d.value), 1);
+  const ySteps = [2000, 1500, 1000, 500, 0];
+  return `
+    <div class="msg-stats">
+      ${msgStat({ title:'Received Msgs Count', num:1057, delta:'47.28', deltaDir:'down', prev:2005, prevLbl:'Yesterday' })}
+      ${msgStat({ title:'Processed Msgs Count', num:1057, delta:'47.28', deltaDir:'down', prev:2005, prevLbl:'Yesterday' })}
+      ${msgStat({ title:'Failed Msgs Count', num:0, delta:'0.0', deltaDir:'flat', prev:0, prevLbl:'Yesterday' })}
+    </div>
+
+    <div class="trend-panel">
+      <div class="trend-head">
+        <div class="l">
+          Messages Trend
+          <button class="icon-btn" title="Refresh" style="width:26px;height:26px">${li('rotate-cw')}</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted)">
+          ${li('chart-column')}
+          <span>Last 7 Days <span style="font-size:10px">▾</span></span>
+        </div>
+      </div>
+
+      <div class="trend-summary">
+        <div class="trend-stat" style="text-align:center">
+          <div class="num" style="display:flex;align-items:center;gap:8px;justify-content:center">
+            ${li('message-square')} 7,587
+          </div>
+          <div class="lbl" style="justify-content:center">Last 7 Days <span class="delta">↓ 10.85 %</span></div>
+        </div>
+        <div class="trend-stat muted" style="text-align:center">
+          <div class="num">8,510</div>
+          <div class="lbl" style="justify-content:center">Previous Period</div>
+        </div>
+      </div>
+
+      <div class="trend-chart">
+        <div style="position:relative">
+          <span class="trend-y-label">Message Received — SUM</span>
+          <div class="trend-bar-row">
+            <div class="y-axis">
+              ${ySteps.map(n => `<div>${n.toLocaleString()}</div>`).join('')}
+            </div>
+            ${days.map(day => {
+              const h = (day.value / max) * 100;
+              return `
+                <div class="trend-bar-col">
+                  ${day.value > 0 ? `<div class="trend-bar-val">${day.value.toLocaleString()}</div>` : ''}
+                  <div class="trend-bar" style="height:${h}%"></div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="trend-x-axis">
+            ${days.map(day => `<div>${day.label}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderMessagesLive() {
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box" style="background:var(--success-soft);color:var(--success)">${li('radio')}</div>
+        <div>
+          <div class="info-section-title">Live messages</div>
+          <div class="info-section-sub">Real-time stream from this device</div>
+        </div>
+      </div>
+      <div style="padding:30px 20px;text-align:center;color:var(--text-muted);font-size:14px">
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px">Listening for messages…</div>
+        <div>New messages from this device will appear here in real time.</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderMessagesHistoric() {
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('history')}</div>
+        <div>
+          <div class="info-section-title">Historic messages</div>
+          <div class="info-section-sub">Search and replay past messages</div>
+        </div>
+      </div>
+      <div style="padding:30px 20px;text-align:center;color:var(--text-muted);font-size:14px">
+        Pick a date range to view archived messages from this device.
+      </div>
+    </div>
   `;
 }
 
