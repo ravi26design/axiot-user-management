@@ -1764,6 +1764,67 @@
   }
   .de-chart-legend .swatch { width: 14px; height: 14px; border-radius: 3px; }
 
+  /* Timeline tab */
+  .tl-title {
+    font-size: var(--fs-lg); font-weight: var(--fw-semi);
+    color: var(--text-muted); margin-bottom: 22px;
+  }
+  .tl-day {
+    font-size: var(--fs-base); font-weight: var(--fw-bold);
+    color: var(--text); margin: 24px 0 14px;
+  }
+  .tl-day:first-of-type { margin-top: 0; }
+  .tl-event {
+    display: grid; grid-template-columns: 80px 44px 1fr;
+    align-items: center; column-gap: 0;
+    padding: 10px 0; position: relative;
+  }
+  .tl-time {
+    font-size: var(--fs-sm); color: var(--text); font-weight: var(--fw-med);
+  }
+  .tl-ico-wrap {
+    position: relative;
+    display: grid; place-items: center;
+  }
+  .tl-ico {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #DCEFE6; color: #2F8C66;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .tl-ico [data-lucide] { width: 16px; height: 16px; }
+  .tl-event:not(:last-child) .tl-ico-wrap::after {
+    content: ''; position: absolute;
+    top: 50%; bottom: -100%;
+    left: 50%; width: 1px;
+    background: var(--border);
+  }
+  .tl-text {
+    font-size: var(--fs-base); color: var(--text);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding-left: 12px;
+  }
+  .tl-text .conj { color: var(--text-muted); }
+  .tl-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-weight: var(--fw-semi);
+  }
+  .tl-status .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .tl-status.online  { color: var(--success); }
+  .tl-status.online .dot  { background: var(--success); }
+  .tl-status.offline { color: var(--danger); }
+  .tl-status.offline .dot { background: var(--danger); }
+  .tl-pill {
+    display: inline-flex; align-items: center;
+    padding: 4px 14px; border-radius: 6px;
+    font-size: var(--fs-sm); font-weight: var(--fw-semi);
+    color: #fff;
+  }
+  .tl-pill.clear    { background: #6FBB99; }
+  .tl-pill.critical { background: #E08585; }
+  .tl-pill.warn     { background: #E3A55D; }
+
   /* Historic messages table */
   .hist-msg-tbl { width: 100%; border-collapse: collapse; }
   .hist-msg-tbl th {
@@ -3016,8 +3077,72 @@ function renderDeviceDetails() {
       : state.detailsDeviceTab === 'messages' ? renderDeviceMessagesTab(d)
       : state.detailsDeviceTab === 'alarms' ? renderDeviceAlarmsTab(d)
       : state.detailsDeviceTab === 'explorer' ? renderDeviceExplorerTab(d)
+      : state.detailsDeviceTab === 'timeline' ? renderDeviceTimelineTab(d)
       : renderDeviceTabPlaceholder(state.detailsDeviceTab)
     }
+  `;
+}
+
+function renderDeviceTimelineTab(d) {
+  const days = [
+    {
+      label: 'Today, Apr 30, 2026',
+      events: [
+        { time: '11:51 AM', kind: 'connection', from: 'offline', to: 'online' },
+        { time: '10:09 AM', kind: 'connection', from: 'online', to: 'offline' }
+      ]
+    },
+    {
+      label: 'Monday, Apr 27, 2026',
+      events: [
+        { time: '06:05 PM', kind: 'connection', from: 'offline', to: 'online' }
+      ]
+    },
+    {
+      label: 'Saturday, Apr 25, 2026',
+      events: [
+        { time: '12:46 AM', kind: 'connection', from: 'online', to: 'offline' }
+      ]
+    },
+    {
+      label: 'Friday, Apr 24, 2026',
+      events: [
+        { time: '11:42 AM', kind: 'status', from: 'clear', to: 'critical' },
+        { time: '11:40 AM', kind: 'status', from: 'critical', to: 'clear' }
+      ]
+    }
+  ];
+
+  function renderEvent(e) {
+    let body = '';
+    if (e.kind === 'connection') {
+      body = `Connection Status was updated from
+        <span class="tl-status ${e.from}"><span class="dot"></span>${cap(e.from)}</span>
+        <span class="conj">to</span>
+        <span class="tl-status ${e.to}"><span class="dot"></span>${cap(e.to)}</span>`;
+    } else if (e.kind === 'status') {
+      body = `Status was updated from
+        <span class="tl-pill ${e.from}">${cap(e.from)}</span>
+        <span class="conj">to</span>
+        <span class="tl-pill ${e.to}">${cap(e.to)}</span>`;
+    }
+    return `
+      <div class="tl-event">
+        <div class="tl-time">${e.time}</div>
+        <div class="tl-ico-wrap"><div class="tl-ico">${li('pencil')}</div></div>
+        <div class="tl-text">${body}</div>
+      </div>
+    `;
+  }
+
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  return `
+    <div class="tl-title">Recent Activity - Last 7 Days</div>
+    ${days.map(day => `
+      <div class="tl-day">${day.label}</div>
+      ${day.events.map(renderEvent).join('')}
+    `).join('')}
   `;
 }
 
