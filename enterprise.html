@@ -1616,6 +1616,154 @@
     font-size: 10px; font-weight: var(--fw-bold);
   }
 
+  /* Data Explorer tab */
+  .de-layout {
+    display: grid; grid-template-columns: 280px 1fr; gap: 16px;
+    align-items: stretch;
+  }
+  @media (max-width: 1100px) { .de-layout { grid-template-columns: 1fr; } }
+
+  .de-rail {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    display: flex; flex-direction: column;
+    max-height: 720px;
+  }
+  .de-rail-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .de-rail-title {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: var(--fs-base); font-weight: var(--fw-semi);
+  }
+  .de-rail-title .limit {
+    font-size: var(--fs-xxs); color: var(--text-muted); font-weight: var(--fw-reg);
+  }
+  .de-search {
+    margin-top: 10px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 7px 10px;
+  }
+  .de-search input { background: none; border: none; outline: none; flex: 1; font-size: 13px; }
+  .de-search input::placeholder { color: var(--text-subtle); }
+
+  .de-section { padding: 8px 0; }
+  .de-section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--bg);
+    border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);
+    font-size: var(--fs-sm); font-weight: var(--fw-semi);
+  }
+  .de-section-head .toggle { color: var(--text-muted); cursor: pointer; }
+
+  .de-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .de-item:hover { background: var(--bg); }
+  .de-item .check {
+    width: 16px; height: 16px; border-radius: 3px;
+    border: 1.5px solid var(--border-strong); background: var(--surface);
+    flex-shrink: 0;
+    display: grid; place-items: center;
+  }
+  .de-item.selected .check {
+    background: var(--primary); border-color: var(--primary);
+  }
+  .de-item.selected .check::after {
+    content: ''; width: 8px; height: 5px;
+    border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translate(1px, -1px);
+  }
+  .de-item .met-ico {
+    width: 24px; height: 24px; border-radius: 4px;
+    background: var(--bg); color: var(--text-muted);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .de-item .met-ico [data-lucide] { width: 14px; height: 14px; }
+  .de-item .met-name { font-size: var(--fs-sm); font-weight: var(--fw-med); line-height: 1.3; }
+  .de-item .met-sub  { font-size: var(--fs-xxs); color: var(--text-muted); font-style: italic; margin-top: 1px; }
+
+  .de-rail-foot {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .de-rail-foot a {
+    color: var(--primary); font-size: var(--fs-sm); font-weight: var(--fw-semi);
+    cursor: pointer;
+  }
+  .de-rail-foot a:hover { text-decoration: underline; }
+
+  /* Right chart panel */
+  .de-chart-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .de-chart-tabs-wrap { display: flex; justify-content: center; }
+  .de-chart-tabs {
+    display: inline-flex; padding: 4px; gap: 2px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .de-chart-tab {
+    padding: 8px 18px; font-size: var(--fs-sm); font-weight: var(--fw-med);
+    color: var(--text-muted); border-radius: 7px; cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .de-chart-tab.active {
+    background: var(--surface); color: var(--primary);
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+    font-weight: var(--fw-semi);
+  }
+
+  .de-chart-toolbar {
+    display: flex; align-items: center; gap: 4px;
+    padding-bottom: 4px;
+  }
+  .de-chart-toolbar .chart-types {
+    display: inline-flex; gap: 2px;
+  }
+  .de-chart-toolbar .chart-types button {
+    width: 32px; height: 32px; border-radius: 6px;
+    color: var(--text-muted); display: grid; place-items: center;
+  }
+  .de-chart-toolbar .chart-types button:hover { background: var(--bg); color: var(--text); }
+  .de-chart-toolbar .chart-types button.active {
+    background: var(--primary-soft); color: var(--primary);
+  }
+  .de-chart-toolbar .live-dot {
+    margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+    font-size: var(--fs-sm); color: var(--danger); font-weight: var(--fw-semi);
+  }
+  .de-chart-toolbar .live-dot::before {
+    content: ''; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--danger); animation: livepulse 1.4s infinite;
+  }
+  @keyframes livepulse { 0% { box-shadow: 0 0 0 0 rgba(159,26,15,.4); } 100% { box-shadow: 0 0 0 8px rgba(159,26,15,0); } }
+
+  .de-chart {
+    background: #fff; border-radius: 6px;
+    height: 360px; position: relative;
+  }
+
+  .de-chart-legend {
+    display: flex; gap: 22px; justify-content: center;
+    font-size: var(--fs-sm); padding-top: 4px;
+  }
+  .de-chart-legend .li {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--text); font-weight: var(--fw-med);
+  }
+  .de-chart-legend .swatch { width: 14px; height: 14px; border-radius: 3px; }
+
   /* Historic messages table */
   .hist-msg-tbl { width: 100%; border-collapse: collapse; }
   .hist-msg-tbl th {
@@ -2867,8 +3015,258 @@ function renderDeviceDetails() {
       : state.detailsDeviceTab === 'details' ? renderDeviceDetailsTab(d)
       : state.detailsDeviceTab === 'messages' ? renderDeviceMessagesTab(d)
       : state.detailsDeviceTab === 'alarms' ? renderDeviceAlarmsTab(d)
+      : state.detailsDeviceTab === 'explorer' ? renderDeviceExplorerTab(d)
       : renderDeviceTabPlaceholder(state.detailsDeviceTab)
     }
+  `;
+}
+
+/* ---- Data Explorer ---- */
+const DATAPOINTS = [
+  { key:'KVA',         label:'KVA',         icon:'trending-up', color:'#C89B69', kind:'energy' },
+  { key:'kVAh',        label:'kVAh',        icon:'trending-up', color:'#7C5FC8', kind:'energy' },
+  { key:'kVARh',       label:'kVARh',       icon:'trending-up', color:'#5B21B6', kind:'energy' },
+  { key:'KW',          label:'KW',          icon:'zap',         color:'#F5A623', kind:'energy' },
+  { key:'kWh',         label:'kWh',         icon:'zap',         color:'#E08963', kind:'energy' },
+  { key:'Voltage_B_N', label:'Voltage_B_N', icon:'zap',         color:'#3B82F6', kind:'voltage' },
+  { key:'Voltage_B_R', label:'Voltage_B_R', icon:'zap',         color:'#1F4E9E', kind:'voltage' },
+  { key:'Voltage_R_N', label:'Voltage_R_N', icon:'zap',         color:'#06B6D4', kind:'voltage' },
+  { key:'Voltage_Y_N', label:'Voltage_Y_N', icon:'zap',         color:'#10B981', kind:'voltage' },
+  { key:'Current_R',   label:'Current_R',   icon:'zap',         color:'#F5A623', kind:'current' },
+  { key:'Current_Y',   label:'Current_Y',   icon:'zap',         color:'#FBBF24', kind:'current' },
+  { key:'Current_B',   label:'Current_B',   icon:'zap',         color:'#3B82F6', kind:'current' },
+  { key:'Frequency',   label:'Frequency',   icon:'activity',    color:'#22C55E', kind:'misc' },
+  { key:'Power_Factor',label:'Power Factor',icon:'activity',    color:'#8B5CF6', kind:'misc' }
+];
+state.detailsExplorerSel    = state.detailsExplorerSel    || ['KVA','Current_B','Current_R'];
+state.detailsExplorerMode   = state.detailsExplorerMode   || 'live';
+state.detailsExplorerChart  = state.detailsExplorerChart  || 'line';
+state.detailsExplorerSearch = state.detailsExplorerSearch || '';
+
+function setExplorerMode(m) { state.detailsExplorerMode = m; renderDeviceDetails(); }
+function setExplorerChart(c) { state.detailsExplorerChart = c; renderDeviceDetails(); }
+function toggleExplorerPoint(key) {
+  const sel = state.detailsExplorerSel;
+  const idx = sel.indexOf(key);
+  if (idx >= 0) sel.splice(idx, 1);
+  else if (sel.length < 6) sel.push(key);
+  else { toast('Max 6 datapoints', 'danger'); return; }
+  renderDeviceDetails();
+}
+function searchExplorer(q) { state.detailsExplorerSearch = q; renderDeviceDetails(); }
+
+function renderDeviceExplorerTab(d) {
+  const q = state.detailsExplorerSearch.toLowerCase();
+  const visible = q ? DATAPOINTS.filter(p => p.label.toLowerCase().includes(q)) : DATAPOINTS;
+  const selected = visible.filter(p => state.detailsExplorerSel.includes(p.key));
+  const others = visible.filter(p => !state.detailsExplorerSel.includes(p.key));
+
+  return `
+    <div class="de-layout">
+      <aside class="de-rail">
+        <div class="de-rail-head">
+          <div class="de-rail-title">
+            <span>Choose Datapoints</span>
+            <span class="limit">Max. Limit: 6</span>
+          </div>
+          <div class="de-search">
+            ${li('search')}
+            <input placeholder="Search Datapoints" value="${state.detailsExplorerSearch}" oninput="searchExplorer(this.value)" />
+          </div>
+        </div>
+        <div style="overflow-y:auto">
+          ${selected.length ? `
+            <div class="de-section">
+              ${selected.map(p => deItem(p, d, true)).join('')}
+            </div>
+          ` : ''}
+          <div class="de-section-head"><span>${d.name}</span><span class="toggle">${li('chevron-up')}</span></div>
+          <div class="de-section">
+            ${others.map(p => deItem(p, d, false)).join('') || '<div style="padding:14px;color:var(--text-muted);font-size:13px;text-align:center">No datapoints</div>'}
+          </div>
+        </div>
+        <div class="de-rail-foot">
+          <a>View Related Metrics</a>
+        </div>
+      </aside>
+
+      <section class="de-chart-panel">
+        <div class="de-chart-tabs-wrap">
+          <div class="de-chart-tabs">
+            <div class="de-chart-tab ${state.detailsExplorerMode==='live'?'active':''}" onclick="setExplorerMode('live')">Live</div>
+            <div class="de-chart-tab ${state.detailsExplorerMode==='raw'?'active':''}" onclick="setExplorerMode('raw')">Raw</div>
+            <div class="de-chart-tab ${state.detailsExplorerMode==='aggregated'?'active':''}" onclick="setExplorerMode('aggregated')">Aggregated</div>
+          </div>
+        </div>
+        <div class="de-chart-toolbar">
+          <div class="chart-types">
+            ${chartTypeBtn('line', 'chart-line')}
+            ${chartTypeBtn('bar', 'chart-column-big')}
+            ${chartTypeBtn('hbar', 'chart-bar-big')}
+            ${chartTypeBtn('area', 'chart-area')}
+            ${chartTypeBtn('multi', 'chart-bar-stacked')}
+          </div>
+          <button class="icon-btn" title="Settings" style="margin-left:6px">${li('settings')}</button>
+          <button class="icon-btn" title="Export">${li('upload')}</button>
+          <button class="icon-btn" title="Refresh">${li('rotate-cw')}</button>
+          ${state.detailsExplorerMode === 'live' ? '<span class="live-dot">Live</span>' : ''}
+        </div>
+        <div class="de-chart">
+          ${renderExplorerChart()}
+        </div>
+        <div class="de-chart-legend">
+          ${state.detailsExplorerSel.map(k => {
+            const p = DATAPOINTS.find(x => x.key === k);
+            if (!p) return '';
+            return `<span class="li"><span class="swatch" style="background:${p.color}"></span>${p.label}</span>`;
+          }).join('')}
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function deItem(p, d, isSel) {
+  return `
+    <div class="de-item ${isSel?'selected':''}" onclick="toggleExplorerPoint('${p.key}')">
+      <div class="check"></div>
+      <div class="met-ico">${li(p.icon)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="met-name">${p.label}</div>
+        <div class="met-sub">${d.name}</div>
+      </div>
+    </div>
+  `;
+}
+
+function chartTypeBtn(key, icon) {
+  return `<button class="${state.detailsExplorerChart === key ? 'active' : ''}" onclick="setExplorerChart('${key}')" title="${key}">${li(icon)}</button>`;
+}
+
+function renderExplorerChart() {
+  const sel = state.detailsExplorerSel.map(k => DATAPOINTS.find(p => p.key === k)).filter(Boolean);
+  if (sel.length === 0) {
+    return `<div style="height:100%;display:grid;place-items:center;color:var(--text-muted);font-size:14px">Select a datapoint from the left to plot it.</div>`;
+  }
+
+  // Generate sample data: 18 timestamps
+  const N = 18;
+  const timestamps = [];
+  for (let i = 0; i < N; i++) {
+    const t = new Date(2026, 3, 30, 14, 54 + i, Math.floor(Math.random()*60));
+    timestamps.push(t);
+  }
+
+  // Generate per-series values
+  const series = sel.map((p, idx) => {
+    let baseVal = p.kind === 'voltage' ? 240 : p.kind === 'current' ? 0.04 : p.kind === 'energy' ? 0 : 50;
+    const range = p.kind === 'voltage' ? 30 : p.kind === 'current' ? 0.04 : p.kind === 'energy' ? 0.06 : 5;
+    const values = [];
+    for (let i = 0; i < N; i++) {
+      // For demo, mostly flat near zero/baseline like reference image
+      const v = p.kind === 'energy' ? 0 : (baseVal + (Math.sin(i + idx) * 0.5 * range));
+      values.push(v);
+    }
+    return { ...p, values };
+  });
+
+  // Chart geometry
+  const W = 1000, H = 320;
+  const padL = 60, padR = series.length > 1 ? 20 + (series.length-1) * 40 : 30;
+  const padT = 20, padB = 60;
+  const innerW = W - padL - padR;
+  const innerH = H - padT - padB;
+
+  // Y scales per series. Use first series for left axis, render right-side axes per additional.
+  const yScales = series.map(s => {
+    const max = Math.max(...s.values, 0.06);
+    const min = Math.min(...s.values, 0);
+    return { min, max };
+  });
+
+  const xStep = innerW / (N - 1);
+  const fmt = (t) => `Apr 30 ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;
+
+  // Build per-series path
+  const paths = series.map((s, sIdx) => {
+    const sc = yScales[sIdx];
+    const range = (sc.max - sc.min) || 1;
+    let path = '';
+    s.values.forEach((v, i) => {
+      const x = padL + i * xStep;
+      const y = padT + innerH - ((v - sc.min) / range) * innerH;
+      path += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+    });
+    return { path, color: s.color, sIdx, values: s.values };
+  });
+
+  // Y-axis ticks (left axis = first series)
+  const leftSc = yScales[0];
+  const yTicks = [];
+  const stepsY = 6;
+  for (let i = 0; i <= stepsY; i++) {
+    const t = leftSc.min + (i / stepsY) * (leftSc.max - leftSc.min);
+    yTicks.push({ y: padT + innerH - (i/stepsY) * innerH, label: t.toFixed(2) });
+  }
+
+  // X-axis ticks (subset of timestamps)
+  const xTicks = [];
+  const tickEvery = 2;
+  for (let i = 0; i < N; i += tickEvery) {
+    xTicks.push({ x: padL + i * xStep, label: fmt(timestamps[i]) });
+  }
+
+  // Right axes
+  const rightAxes = series.slice(1).map((s, idx) => {
+    const sc = yScales[idx + 1];
+    const x = W - padR + 6 + idx * 40;
+    const ticks = [];
+    for (let i = 0; i <= stepsY; i++) {
+      const t = sc.min + (i / stepsY) * (sc.max - sc.min);
+      ticks.push({ y: padT + innerH - (i/stepsY) * innerH, label: t.toFixed(2) });
+    }
+    return { x, ticks, label: `${s.label} (${s.kind === 'voltage' ? 'V' : s.kind === 'current' ? 'V' : ''})` };
+  });
+
+  // Data labels (show "0" for first series at every point like reference)
+  const labels = paths[0].values.map((v, i) => {
+    return `<text x="${padL + i*xStep}" y="${padT + innerH - 4}" text-anchor="middle" font-size="10" fill="#0B1220" font-weight="500">${v === 0 ? '0' : v.toFixed(1)}</text>`;
+  }).join('');
+
+  return `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:100%" preserveAspectRatio="none">
+      <!-- grid lines -->
+      ${yTicks.map(t => `<line x1="${padL}" y1="${t.y}" x2="${W - padR}" y2="${t.y}" stroke="#E4E7EC" stroke-width="1"/>`).join('')}
+
+      <!-- Left axis labels -->
+      ${yTicks.map(t => `<text x="${padL - 8}" y="${t.y + 3}" text-anchor="end" font-size="10" fill="#64748B">${t.label}</text>`).join('')}
+      <text x="20" y="${padT + innerH/2}" text-anchor="middle" font-size="10" fill="#64748B" transform="rotate(-90 20 ${padT + innerH/2})">${series[0].label} (${series[0].kind==='voltage'?'V':series[0].kind==='current'?'V':'KVA'})</text>
+
+      <!-- Right axes -->
+      ${rightAxes.map(ax => `
+        ${ax.ticks.map(t => `<text x="${ax.x + 24}" y="${t.y + 3}" text-anchor="end" font-size="10" fill="#64748B">${t.label}</text>`).join('')}
+        <text x="${ax.x + 30}" y="${padT + innerH/2}" text-anchor="middle" font-size="10" fill="#64748B" transform="rotate(-90 ${ax.x + 30} ${padT + innerH/2})">${ax.label}</text>
+      `).join('')}
+
+      <!-- Lines -->
+      ${paths.map(p => `<path d="${p.path}" fill="none" stroke="${p.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}
+
+      <!-- Dots at each point (first series) -->
+      ${paths.map(p => p.values.map((v, i) => {
+        const sc = yScales[p.sIdx];
+        const range = (sc.max - sc.min) || 1;
+        const x = padL + i * xStep;
+        const y = padT + innerH - ((v - sc.min) / range) * innerH;
+        return `<circle cx="${x}" cy="${y}" r="3" fill="${p.color}"/>`;
+      }).join('')).join('')}
+
+      <!-- Data labels on first series -->
+      ${labels}
+
+      <!-- X-axis ticks -->
+      ${xTicks.map(t => `<text x="${t.x}" y="${H - padB + 28}" text-anchor="end" font-size="9.5" fill="#64748B" transform="rotate(-32 ${t.x} ${H - padB + 28})">${t.label}</text>`).join('')}
+      <line x1="${padL}" y1="${padT + innerH}" x2="${W - padR}" y2="${padT + innerH}" stroke="#CBD1D9" stroke-width="1"/>
+    </svg>
   `;
 }
 
