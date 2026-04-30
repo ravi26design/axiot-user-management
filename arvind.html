@@ -1784,15 +1784,16 @@
     color: var(--text);
   }
 
+  /* Rail center is at: feed.padding-left = 40 → rail at left: 15, width 2 → center at 16. All dots are absolutely positioned to share that center. */
   .tl-feed {
     position: relative;
-    padding-left: 16px;
+    padding-left: 40px;
   }
   .tl-feed::before {
     content: ''; position: absolute;
-    top: 8px; bottom: 8px;
-    left: 16px; width: 2px;
-    background: linear-gradient(to bottom, transparent, var(--border) 20px, var(--border) calc(100% - 20px), transparent);
+    top: 12px; bottom: 12px;
+    left: 15px; width: 2px;
+    background: var(--border);
     border-radius: 1px;
   }
 
@@ -1802,19 +1803,20 @@
   }
   .tl-day:first-child { margin-top: 0; }
   .tl-day-head {
-    display: inline-flex; align-items: center; gap: 10px;
-    margin-bottom: 4px;
-    padding: 6px 14px 6px 8px;
-    background: var(--surface);
-    border-radius: 999px;
-    position: relative; z-index: 1;
-    margin-left: -8px;
+    position: relative;
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; margin-bottom: 4px;
   }
   .tl-day-dot {
+    /* Centered on rail (16). Width 16 + border 3 → outer 22, half 11. left = 16 - 11 = 5 from .tl-feed. Head starts at 40, so left here = 5 - 40 = -35 */
+    position: absolute;
+    left: -35px;
+    top: 50%; transform: translateY(-50%);
     width: 16px; height: 16px; border-radius: 50%;
     background: var(--surface);
     border: 3px solid var(--primary);
     flex-shrink: 0;
+    z-index: 1;
   }
   .tl-day-head .label {
     font-size: var(--fs-base); font-weight: var(--fw-semi);
@@ -1827,13 +1829,14 @@
 
   .tl-event {
     position: relative;
-    display: grid; grid-template-columns: 28px 90px 1fr;
+    display: grid; grid-template-columns: 90px 1fr;
     align-items: center; column-gap: 14px;
     padding: 8px 0;
   }
   .tl-event::before {
+    /* Centered on rail (16). Width 8 + border 2 → outer 12, half 6. left = 16 - 6 = 10 from feed. Event content starts at 40 so left here = 10 - 40 = -30 */
     content: ''; position: absolute;
-    left: 8px; top: 50%;
+    left: -30px; top: 50%;
     width: 8px; height: 8px; border-radius: 50%;
     background: var(--surface);
     border: 2px solid var(--text-subtle);
@@ -1847,7 +1850,7 @@
 
   .tl-time {
     font-size: var(--fs-xs); color: var(--text-muted);
-    font-weight: var(--fw-med); padding-left: 18px;
+    font-weight: var(--fw-med);
     font-variant-numeric: tabular-nums;
   }
   .tl-card {
@@ -3202,7 +3205,6 @@ function renderDeviceTimelineTab(d) {
          <span class="tl-pill ${e.to}">${cap(e.to)}</span>`;
     return `
       <div class="tl-event ${dirClass}">
-        <div></div>
         <div class="tl-time">${e.time}</div>
         <div class="tl-card ${dirClass}">
           <div class="ev-ico">${icon}</div>
