@@ -1174,6 +1174,8 @@
   body.client-view .field:has(#newRoleScope),
   body.client-view .industry-client-col,
   body.client-view .industry-client-filter,
+  body.client-view .device-client-col,
+  body.client-view .device-client-filter,
   body.client-view .enterprise-only { display: none !important; }
 
   /* ===== Grouped action bar for user details ===== */
@@ -1376,6 +1378,62 @@
   </div>
 </div>
 
+<!-- DEVICES SCREEN -->
+<div class="screen" id="screen-devices">
+  <div class="app">
+    <aside class="sidebar" data-sidebar></aside>
+    <div class="main">
+      <header class="topbar" data-topbar></header>
+      <div class="content">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Devices <span id="devicesCount" style="color:var(--text-muted);font-weight:500;font-size:18px"></span></div>
+            <div class="page-sub">Manage IoT devices across clients and industries.</div>
+          </div>
+          <button class="btn btn-primary" onclick="openDeviceDrawer()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Add device
+          </button>
+        </div>
+
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search-box">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+              <input id="deviceSearch" placeholder="Search devices…" oninput="renderDevicesPage()" />
+            </div>
+            <div class="filter-wrap device-client-filter">
+              <button class="chip-select" id="filterDeviceClientBtn" onclick="toggleDeviceClientFilter(event)">Client <span class="caret">▾</span></button>
+            </div>
+            <div class="filter-wrap">
+              <button class="chip-select" id="filterDeviceIndustryBtn" onclick="toggleDeviceIndustryFilter(event)">Industry <span class="caret">▾</span></button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Device</th>
+                  <th>Type</th>
+                  <th class="device-client-col">Client</th>
+                  <th>Industry</th>
+                  <th>Status</th>
+                  <th>Last seen</th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+              <tbody id="deviceRows"></tbody>
+            </table>
+          </div>
+          <div class="tbl-footer">
+            <div id="deviceListMeta">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- INDUSTRIES SCREEN -->
 <div class="screen" id="screen-industries">
   <div class="app">
@@ -1522,6 +1580,76 @@
   <div class="drawer-foot">
     <button class="btn btn-ghost" onclick="closeRoleDrawer()">Cancel</button>
     <button class="btn btn-primary" onclick="submitNewRole()">Create role</button>
+  </div>
+</aside>
+
+<!-- ==== Device drawer ==== -->
+<div class="drawer-backdrop" id="deviceDrawerBackdrop" onclick="closeDeviceDrawer()"></div>
+<aside class="drawer" id="deviceDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-title" id="deviceDrawerTitle">Add device</div>
+      <div class="drawer-sub">Register a new IoT device for a client industry.</div>
+    </div>
+    <button class="icon-btn" onclick="closeDeviceDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="drawer-body">
+    <div class="form-section">
+      <div class="form-section-title">Device details</div>
+      <div class="field">
+        <label class="label">Device name <span class="req">*</span></label>
+        <input class="input" id="deviceName" placeholder="e.g. Compressor #4" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="label">Type <span class="req">*</span></label>
+          <select class="select" id="deviceType">
+            <option>Compressor</option><option>Valve</option><option>Motor</option><option>Sensor</option>
+            <option>Pump</option><option>Boiler</option><option>Press</option><option>Robot</option>
+            <option>Welder</option><option>Gateway</option><option>Server</option><option>Network</option>
+            <option>Camera</option><option>Access Control</option><option>Cooling</option><option>Exchanger</option>
+            <option>Flow meter</option><option>Gauge</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label">Serial number</label>
+          <input class="input" id="deviceSerial" placeholder="SN-XXXXX" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Firmware version</label>
+        <input class="input" id="deviceFirmware" placeholder="e.g. 2.4.1" />
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Assignment</div>
+      <div class="field invite-client-field">
+        <label class="label">Client <span class="req">*</span></label>
+        <select class="select" id="deviceClient" onchange="refreshDeviceIndustries()"></select>
+        <div class="hint">Which client owns this device.</div>
+      </div>
+      <div class="field">
+        <label class="label">Industry <span class="req">*</span></label>
+        <select class="select" id="deviceIndustry"></select>
+        <div class="hint">Which industry/location this device sits at.</div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Status</div>
+      <div class="field">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+          <div>
+            <div style="font-size:14px;font-weight:500">Active</div>
+            <div class="hint" style="margin-top:4px">Inactive devices stop reporting telemetry and don't appear in operational views.</div>
+          </div>
+          <div class="switch on" id="deviceActive" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-ghost" onclick="closeDeviceDrawer()">Cancel</button>
+    <button class="btn btn-primary" onclick="submitDevice()" id="deviceSubmitBtn">Create device</button>
   </div>
 </aside>
 
@@ -1677,7 +1805,8 @@ const NAV = [
   { section: 'Administration' },
   { key: 'users',      label: 'Users',                ico: SVG.users,      screen: 'users' },
   { key: 'roles',      label: 'Roles & permissions',  ico: SVG.roles,      screen: 'roles' },
-  { key: 'industries', label: 'Industries',           ico: SVG.industries, screen: 'industries' }
+  { key: 'industries', label: 'Industries',           ico: SVG.industries, screen: 'industries' },
+  { key: 'devices',    label: 'Devices',              ico: SVG.devices,    screen: 'devices' }
 ];
 
 const RESOURCES = [
@@ -1740,8 +1869,19 @@ const state = {
   dirtyPerms: null,
   initialPerms: null,
   editingIndustryId: null,
-  industryClientFilter: 'all'
+  industryClientFilter: 'all',
+  editingDeviceId: null,
+  deviceClientFilter: 'all',
+  deviceIndustryFilter: 'all'
 };
+
+// Augment DEVICES with status + lastSeen for the management UI
+DEVICES.forEach((d, i) => {
+  if (d.active === undefined)   d.active   = i % 7 !== 0;          // mostly active
+  if (!d.lastSeen)               d.lastSeen = ['2 min ago','12 min ago','1 hour ago','3 hours ago','Yesterday','2 days ago'][i % 6];
+  if (!d.serial)                 d.serial   = 'SN-' + (10000 + i);
+  if (!d.firmware)               d.firmware = '2.4.' + (i % 5);
+});
 
 /* ============================================================
    Devices + role-based defaults
@@ -2004,6 +2144,7 @@ function renderTopbar() {
     users: 'Users',
     roles: 'Roles & permissions',
     industries: 'Industries',
+    devices: 'Devices',
     userDetails: ''
   };
   const title = titles[state.currentScreen] || '';
@@ -2039,6 +2180,209 @@ function renderTopbar() {
     </div>
   `;
   document.querySelectorAll('[data-topbar]').forEach(el => el.innerHTML = html);
+}
+
+/* ============================================================
+   Devices module (CRUD)
+   ============================================================ */
+function visibleDevices() {
+  const q = (document.getElementById('deviceSearch')?.value || '').toLowerCase().trim();
+  return DEVICES.filter(d => {
+    if (VIEW_CLIENT && d.client !== VIEW_CLIENT) return false;
+    if (!VIEW_CLIENT && state.deviceClientFilter !== 'all' && d.client !== state.deviceClientFilter) return false;
+    if (state.deviceIndustryFilter !== 'all' && d.location !== state.deviceIndustryFilter) return false;
+    if (q && !(d.name.toLowerCase().includes(q) || (d.type||'').toLowerCase().includes(q) || (d.serial||'').toLowerCase().includes(q) || (d.location||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function renderDevicesPage() {
+  const list = visibleDevices();
+  const total = VIEW_CLIENT ? DEVICES.filter(d => d.client === VIEW_CLIENT).length : DEVICES.length;
+  document.getElementById('devicesCount').textContent = `(${list.length})`;
+  const meta = document.getElementById('deviceListMeta');
+  if (meta) meta.textContent = `${list.length} of ${total} devices`;
+
+  // Filter chip labels
+  const cf = state.deviceClientFilter;
+  const cbtn = document.getElementById('filterDeviceClientBtn');
+  if (cbtn && !VIEW_CLIENT) {
+    cbtn.classList.toggle('active', cf !== 'all');
+    cbtn.innerHTML = (cf === 'all' ? 'Client' : `${cf} <span style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">1</span>`) + ' <span class="caret">▾</span>';
+  }
+  const inf = state.deviceIndustryFilter;
+  const ibtn = document.getElementById('filterDeviceIndustryBtn');
+  if (ibtn) {
+    ibtn.classList.toggle('active', inf !== 'all');
+    ibtn.innerHTML = (inf === 'all' ? 'Industry' : `${inf} <span style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">1</span>`) + ' <span class="caret">▾</span>';
+  }
+
+  const tbody = document.getElementById('deviceRows');
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
+      <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">No devices match</div>
+      <div style="font-size:13px;color:var(--text-muted)">Try adjusting filters or add a device.</div>
+      <div style="margin-top:14px"><button class="btn btn-primary btn-sm" onclick="openDeviceDrawer()">+ Add device</button></div>
+    </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(d => `
+    <tr class="row-clickable" onclick="openDeviceDrawer('${d.id}')">
+      <td>
+        <div class="cell-user">
+          <div class="dev-ico">${SVG.devices}</div>
+          <div>
+            <div class="cell-user-name">${d.name}</div>
+            <div class="cell-user-sub">${d.serial || '—'} · v${d.firmware || '—'}</div>
+          </div>
+        </div>
+      </td>
+      <td>${d.type}</td>
+      <td class="device-client-col" style="color:var(--text-muted)">${d.client}</td>
+      <td style="color:var(--text-muted)">${d.location}</td>
+      <td>${d.active !== false ? '<span class="chip chip-active"><span class="dot"></span>Active</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Inactive</span>'}</td>
+      <td style="color:var(--text-muted)">${d.lastSeen || '—'}</td>
+      <td onclick="event.stopPropagation()">
+        <div class="row-actions">
+          <button class="icon-btn" title="Edit" onclick="openDeviceDrawer('${d.id}')">${SVG.edit}</button>
+          <button class="icon-btn" title="Delete" onclick="deleteDevice('${d.id}')" style="color:var(--danger)">${SVG.trash}</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openDeviceDrawer(id) {
+  state.editingDeviceId = id || null;
+  const d = id ? DEVICES.find(x => x.id === id) : null;
+  document.getElementById('deviceDrawerTitle').textContent = id ? 'Edit device' : 'Add device';
+  document.getElementById('deviceSubmitBtn').textContent = id ? 'Save changes' : 'Create device';
+  document.getElementById('deviceName').value = d ? d.name : '';
+  document.getElementById('deviceType').value = d ? d.type : 'Compressor';
+  document.getElementById('deviceSerial').value = d ? (d.serial || '') : '';
+  document.getElementById('deviceFirmware').value = d ? (d.firmware || '') : '';
+  const cs = document.getElementById('deviceClient');
+  cs.innerHTML = CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  if (VIEW_CLIENT) { cs.value = VIEW_CLIENT; cs.disabled = true; }
+  else { cs.value = d ? d.client : (state.deviceClientFilter !== 'all' ? state.deviceClientFilter : CLIENTS[0]); cs.disabled = false; }
+  refreshDeviceIndustries();
+  if (d) document.getElementById('deviceIndustry').value = d.location;
+  const sw = document.getElementById('deviceActive');
+  sw.classList.toggle('on', d ? d.active !== false : true);
+  document.getElementById('deviceDrawer').classList.add('open');
+  document.getElementById('deviceDrawerBackdrop').classList.add('open');
+  setTimeout(() => document.getElementById('deviceName').focus(), 250);
+}
+function refreshDeviceIndustries() {
+  const cs = document.getElementById('deviceClient');
+  const is = document.getElementById('deviceIndustry');
+  if (!cs || !is) return;
+  const opts = state.industries.filter(i => i.client === cs.value && i.active !== false);
+  is.innerHTML = opts.length
+    ? opts.map(i => `<option value="${i.name}">${i.name}</option>`).join('')
+    : '<option value="" disabled>No industries — add one first</option>';
+}
+function closeDeviceDrawer() {
+  document.getElementById('deviceDrawer').classList.remove('open');
+  document.getElementById('deviceDrawerBackdrop').classList.remove('open');
+  state.editingDeviceId = null;
+}
+function submitDevice() {
+  const name = document.getElementById('deviceName').value.trim();
+  const client = document.getElementById('deviceClient').value;
+  const industry = document.getElementById('deviceIndustry').value;
+  if (!name) { toast('Device name is required', 'danger'); return; }
+  if (!client) { toast('Please select a client', 'danger'); return; }
+  if (!industry) { toast('Please select an industry', 'danger'); return; }
+  const data = {
+    name, client,
+    type:     document.getElementById('deviceType').value,
+    serial:   document.getElementById('deviceSerial').value.trim(),
+    firmware: document.getElementById('deviceFirmware').value.trim(),
+    location: industry,
+    industry: 'Textiles & Apparel',  // legacy field for back-compat
+    active:   document.getElementById('deviceActive').classList.contains('on')
+  };
+  if (state.editingDeviceId) {
+    Object.assign(DEVICES.find(x => x.id === state.editingDeviceId), data);
+    toast('Device updated', 'success');
+  } else {
+    DEVICES.push({ id: 'd-' + Date.now(), lastSeen: 'just now', ...data });
+    toast('Device created', 'success');
+  }
+  closeDeviceDrawer();
+  renderDevicesPage();
+}
+function deleteDevice(id) {
+  const d = DEVICES.find(x => x.id === id);
+  if (!d) return;
+  confirmDialog(`Delete device "${d.name}"?`,
+    `This permanently removes the device and all per-user permissions linked to it.`,
+    () => {
+      const idx = DEVICES.findIndex(x => x.id === id);
+      if (idx >= 0) DEVICES.splice(idx, 1);
+      renderDevicesPage();
+      toast('Device deleted', 'danger');
+    });
+}
+
+function toggleDeviceClientFilter(evt) {
+  evt.stopPropagation();
+  const existing = document.getElementById('devClientPop');
+  if (existing) { existing.remove(); return; }
+  const wrap = evt.currentTarget.parentElement;
+  const opts = ['all', ...CLIENTS];
+  wrap.insertAdjacentHTML('beforeend', `
+    <div class="filter-pop open" id="devClientPop" style="min-width:200px">
+      <div class="filter-pop-head"><span>Filter by client</span></div>
+      ${opts.map(c => `
+        <label class="filter-opt" onclick="state.deviceClientFilter='${c}';document.getElementById('devClientPop').remove();renderDevicesPage()">
+          <span>${c === 'all' ? 'All clients' : c}</span>
+        </label>
+      `).join('')}
+    </div>
+  `);
+  setTimeout(() => {
+    const closer = (e) => {
+      if (!e.target.closest('#devClientPop') && !e.target.closest('#filterDeviceClientBtn')) {
+        const p = document.getElementById('devClientPop'); if (p) p.remove();
+        document.removeEventListener('click', closer);
+      }
+    };
+    document.addEventListener('click', closer);
+  }, 0);
+}
+
+function toggleDeviceIndustryFilter(evt) {
+  evt.stopPropagation();
+  const existing = document.getElementById('devIndPop');
+  if (existing) { existing.remove(); return; }
+  const wrap = evt.currentTarget.parentElement;
+  const inds = state.industries
+    .filter(i => !VIEW_CLIENT || i.client === VIEW_CLIENT)
+    .filter(i => state.deviceClientFilter === 'all' || i.client === state.deviceClientFilter || VIEW_CLIENT)
+    .map(i => i.name);
+  const opts = ['all', ...new Set(inds)];
+  wrap.insertAdjacentHTML('beforeend', `
+    <div class="filter-pop open" id="devIndPop" style="min-width:240px">
+      <div class="filter-pop-head"><span>Filter by industry</span></div>
+      ${opts.map(c => `
+        <label class="filter-opt" onclick="state.deviceIndustryFilter='${c}';document.getElementById('devIndPop').remove();renderDevicesPage()">
+          <span>${c === 'all' ? 'All industries' : c}</span>
+        </label>
+      `).join('')}
+    </div>
+  `);
+  setTimeout(() => {
+    const closer = (e) => {
+      if (!e.target.closest('#devIndPop') && !e.target.closest('#filterDeviceIndustryBtn')) {
+        const p = document.getElementById('devIndPop'); if (p) p.remove();
+        document.removeEventListener('click', closer);
+      }
+    };
+    document.addEventListener('click', closer);
+  }, 0);
 }
 
 /* ============================================================
@@ -2206,6 +2550,7 @@ function switchScreen(name) {
   renderTopbar();
   if (name === 'roles') renderRoles();
   if (name === 'industries') renderIndustries();
+  if (name === 'devices') renderDevicesPage();
   window.scrollTo(0, 0);
 }
 
@@ -3362,10 +3707,12 @@ function toast(msg, type = '') {
 renderSidebar('users');
 renderSidebar('roles');
 renderSidebar('industries');
+renderSidebar('devices');
 renderTopbar();
 renderUsers();
 renderRoles();
 renderIndustries();
+renderDevicesPage();
 if (window.lucide) window.lucide.createIcons();
 
 document.addEventListener('keydown', e => {
