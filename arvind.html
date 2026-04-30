@@ -1808,13 +1808,14 @@
     padding: 8px 0; margin-bottom: 4px;
   }
   .tl-day-dot {
-    /* Centered on rail (16). Width 16 + border 3 → outer 22, half 11. left = 16 - 11 = 5 from .tl-feed. Head starts at 40, so left here = 5 - 40 = -35 */
+    /* box-sizing border-box → width 16 IS the outer. Half = 8. Rail center at left 16 of feed. Head starts at left 40, so dot.left = (16 - 8) - 40 = -32 */
     position: absolute;
-    left: -35px;
+    left: -32px;
     top: 50%; transform: translateY(-50%);
     width: 16px; height: 16px; border-radius: 50%;
     background: var(--surface);
     border: 3px solid var(--primary);
+    box-sizing: border-box;
     flex-shrink: 0;
     z-index: 1;
   }
@@ -1834,12 +1835,13 @@
     padding: 8px 0;
   }
   .tl-event::before {
-    /* Centered on rail (16). Width 8 + border 2 → outer 12, half 6. left = 16 - 6 = 10 from feed. Event content starts at 40 so left here = 10 - 40 = -30 */
+    /* box-sizing border-box → width 8 IS the outer. Half = 4. Rail center at left 16 of feed. Event starts at left 40, so dot.left = (16 - 4) - 40 = -28 */
     content: ''; position: absolute;
-    left: -30px; top: 50%;
+    left: -28px; top: 50%;
     width: 8px; height: 8px; border-radius: 50%;
     background: var(--surface);
     border: 2px solid var(--text-subtle);
+    box-sizing: border-box;
     transform: translateY(-50%);
     z-index: 1;
   }
