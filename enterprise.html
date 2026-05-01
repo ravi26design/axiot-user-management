@@ -3656,7 +3656,6 @@ function renderDeviceAttributesTab(d) {
     </style>
     <div class="tel-card">
       <div class="tel-head">
-        <div class="tel-title">Attributes</div>
         <div class="de-chart-tabs">
           ${ATTR_SCOPES.map(s => `<div class="de-chart-tab ${scope===s.id?'active':''}" onclick="setAttributesScope('${s.id}')">${s.label}</div>`).join('')}
         </div>
