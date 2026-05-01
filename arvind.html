@@ -3193,6 +3193,7 @@ function renderDeviceDetails() {
         ${ddTab('details', 'Details')}
         ${ddTab('telemetry', 'Telemetry')}
         ${ddTab('attributes', 'Attributes')}
+        ${ddTab('calculated', 'Calculated fields')}
         ${ddTab('messages', 'Messages')}
         ${ddTab('alarms', 'Alarms')}
         ${ddTab('explorer', 'Data Explorer')}
@@ -3207,6 +3208,7 @@ function renderDeviceDetails() {
       : state.detailsDeviceTab === 'details' ? renderDeviceDetailsTab(d)
       : state.detailsDeviceTab === 'telemetry' ? renderDeviceTelemetryTab(d)
       : state.detailsDeviceTab === 'attributes' ? renderDeviceAttributesTab(d)
+      : state.detailsDeviceTab === 'calculated' ? renderDeviceCalculatedTab(d)
       : state.detailsDeviceTab === 'messages' ? renderDeviceMessagesTab(d)
       : state.detailsDeviceTab === 'alarms' ? renderDeviceAlarmsTab(d)
       : state.detailsDeviceTab === 'explorer' ? renderDeviceExplorerTab(d)
@@ -3884,6 +3886,354 @@ function editAttribute(id) {
       renderDeviceDetails();
     }
   });
+}
+
+/* ---- Calculated fields tab ---- */
+function setCalculatedPage(n)    { state.calculatedPage = Math.max(1, n); renderDeviceDetails(); }
+function setCalculatedPerPage(n) { state.calculatedPerPage = parseInt(n, 10) || 10; state.calculatedPage = 1; renderDeviceDetails(); }
+
+function renderDeviceCalculatedTab(d) {
+  state.calculatedPage    = state.calculatedPage    || 1;
+  state.calculatedPerPage = state.calculatedPerPage || 10;
+  if (!state._calcCache) state._calcCache = {};
+  if (!state._calcCache[d.id]) state._calcCache[d.id] = [];
+
+  const all = state._calcCache[d.id];
+  const total = all.length;
+  const per = state.calculatedPerPage;
+  const totalPages = Math.max(1, Math.ceil(total / per));
+  if (state.calculatedPage > totalPages) state.calculatedPage = totalPages;
+  const start = (state.calculatedPage - 1) * per;
+  const visible = all.slice(start, start + per);
+  const page = state.calculatedPage;
+
+  return `
+    <style>
+      .tel-card { background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:14px }
+      .tel-head { padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:18px;flex-wrap:wrap }
+      .tel-actions { margin-left:auto;display:flex;gap:4px }
+      .tel-actions .icon-btn { width:34px;height:34px;border-radius:8px;display:grid;place-items:center;color:var(--text-muted);cursor:pointer;background:none;border:none }
+      .tel-actions .icon-btn:hover { background:var(--bg) }
+      .tel-actions .icon-btn [data-lucide] { width:18px;height:18px }
+      .tel-table { width:100%;border-collapse:collapse }
+      .tel-table th { text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);background:#fff;border-bottom:1px solid var(--border);user-select:none }
+      .tel-table td { padding:14px 22px;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle }
+      .tel-table tbody tr:last-child td { border-bottom:none }
+      .tel-table tbody tr:hover td { background:#FAFBFC }
+      .tel-table tbody tr:hover .row-edit { opacity:1 }
+      .tel-table input[type="checkbox"] { accent-color:var(--primary);width:16px;height:16px;cursor:pointer;vertical-align:middle }
+      .tel-sort-arrow { color:var(--text);margin-left:4px;font-size:14px;display:inline-block }
+      .row-edit { opacity:0;transition:opacity .12s;color:var(--text-muted);background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:6px;display:grid;place-items:center }
+      .row-edit:hover { background:var(--bg);color:var(--primary) }
+      .row-edit [data-lucide] { width:16px;height:16px }
+    </style>
+    <div class="tel-card">
+      <div class="tel-head">
+        <div class="tel-actions" style="margin-left:auto">
+          <button class="icon-btn" title="Add calculated field" onclick="addCalculatedField()">${li('plus')}</button>
+        </div>
+      </div>
+      <table class="tel-table">
+        <thead>
+          <tr>
+            <th style="width:48px"><input type="checkbox" /></th>
+            <th>Created time <span class="tel-sort-arrow">↓</span></th>
+            <th>Name</th>
+            <th>Type</th>
+            <th style="width:48px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${visible.length ? visible.map(r => `
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>${r.createdTime}</td>
+              <td>${_kvEscape(r.title)}</td>
+              <td>${r.type === 'simple' ? 'Simple' : 'Aggregated'}</td>
+              <td><button class="row-edit" title="Edit" onclick="editCalculatedField('${r.id}')">${li('pencil')}</button></td>
+            </tr>
+          `).join('') : `
+            <tr><td colspan="5" style="padding:60px 22px;text-align:center;color:var(--text-muted)">No calculated fields found</td></tr>
+          `}
+        </tbody>
+      </table>
+      <div class="tbl-footer">
+        <div>${total === 0 ? '0 of 0' : `${start + 1}–${Math.min(start + per, total)} of ${total}`}</div>
+        <div class="pager">
+          <button onclick="setCalculatedPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:.4;cursor:default"' : ''}>‹</button>
+          <button class="active">${page}</button>
+          <button onclick="setCalculatedPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:.4;cursor:default"' : ''}>›</button>
+        </div>
+        <div>
+          <select class="select-sm" onchange="setCalculatedPerPage(this.value)">
+            ${[10, 25, 50, 100].map(n => `<option value="${n}" ${per === n ? 'selected' : ''}>${n} per page</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function addCalculatedField(existing) {
+  const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+  if (!d) return;
+  closeCalcAdd();
+  const editing = !!existing;
+  state._calcDraft = {
+    id:         editing ? existing.id : null,
+    title:      existing && existing.title      || '',
+    type:       existing && existing.type       || 'simple',
+    sampling:   existing && existing.sampling   || 15,
+    args:       existing && existing.args ? existing.args.map(a => ({...a})) : [],
+    expression: existing && existing.expression || '(temperature - 32) / 1.8',
+    outputType: existing && existing.outputType || 'timeseries',
+    outputKey:  existing && existing.outputKey  || '',
+    decimals:   existing && existing.decimals   || '',
+    useLatest:  existing && existing.useLatest  || false,
+    strategy:   existing && existing.strategy   || 'right-away'
+  };
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'drawer-backdrop';
+  backdrop.id = 'calcAddBackdrop';
+  backdrop.onclick = closeCalcAdd;
+
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+  drawer.id = 'calcAddDrawer';
+  drawer.style.width = '560px';
+  drawer.innerHTML = `
+    <style>
+      .calc-arg { display:grid;grid-template-columns:1fr 160px 1fr 36px;gap:8px;align-items:center;margin-bottom:8px }
+      .calc-arg .icon-btn { width:34px;height:34px;border-radius:6px;display:grid;place-items:center;color:var(--text-muted);background:none;border:none;cursor:pointer }
+      .calc-arg .icon-btn:hover { color:var(--danger);background:var(--bg) }
+      .calc-arg .icon-btn [data-lucide] { width:16px;height:16px }
+      .calc-empty-args { text-align:center;color:var(--danger);font-size:13px;padding:14px 0 }
+      .calc-sampling-btn { display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:500;border:1px solid var(--primary);border-radius:999px;background:#fff;color:var(--primary);cursor:pointer;font-family:inherit;white-space:nowrap }
+      .calc-sampling-btn:hover { background:var(--primary-soft) }
+      .calc-pill-tabs { display:inline-flex;padding:4px;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:999px }
+      .calc-pill-tabs .pill { padding:6px 14px;font-size:13px;font-weight:500;color:var(--text-muted);border-radius:999px;cursor:pointer;border:none;background:none;font-family:inherit }
+      .calc-pill-tabs .pill.active { background:var(--primary);color:#fff;font-weight:600 }
+      .calc-strategy-row { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;flex-wrap:wrap }
+    </style>
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">${editing ? 'Edit' : 'Add'} calculated field</div>
+        <div class="drawer-sub">Define a calculation derived from telemetry or attributes.</div>
+      </div>
+      <button class="icon-btn" onclick="closeCalcAdd()" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="form-section">
+        <div class="form-section-title">General</div>
+        <div class="field">
+          <div style="display:flex;gap:10px;align-items:flex-end">
+            <div style="flex:1">
+              <label class="label">Title <span class="req">*</span></label>
+              <input class="input" id="calcTitle" placeholder="e.g. Temperature in Celsius" value="${_kvEscape(state._calcDraft.title)}" oninput="state._calcDraft.title=this.value;validateCalcForm()" />
+            </div>
+            <button type="button" class="calc-sampling-btn" onclick="cycleCalcSampling()" title="Sampling interval">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M5 9 8 6M19 9l-3-3M12 13v-3M9 2h6"/></svg>
+              <span id="calcSamplingLabel">${state._calcDraft.sampling} min</span>
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Type</label>
+          <select class="select" id="calcType" onchange="state._calcDraft.type=this.value">
+            <option value="simple" ${state._calcDraft.type==='simple'?'selected':''}>Simple</option>
+            <option value="aggregated" ${state._calcDraft.type==='aggregated'?'selected':''}>Aggregated</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Arguments <span class="req">*</span></div>
+        <div id="calcArgsList"></div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="addCalcArg()" style="color:var(--primary);padding-left:0;margin-top:6px">+ Add argument</button>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Expression <span class="req">*</span></div>
+        <div class="field">
+          <input class="input" id="calcExpression" placeholder="(temperature - 32) / 1.8" value="${_kvEscape(state._calcDraft.expression)}" oninput="state._calcDraft.expression=this.value;validateCalcForm()" />
+          <div class="hint">Default expression demonstrates how to transform a temperature from Fahrenheit to Celsius.</div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Output</div>
+        <div class="field">
+          <label class="label">Output type</label>
+          <select class="select" id="calcOutputType" onchange="state._calcDraft.outputType=this.value">
+            <option value="timeseries" ${state._calcDraft.outputType==='timeseries'?'selected':''}>Time series</option>
+            <option value="attribute"  ${state._calcDraft.outputType==='attribute' ?'selected':''}>Attribute</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="label">Time series key <span class="req">*</span></label>
+            <input class="input" id="calcOutputKey" placeholder="e.g. temperatureC" value="${_kvEscape(state._calcDraft.outputKey)}" oninput="state._calcDraft.outputKey=this.value;validateCalcForm()" />
+          </div>
+          <div class="field">
+            <label class="label">Decimals by default</label>
+            <input class="input" id="calcDecimals" placeholder="2" value="${_kvEscape(state._calcDraft.decimals)}" oninput="state._calcDraft.decimals=this.value" />
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="name">Use latest timestamp</div>
+            <div class="desc">Use the timestamp of the most recent argument value.</div>
+          </div>
+          <div class="switch ${state._calcDraft.useLatest?'on':''}" id="calcUseLatest" onclick="this.classList.toggle('on');state._calcDraft.useLatest=this.classList.contains('on')"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Strategy</div>
+        <div class="calc-strategy-row">
+          <div class="hint" style="margin:0">When the calculation runs.</div>
+          <div class="calc-pill-tabs" id="calcStrategyTabs">
+            <button type="button" class="pill ${state._calcDraft.strategy==='right-away'?'active':''}" data-strategy="right-away" onclick="setCalcStrategy('right-away')">Process right away</button>
+            <button type="button" class="pill ${state._calcDraft.strategy==='rule-chain'?'active':''}" data-strategy="rule-chain" onclick="setCalcStrategy('rule-chain')">Process via Rule Chains</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn btn-ghost" onclick="closeCalcAdd()">Cancel</button>
+      <button class="btn btn-primary" id="calcAddBtn" onclick="submitCalcField()" disabled>${editing ? 'Save changes' : 'Add'}</button>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+
+  requestAnimationFrame(() => {
+    backdrop.classList.add('open');
+    drawer.classList.add('open');
+  });
+
+  setTimeout(() => { const t = document.getElementById('calcTitle'); if (t) t.focus(); }, 280);
+
+  renderCalcArgs();
+  validateCalcForm();
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function closeCalcAdd() {
+  const backdrop = document.getElementById('calcAddBackdrop');
+  const drawer   = document.getElementById('calcAddDrawer');
+  if (!backdrop && !drawer) return;
+  if (backdrop) backdrop.classList.remove('open');
+  if (drawer)   drawer.classList.remove('open');
+  setTimeout(() => {
+    const b  = document.getElementById('calcAddBackdrop');
+    const dr = document.getElementById('calcAddDrawer');
+    if (b)  b.remove();
+    if (dr) dr.remove();
+  }, 260);
+}
+
+function renderCalcArgs() {
+  const wrap = document.getElementById('calcArgsList');
+  if (!wrap) return;
+  const args = state._calcDraft.args;
+  if (!args.length) {
+    wrap.innerHTML = `<div class="calc-empty-args">At least one argument is required.</div>`;
+    return;
+  }
+  wrap.innerHTML = args.map(a => `
+    <div class="calc-arg" data-id="${a.id}">
+      <input class="input" placeholder="Name (e.g. temperature)" value="${_kvEscape(a.name)}" oninput="updateCalcArg('${a.id}', 'name', this.value)" />
+      <select class="select" onchange="updateCalcArg('${a.id}', 'source', this.value)">
+        <option value="latestTelemetry" ${a.source==='latestTelemetry'?'selected':''}>Latest telemetry</option>
+        <option value="attribute"        ${a.source==='attribute'       ?'selected':''}>Attribute</option>
+      </select>
+      <input class="input" placeholder="Source key" value="${_kvEscape(a.key)}" oninput="updateCalcArg('${a.id}', 'key', this.value)" />
+      <button class="icon-btn" onclick="removeCalcArg('${a.id}')" title="Remove argument">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function addCalcArg() {
+  const id = 'arg-' + (state._calcArgSeq = (state._calcArgSeq || 0) + 1);
+  state._calcDraft.args.push({ id, name: '', source: 'latestTelemetry', key: '' });
+  renderCalcArgs();
+  validateCalcForm();
+}
+
+function removeCalcArg(id) {
+  state._calcDraft.args = state._calcDraft.args.filter(a => a.id !== id);
+  renderCalcArgs();
+  validateCalcForm();
+}
+
+function updateCalcArg(id, field, value) {
+  const arg = state._calcDraft.args.find(a => a.id === id);
+  if (arg) arg[field] = value;
+  validateCalcForm();
+}
+
+function cycleCalcSampling() {
+  const cycle = [5, 15, 30, 60];
+  const cur = state._calcDraft.sampling;
+  const idx = cycle.indexOf(cur);
+  state._calcDraft.sampling = cycle[(idx + 1) % cycle.length];
+  const lbl = document.getElementById('calcSamplingLabel');
+  if (lbl) lbl.textContent = state._calcDraft.sampling + ' min';
+}
+
+function setCalcStrategy(s) {
+  state._calcDraft.strategy = s;
+  document.querySelectorAll('#calcStrategyTabs .pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.strategy === s);
+  });
+}
+
+function validateCalcForm() {
+  const draft = state._calcDraft;
+  const valid = !!draft.title.trim()
+    && draft.args.length > 0
+    && draft.args.every(a => a.name.trim() && a.key.trim())
+    && !!draft.expression.trim()
+    && !!draft.outputKey.trim();
+  const btn = document.getElementById('calcAddBtn');
+  if (btn) btn.disabled = !valid;
+}
+
+function submitCalcField() {
+  const draft = state._calcDraft;
+  const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+  if (!d) return;
+  if (!state._calcCache) state._calcCache = {};
+  if (!state._calcCache[d.id]) state._calcCache[d.id] = [];
+  const pad = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  if (draft.id) {
+    const existing = state._calcCache[d.id].find(r => r.id === draft.id);
+    if (existing) Object.assign(existing, draft);
+    toast('Calculated field updated', 'success');
+  } else {
+    const newId = 'cf-' + (state._calcSeq = (state._calcSeq || 0) + 1);
+    state._calcCache[d.id].unshift({ id: newId, createdTime: fmt, ...draft });
+    toast('Calculated field added', 'success');
+  }
+  closeCalcAdd();
+  renderDeviceDetails();
+}
+
+function editCalculatedField(id) {
+  const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+  if (!d || !state._calcCache || !state._calcCache[d.id]) return;
+  const row = state._calcCache[d.id].find(r => r.id === id);
+  if (!row) return;
+  addCalculatedField(row);
 }
 
 /* ---- Data Explorer ---- */
