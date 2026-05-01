@@ -2414,6 +2414,40 @@
       </div>
     </div>
     <div class="form-section">
+      <div class="form-section-title">Device image</div>
+      <div class="field">
+        <input type="file" id="deviceImageInput" accept="image/png,image/jpeg,image/jpg,image/webp" style="display:none" onchange="handleDeviceImageSelect(event)" />
+        <div id="deviceImageEmpty"
+             style="border:2px dashed #B8C0CC;border-radius:10px;padding:22px 16px;text-align:center;cursor:pointer;background:#F5F7FA;transition:border-color .12s, background .12s"
+             onclick="document.getElementById('deviceImageInput').click()"
+             ondragover="event.preventDefault();event.stopPropagation();this.style.borderColor='#1F4E9E';this.style.background='#E8EEF8'"
+             ondragleave="this.style.borderColor='#B8C0CC';this.style.background='#F5F7FA'"
+             ondrop="handleDeviceImageDrop(event)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1F4E9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:6px">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <div style="font-size:13px;font-weight:500;color:#0B1220">Click or drag an image to upload</div>
+          <div style="font-size:12px;color:rgba(11,18,32,0.52);margin-top:4px">PNG, JPG or WEBP — up to 5 MB</div>
+        </div>
+        <div id="deviceImagePreview" style="display:none;border:1px solid #D8DEE5;border-radius:10px;padding:12px;background:#fff">
+          <div style="display:flex;align-items:center;gap:12px">
+            <img id="deviceImagePreviewImg" alt="Device" style="width:64px;height:64px;border-radius:8px;object-fit:cover;background:#F5F7FA;flex-shrink:0;border:1px solid #D8DEE5" />
+            <div style="flex:1;min-width:0">
+              <div id="deviceImageName" style="font-size:13px;font-weight:500;color:#0B1220;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">image.png</div>
+              <div id="deviceImageSize" style="font-size:12px;color:rgba(11,18,32,0.52);margin-top:2px">0 KB</div>
+              <div style="margin-top:6px;display:flex;gap:14px">
+                <button type="button" style="font-size:12px;font-weight:500;color:#1F4E9E;background:none;border:none;padding:0;cursor:pointer" onclick="document.getElementById('deviceImageInput').click()">Replace</button>
+                <button type="button" style="font-size:12px;font-weight:500;color:#9F1A0F;background:none;border:none;padding:0;cursor:pointer" onclick="removeDeviceImage()">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hint" style="margin-top:8px">Optional. Helpful for identifying the physical unit at a glance.</div>
+      </div>
+    </div>
+    <div class="form-section">
       <div class="form-section-title">Assignment</div>
       <div class="field invite-client-field">
         <label class="label">Client <span class="req">*</span></label>
@@ -3992,6 +4026,13 @@ function openDeviceDrawer(id) {
   if (d) document.getElementById('deviceIndustry').value = d.location;
   const sw = document.getElementById('deviceActive');
   sw.classList.toggle('on', d ? d.active !== false : true);
+  if (d && d.image) {
+    state._pendingDeviceImage = { dataUrl: d.image, name: d.imageName || 'Device image', size: d.imageSize || 0 };
+    setDeviceImagePreview(d.image, d.imageName || 'Device image', d.imageSize || 0);
+  } else {
+    state._pendingDeviceImage = null;
+    clearDeviceImagePreview();
+  }
   document.getElementById('deviceDrawer').classList.add('open');
   document.getElementById('deviceDrawerBackdrop').classList.add('open');
   setTimeout(() => document.getElementById('deviceName').focus(), 250);
@@ -4024,7 +4065,10 @@ function submitDevice() {
     firmware: document.getElementById('deviceFirmware').value.trim(),
     location: industry,
     industry: 'Textiles & Apparel',  // legacy field for back-compat
-    active:   document.getElementById('deviceActive').classList.contains('on')
+    active:   document.getElementById('deviceActive').classList.contains('on'),
+    image:     state._pendingDeviceImage ? state._pendingDeviceImage.dataUrl : null,
+    imageName: state._pendingDeviceImage ? state._pendingDeviceImage.name    : null,
+    imageSize: state._pendingDeviceImage ? state._pendingDeviceImage.size    : null
   };
   if (state.editingDeviceId) {
     Object.assign(DEVICES.find(x => x.id === state.editingDeviceId), data);
@@ -4047,6 +4091,59 @@ function deleteDevice(id) {
       renderDevicesPage();
       toast('Device deleted', 'danger');
     });
+}
+
+// ── Device image upload helpers ──
+function _formatBytes(b) {
+  if (b == null) return '';
+  if (b < 1024) return b + ' B';
+  if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1024 / 1024).toFixed(2) + ' MB';
+}
+function setDeviceImagePreview(dataUrl, name, size) {
+  document.getElementById('deviceImagePreviewImg').src = dataUrl;
+  document.getElementById('deviceImageName').textContent = name || 'Device image';
+  document.getElementById('deviceImageSize').textContent = _formatBytes(size);
+  document.getElementById('deviceImageEmpty').style.display = 'none';
+  document.getElementById('deviceImagePreview').style.display = 'block';
+}
+function clearDeviceImagePreview() {
+  const img = document.getElementById('deviceImagePreviewImg');
+  if (img) img.src = '';
+  const input = document.getElementById('deviceImageInput');
+  if (input) input.value = '';
+  const empty = document.getElementById('deviceImageEmpty');
+  const prev  = document.getElementById('deviceImagePreview');
+  if (empty) empty.style.display = 'block';
+  if (prev)  prev.style.display = 'none';
+}
+function removeDeviceImage() {
+  state._pendingDeviceImage = null;
+  clearDeviceImagePreview();
+}
+function _handleDeviceImageFile(file) {
+  if (!file) return;
+  if (!file.type || !file.type.startsWith('image/')) {
+    toast('Please choose an image file', 'danger'); return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    toast('Image must be under 5 MB', 'danger'); return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    state._pendingDeviceImage = { dataUrl: e.target.result, name: file.name, size: file.size };
+    setDeviceImagePreview(e.target.result, file.name, file.size);
+  };
+  reader.readAsDataURL(file);
+}
+function handleDeviceImageSelect(evt) {
+  _handleDeviceImageFile(evt.target.files && evt.target.files[0]);
+}
+function handleDeviceImageDrop(evt) {
+  evt.preventDefault(); evt.stopPropagation();
+  evt.currentTarget.style.borderColor = '#B8C0CC';
+  evt.currentTarget.style.background  = '#F5F7FA';
+  _handleDeviceImageFile(evt.dataTransfer.files && evt.dataTransfer.files[0]);
 }
 
 function toggleDeviceClientFilter(evt) {
