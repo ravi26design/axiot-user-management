@@ -3293,7 +3293,8 @@ function getDeviceTelemetry(d) {
   const pad = n => String(n).padStart(2, '0');
   const fmt = ts => `${ts.getFullYear()}-${pad(ts.getMonth()+1)}-${pad(ts.getDate())} ${pad(ts.getHours())}:${pad(ts.getMinutes())}:${pad(ts.getSeconds())}`;
   const base = new Date('2026-05-01T09:48:15');
-  const rows = [{ time: '2026-05-01 09:48:15', key: 'Test', value: '12' }];
+  const newRowId = () => 't-' + (state._telSeq = (state._telSeq || 0) + 1);
+  const rows = [{ id: newRowId(), time: '2026-05-01 09:48:15', key: 'Test', value: '12' }];
   const seedDp = (typeof DATAPOINTS !== 'undefined') ? DATAPOINTS.slice(0, 8) : [];
   seedDp.forEach((p, i) => {
     const t = new Date(base.getTime() - (i + 1) * 47000);
@@ -3302,7 +3303,7 @@ function getDeviceTelemetry(d) {
     else if (p.kind === 'current') v = (10 + ((i * 0.7) % 5)).toFixed(2);
     else if (p.kind === 'energy')  v = String(1500 + ((i * 47) % 500));
     else                            v = (((i + 1) * 13) % 100).toFixed(1);
-    rows.push({ time: fmt(t), key: p.label, value: v });
+    rows.push({ id: newRowId(), time: fmt(t), key: p.label, value: v });
   });
   state._telemetryCache[d.id] = rows;
   return rows;
@@ -3377,7 +3378,7 @@ function renderDeviceTelemetryTab(d) {
               <td>${r.time}</td>
               <td><span class="tel-key-cell"><span>${r.key}</span><span class="chart-ico">${li('line-chart')}</span></span></td>
               <td>${r.value}</td>
-              <td><button class="tel-row-del" title="Delete" onclick="deleteTelemetryRow('${r.key.replace(/'/g, "\\'")}')">${li('trash-2')}</button></td>
+              <td><button class="tel-row-del" title="Delete" onclick="deleteTelemetryRow('${r.id}')">${li('trash-2')}</button></td>
             </tr>
           `).join('') : `
             <tr><td colspan="5" style="padding:40px;text-align:center;color:var(--text-muted)">No telemetry data yet.</td></tr>
@@ -3404,9 +3405,212 @@ function renderDeviceTelemetryTab(d) {
 }
 function setTelemetryPage(n)    { state.telemetryPage = Math.max(1, n); renderDeviceDetails(); }
 function setTelemetryPerPage(n) { state.telemetryPerPage = parseInt(n, 10) || 10; state.telemetryPage = 1; renderDeviceDetails(); }
-function addTelemetryRow()      { toast('Add telemetry — coming soon'); }
 function searchTelemetry()      { toast('Search telemetry — coming soon'); }
-function deleteTelemetryRow(k)  { toast(`Delete "${k}" — demo`, 'danger'); }
+
+const TEL_TYPE_ICON = {
+  string:  '<span style="font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:16px;line-height:1">T</span>',
+  integer: '<span style="font-family:Menlo,Consolas,monospace;font-size:11px;font-weight:700;letter-spacing:-0.5px;line-height:1">123</span>',
+  double:  '<span style="font-family:Menlo,Consolas,monospace;font-size:11px;font-weight:700;letter-spacing:-0.5px;line-height:1">123</span>',
+  boolean: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>',
+  json:    '<span style="font-family:Menlo,Consolas,monospace;font-size:11px;font-weight:700;letter-spacing:-0.5px;line-height:1">{..}</span>'
+};
+const TEL_TYPE_LABEL = { string:'String', integer:'Integer', double:'Double', boolean:'Boolean', json:'JSON' };
+const TEL_TYPE_PLACEHOLDER = { string:'String value*', integer:'Integer value*', double:'Double value*', boolean:'Boolean value* (true / false)', json:'JSON value*' };
+
+function addTelemetryRow() {
+  const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+  if (!d) return;
+  closeTelAdd();
+  state._telAdd = { type: 'string' };
+
+  const wrap = document.createElement('div');
+  wrap.id = 'telAddBackdrop';
+  wrap.style.cssText = 'position:fixed;inset:0;background:rgba(11,18,32,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:telFadeIn .15s ease';
+  wrap.onclick = (e) => { if (e.target === wrap) closeTelAdd(); };
+
+  const types = ['string', 'integer', 'double', 'boolean', 'json'];
+
+  wrap.innerHTML = `
+    <style>
+      @keyframes telFadeIn { from { opacity:0 } to { opacity:1 } }
+      .tel-modal { background:#fff;border-radius:6px;width:100%;max-width:520px;box-shadow:0 24px 48px rgba(0,0,0,0.22);overflow:visible }
+      .tel-modal-head { background:var(--primary,#1F4E9E);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-radius:6px 6px 0 0 }
+      .tel-modal-head h3 { font-size:18px;font-weight:600;margin:0;color:#fff }
+      .tel-modal-close { background:none;border:none;color:#fff;cursor:pointer;width:30px;height:30px;border-radius:6px;display:grid;place-items:center;opacity:.85 }
+      .tel-modal-close:hover { background:rgba(255,255,255,0.15);opacity:1 }
+      .tel-modal-body { padding:24px }
+      .tel-input { width:100%;padding:14px 14px;border:1px solid var(--border-strong,#B8C0CC);border-radius:4px;font-size:14px;font-family:inherit;color:var(--text);outline:none;background:#fff;box-sizing:border-box }
+      .tel-input::placeholder { color:rgba(11,18,32,0.45) }
+      .tel-input:focus { border-color:var(--primary,#1F4E9E);box-shadow:0 0 0 1px var(--primary,#1F4E9E) }
+      .tel-row2 { display:flex;gap:12px;margin-top:12px;align-items:flex-start }
+      .tel-type-wrap { position:relative;flex:0 0 180px }
+      .tel-type-btn { width:100%;padding:13px 12px;border:1px solid var(--primary,#1F4E9E);border-radius:4px;background:#fff;display:flex;align-items:center;gap:10px;font-family:inherit;font-size:14px;color:var(--text);cursor:pointer;text-align:left;box-sizing:border-box }
+      .tel-type-btn .arrow-svg { margin-left:auto;color:var(--primary,#1F4E9E);transition:transform .15s }
+      .tel-type-btn.open .arrow-svg { transform:rotate(180deg) }
+      .tel-type-btn .ico { width:24px;display:inline-flex;align-items:center;justify-content:center;color:rgba(11,18,32,0.72) }
+      .tel-type-list { position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border-radius:6px;box-shadow:0 12px 32px rgba(0,0,0,0.18);padding:6px 0;z-index:10;max-height:340px;overflow-y:auto;display:none }
+      .tel-type-list.open { display:block }
+      .tel-type-item { padding:12px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;font-size:15px;color:var(--text) }
+      .tel-type-item:hover { background:var(--bg,#F5F7FA) }
+      .tel-type-item.selected { background:var(--bg,#F5F7FA);color:var(--primary,#1F4E9E);font-weight:500 }
+      .tel-type-item .ico { width:28px;display:inline-flex;align-items:center;justify-content:center;color:rgba(11,18,32,0.6) }
+      .tel-type-item.selected .ico { color:var(--primary,#1F4E9E) }
+      .tel-modal-foot { padding:8px 24px 22px;display:flex;justify-content:flex-end;align-items:center;gap:14px }
+      .tel-cancel { background:none;border:none;color:var(--primary,#1F4E9E);font-weight:600;font-size:14px;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.4px }
+      .tel-cancel:hover { background:rgba(31,78,158,0.06) }
+      .tel-add-btn { background:#E5E7EB;color:#9CA3AF;border:none;font-weight:600;font-size:14px;padding:9px 24px;border-radius:4px;cursor:not-allowed;font-family:inherit;text-transform:uppercase;letter-spacing:0.4px;transition:background .12s, color .12s }
+      .tel-add-btn.enabled { background:var(--primary,#1F4E9E);color:#fff;cursor:pointer }
+      .tel-add-btn.enabled:hover { background:var(--primary-hover,#173F82) }
+    </style>
+    <div class="tel-modal" onclick="event.stopPropagation()">
+      <div class="tel-modal-head">
+        <h3>Add telemetry</h3>
+        <button class="tel-modal-close" onclick="closeTelAdd()" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="tel-modal-body">
+        <input class="tel-input" id="telAddKey" placeholder="Key*" autocomplete="off" />
+        <div class="tel-row2">
+          <div class="tel-type-wrap">
+            <button class="tel-type-btn" id="telTypeBtn" type="button" onclick="event.stopPropagation();toggleTelType()">
+              <span class="ico" id="telTypeIco">${TEL_TYPE_ICON.string}</span>
+              <span id="telTypeLabel">String</span>
+              <svg class="arrow-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="tel-type-list" id="telTypeList">
+              ${types.map(id => `
+                <div class="tel-type-item${id==='string'?' selected':''}" data-id="${id}" onclick="event.stopPropagation();selectTelType('${id}')">
+                  <span class="ico">${TEL_TYPE_ICON[id]}</span>
+                  <span>${TEL_TYPE_LABEL[id]}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <input class="tel-input" id="telAddValue" placeholder="String value*" autocomplete="off" style="flex:1" />
+        </div>
+      </div>
+      <div class="tel-modal-foot">
+        <button class="tel-cancel" onclick="closeTelAdd()">Cancel</button>
+        <button class="tel-add-btn" id="telAddBtn" onclick="submitTelAdd()" disabled>Add</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+
+  setTimeout(() => { const k = document.getElementById('telAddKey'); if (k) k.focus(); }, 30);
+
+  ['telAddKey', 'telAddValue'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', validateTelAdd);
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter')  { e.preventDefault(); if (!document.getElementById('telAddBtn').disabled) submitTelAdd(); }
+      if (e.key === 'Escape') { e.preventDefault(); closeTelAdd(); }
+    });
+  });
+
+  setTimeout(() => { document.addEventListener('click', telTypeOutside, true); }, 50);
+}
+
+function telTypeOutside(e) {
+  const w = document.querySelector('.tel-type-wrap');
+  if (!w || w.contains(e.target)) return;
+  const list = document.getElementById('telTypeList');
+  const btn  = document.getElementById('telTypeBtn');
+  if (list) list.classList.remove('open');
+  if (btn)  btn.classList.remove('open');
+}
+
+function toggleTelType() {
+  const list = document.getElementById('telTypeList');
+  const btn  = document.getElementById('telTypeBtn');
+  if (!list || !btn) return;
+  list.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+function selectTelType(id) {
+  state._telAdd = state._telAdd || {};
+  state._telAdd.type = id;
+  document.getElementById('telTypeIco').innerHTML = TEL_TYPE_ICON[id];
+  document.getElementById('telTypeLabel').textContent = TEL_TYPE_LABEL[id];
+  document.getElementById('telAddValue').placeholder = TEL_TYPE_PLACEHOLDER[id];
+  document.querySelectorAll('.tel-type-item').forEach(it => it.classList.toggle('selected', it.dataset.id === id));
+  toggleTelType();
+  validateTelAdd();
+  document.getElementById('telAddValue').focus();
+}
+
+function validateTelAdd() {
+  const keyEl = document.getElementById('telAddKey');
+  const valEl = document.getElementById('telAddValue');
+  if (!keyEl || !valEl) return;
+  const key = keyEl.value.trim();
+  const val = valEl.value.trim();
+  const type = (state._telAdd && state._telAdd.type) || 'string';
+  let valid = key.length > 0 && val.length > 0;
+  if (valid) {
+    if (type === 'integer')      valid = /^-?\d+$/.test(val);
+    else if (type === 'double')  valid = /^-?\d+(\.\d+)?$/.test(val);
+    else if (type === 'boolean') valid = /^(true|false)$/i.test(val);
+    else if (type === 'json')    { try { JSON.parse(val); } catch (e) { valid = false; } }
+  }
+  const btn = document.getElementById('telAddBtn');
+  if (btn) { btn.disabled = !valid; btn.classList.toggle('enabled', valid); }
+}
+
+function closeTelAdd() {
+  document.removeEventListener('click', telTypeOutside, true);
+  const w = document.getElementById('telAddBackdrop');
+  if (w) w.remove();
+}
+
+function submitTelAdd() {
+  const keyEl = document.getElementById('telAddKey');
+  const valEl = document.getElementById('telAddValue');
+  if (!keyEl || !valEl) return;
+  const key = keyEl.value.trim();
+  let val = valEl.value.trim();
+  const type = (state._telAdd && state._telAdd.type) || 'string';
+  if (!key || !val) { toast('Key and value are required', 'danger'); return; }
+  if (type === 'integer'  && !/^-?\d+$/.test(val))         { toast('Integer must be a whole number', 'danger'); return; }
+  if (type === 'double'   && !/^-?\d+(\.\d+)?$/.test(val)) { toast('Double must be a number', 'danger'); return; }
+  if (type === 'boolean'  && !/^(true|false)$/i.test(val)) { toast('Boolean must be true or false', 'danger'); return; }
+  if (type === 'json')    { try { JSON.parse(val); } catch (e) { toast('Value is not valid JSON', 'danger'); return; } }
+  if (type === 'boolean') val = val.toLowerCase();
+
+  const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+  if (!d) return;
+  if (!state._telemetryCache) state._telemetryCache = {};
+  if (!state._telemetryCache[d.id]) getDeviceTelemetry(d);
+
+  const pad = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const rowId = 't-' + (state._telSeq = (state._telSeq || 0) + 1);
+  state._telemetryCache[d.id].unshift({ id: rowId, time: fmt, key, value: val, valueType: type });
+  state.telemetryPage = 1;
+  closeTelAdd();
+  toast('Telemetry added', 'success');
+  renderDeviceDetails();
+}
+
+function deleteTelemetryRow(id) {
+  const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+  if (!d || !state._telemetryCache || !state._telemetryCache[d.id]) return;
+  const arr = state._telemetryCache[d.id];
+  const row = arr.find(r => r.id === id);
+  if (!row) return;
+  confirmDialog(`Delete "${row.key}"?`,
+    `This removes the telemetry entry from this device.`,
+    () => {
+      const idx = arr.findIndex(r => r.id === id);
+      if (idx >= 0) arr.splice(idx, 1);
+      toast('Telemetry deleted', 'danger');
+      renderDeviceDetails();
+    });
+}
 
 /* ---- Data Explorer ---- */
 const DATAPOINTS = [
