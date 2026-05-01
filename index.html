@@ -3183,6 +3183,7 @@ function renderDeviceDetails() {
       <div class="dd-tabs">
         ${ddTab('overview', 'Overview')}
         ${ddTab('details', 'Details')}
+        ${ddTab('telemetry', 'Telemetry')}
         ${ddTab('messages', 'Messages')}
         ${ddTab('alarms', 'Alarms')}
         ${ddTab('explorer', 'Data Explorer')}
@@ -3195,6 +3196,7 @@ function renderDeviceDetails() {
     ${
       state.detailsDeviceTab === 'overview' ? renderDeviceOverview(d, isCritical)
       : state.detailsDeviceTab === 'details' ? renderDeviceDetailsTab(d)
+      : state.detailsDeviceTab === 'telemetry' ? renderDeviceTelemetryTab(d)
       : state.detailsDeviceTab === 'messages' ? renderDeviceMessagesTab(d)
       : state.detailsDeviceTab === 'alarms' ? renderDeviceAlarmsTab(d)
       : state.detailsDeviceTab === 'explorer' ? renderDeviceExplorerTab(d)
@@ -3283,6 +3285,128 @@ function renderDeviceTimelineTab(d) {
     </div>
   `;
 }
+
+/* ---- Telemetry tab ---- */
+function getDeviceTelemetry(d) {
+  if (!state._telemetryCache) state._telemetryCache = {};
+  if (state._telemetryCache[d.id]) return state._telemetryCache[d.id];
+  const pad = n => String(n).padStart(2, '0');
+  const fmt = ts => `${ts.getFullYear()}-${pad(ts.getMonth()+1)}-${pad(ts.getDate())} ${pad(ts.getHours())}:${pad(ts.getMinutes())}:${pad(ts.getSeconds())}`;
+  const base = new Date('2026-05-01T09:48:15');
+  const rows = [{ time: '2026-05-01 09:48:15', key: 'Test', value: '12' }];
+  const seedDp = (typeof DATAPOINTS !== 'undefined') ? DATAPOINTS.slice(0, 8) : [];
+  seedDp.forEach((p, i) => {
+    const t = new Date(base.getTime() - (i + 1) * 47000);
+    let v;
+    if (p.kind === 'voltage')      v = String(220 + ((i * 3) % 20));
+    else if (p.kind === 'current') v = (10 + ((i * 0.7) % 5)).toFixed(2);
+    else if (p.kind === 'energy')  v = String(1500 + ((i * 47) % 500));
+    else                            v = (((i + 1) * 13) % 100).toFixed(1);
+    rows.push({ time: fmt(t), key: p.label, value: v });
+  });
+  state._telemetryCache[d.id] = rows;
+  return rows;
+}
+
+function renderDeviceTelemetryTab(d) {
+  state.telemetryPage    = state.telemetryPage    || 1;
+  state.telemetryPerPage = state.telemetryPerPage || 10;
+
+  const all   = getDeviceTelemetry(d);
+  const total = all.length;
+  const per   = state.telemetryPerPage;
+  const totalPages = Math.max(1, Math.ceil(total / per));
+  if (state.telemetryPage > totalPages) state.telemetryPage = totalPages;
+  const start   = (state.telemetryPage - 1) * per;
+  const visible = all.slice(start, start + per);
+  const page    = state.telemetryPage;
+
+  return `
+    <style>
+      .tel-card { background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:14px }
+      .tel-head { display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border) }
+      .tel-title { font-size:18px;font-weight:600;color:var(--text) }
+      .tel-actions { display:flex;gap:4px }
+      .tel-actions .icon-btn { width:34px;height:34px;border-radius:8px;display:grid;place-items:center;color:var(--text-muted);cursor:pointer;background:none;border:none }
+      .tel-actions .icon-btn:hover { background:var(--bg) }
+      .tel-actions .icon-btn [data-lucide] { width:18px;height:18px }
+      .tel-table { width:100%;border-collapse:collapse }
+      .tel-table th { text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);background:#fff;border-bottom:1px solid var(--border);user-select:none }
+      .tel-table td { padding:14px 22px;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle }
+      .tel-table tbody tr:last-child td { border-bottom:none }
+      .tel-table tbody tr:hover td { background:#FAFBFC }
+      .tel-table tbody tr:hover .tel-row-del { opacity:1 }
+      .tel-table input[type="checkbox"] { accent-color:var(--primary);width:16px;height:16px;cursor:pointer;vertical-align:middle }
+      .tel-key-cell { display:inline-flex;align-items:center;gap:8px }
+      .tel-key-cell .chart-ico { color:var(--text-subtle);display:inline-flex;align-items:center;justify-content:center }
+      .tel-key-cell .chart-ico [data-lucide] { width:14px;height:14px }
+      .tel-sort-arrow { color:var(--text);margin-left:4px;font-size:14px;display:inline-block }
+      .tel-row-del { opacity:0;transition:opacity .12s;color:var(--text-muted);background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:6px;display:grid;place-items:center }
+      .tel-row-del:hover { background:var(--bg);color:var(--danger) }
+      .tel-row-del [data-lucide] { width:16px;height:16px }
+      .tel-pager { display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:14px 22px;font-size:13px;color:var(--text-muted);border-top:1px solid var(--border);flex-wrap:wrap }
+      .tel-pager .pp-select { display:flex;align-items:center;gap:8px }
+      .tel-pager select { font-size:13px;padding:5px 26px 5px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 8px center }
+      .tel-pager .pg-icon { background:none;border:none;cursor:pointer;color:var(--text-muted);width:30px;height:30px;border-radius:6px;display:grid;place-items:center }
+      .tel-pager .pg-icon:hover:not(:disabled) { background:var(--bg);color:var(--text) }
+      .tel-pager .pg-icon:disabled { opacity:.4;cursor:default }
+      .tel-pager .pg-icon [data-lucide] { width:18px;height:18px }
+    </style>
+    <div class="tel-card">
+      <div class="tel-head">
+        <div class="tel-title">Telemetry</div>
+        <div class="tel-actions">
+          <button class="icon-btn" title="Add telemetry" onclick="addTelemetryRow()">${li('plus')}</button>
+          <button class="icon-btn" title="Search" onclick="searchTelemetry()">${li('search')}</button>
+        </div>
+      </div>
+      <table class="tel-table">
+        <thead>
+          <tr>
+            <th style="width:48px"><input type="checkbox" /></th>
+            <th>Last update time</th>
+            <th>Key <span class="tel-sort-arrow">↑</span></th>
+            <th>Value</th>
+            <th style="width:48px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${visible.length ? visible.map(r => `
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>${r.time}</td>
+              <td><span class="tel-key-cell"><span>${r.key}</span><span class="chart-ico">${li('line-chart')}</span></span></td>
+              <td>${r.value}</td>
+              <td><button class="tel-row-del" title="Delete" onclick="deleteTelemetryRow('${r.key.replace(/'/g, "\\'")}')">${li('trash-2')}</button></td>
+            </tr>
+          `).join('') : `
+            <tr><td colspan="5" style="padding:40px;text-align:center;color:var(--text-muted)">No telemetry data yet.</td></tr>
+          `}
+        </tbody>
+      </table>
+      <div class="tel-pager">
+        <div class="pp-select">
+          <span>Items per page:</span>
+          <select onchange="setTelemetryPerPage(this.value)">
+            ${[10, 25, 50, 100].map(n => `<option value="${n}" ${per === n ? 'selected' : ''}>${n}</option>`).join('')}
+          </select>
+        </div>
+        <span>${total === 0 ? '0 – 0' : `${start + 1} – ${Math.min(start + per, total)}`} of ${total}</span>
+        <div style="display:flex;gap:2px">
+          <button class="pg-icon" title="First page" onclick="setTelemetryPage(1)" ${page === 1 ? 'disabled' : ''}>${li('chevrons-left')}</button>
+          <button class="pg-icon" title="Previous page" onclick="setTelemetryPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>${li('chevron-left')}</button>
+          <button class="pg-icon" title="Next page" onclick="setTelemetryPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>${li('chevron-right')}</button>
+          <button class="pg-icon" title="Last page" onclick="setTelemetryPage(${totalPages})" ${page === totalPages ? 'disabled' : ''}>${li('chevrons-right')}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function setTelemetryPage(n)    { state.telemetryPage = Math.max(1, n); renderDeviceDetails(); }
+function setTelemetryPerPage(n) { state.telemetryPerPage = parseInt(n, 10) || 10; state.telemetryPage = 1; renderDeviceDetails(); }
+function addTelemetryRow()      { toast('Add telemetry — coming soon'); }
+function searchTelemetry()      { toast('Search telemetry — coming soon'); }
+function deleteTelemetryRow(k)  { toast(`Delete "${k}" — demo`, 'danger'); }
 
 /* ---- Data Explorer ---- */
 const DATAPOINTS = [
