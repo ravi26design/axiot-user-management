@@ -3184,6 +3184,7 @@ function renderDeviceDetails() {
         ${ddTab('overview', 'Overview')}
         ${ddTab('details', 'Details')}
         ${ddTab('telemetry', 'Telemetry')}
+        ${ddTab('attributes', 'Attributes')}
         ${ddTab('messages', 'Messages')}
         ${ddTab('alarms', 'Alarms')}
         ${ddTab('explorer', 'Data Explorer')}
@@ -3197,6 +3198,7 @@ function renderDeviceDetails() {
       state.detailsDeviceTab === 'overview' ? renderDeviceOverview(d, isCritical)
       : state.detailsDeviceTab === 'details' ? renderDeviceDetailsTab(d)
       : state.detailsDeviceTab === 'telemetry' ? renderDeviceTelemetryTab(d)
+      : state.detailsDeviceTab === 'attributes' ? renderDeviceAttributesTab(d)
       : state.detailsDeviceTab === 'messages' ? renderDeviceMessagesTab(d)
       : state.detailsDeviceTab === 'alarms' ? renderDeviceAlarmsTab(d)
       : state.detailsDeviceTab === 'explorer' ? renderDeviceExplorerTab(d)
@@ -3420,117 +3422,24 @@ const TEL_TYPE_PLACEHOLDER = { string:'String value', integer:'Integer value', d
 function addTelemetryRow() {
   const d = DEVICES.find(x => x.id === state.detailsDeviceId);
   if (!d) return;
-  closeTelAdd();
-  state._telAdd = { type: 'string' };
-
-  const types = ['string', 'integer', 'double', 'boolean', 'json'];
-
-  const backdrop = document.createElement('div');
-  backdrop.className = 'drawer-backdrop';
-  backdrop.id = 'telAddBackdrop';
-  backdrop.onclick = closeTelAdd;
-
-  const drawer = document.createElement('aside');
-  drawer.className = 'drawer';
-  drawer.id = 'telAddDrawer';
-  drawer.innerHTML = `
-    <style>
-      .tel-type-wrap { position:relative }
-      .tel-type-btn {
-        width:100%; padding:9px 12px;
-        background:var(--surface); border:1px solid var(--border-strong);
-        border-radius:5px; font-size:14px; font-family:inherit; color:var(--text);
-        cursor:pointer; text-align:left;
-        display:flex; align-items:center; gap:10px;
-        transition:border-color .1s, box-shadow .1s;
-        box-sizing:border-box;
-      }
-      .tel-type-btn:hover { border-color:var(--text-subtle) }
-      .tel-type-btn.open { border-color:var(--primary); box-shadow:0 0 0 3px rgba(31,78,158,0.15) }
-      .tel-type-btn .ico { width:20px;display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted) }
-      .tel-type-btn .arrow-svg { margin-left:auto;color:var(--text-subtle);transition:transform .15s }
-      .tel-type-btn.open .arrow-svg { transform:rotate(180deg);color:var(--primary) }
-      .tel-type-list {
-        position:absolute;top:calc(100% + 4px);left:0;right:0;
-        background:var(--surface);border:1px solid var(--border);
-        border-radius:8px;padding:4px;z-index:10;
-        box-shadow:0 12px 32px rgba(16,24,40,0.12);
-        max-height:280px;overflow-y:auto;display:none;
-      }
-      .tel-type-list.open { display:block }
-      .tel-type-item {
-        padding:8px 10px;display:flex;align-items:center;gap:12px;
-        cursor:pointer;font-size:14px;color:var(--text);border-radius:5px;
-      }
-      .tel-type-item:hover { background:var(--bg) }
-      .tel-type-item.selected { background:var(--primary-soft);color:var(--primary) }
-      .tel-type-item .ico { width:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted) }
-      .tel-type-item.selected .ico { color:var(--primary) }
-    </style>
-    <div class="drawer-head">
-      <div>
-        <div class="drawer-title">Add telemetry</div>
-        <div class="drawer-sub">Append a new reading to ${d.name}.</div>
-      </div>
-      <button class="icon-btn" onclick="closeTelAdd()" aria-label="Close">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
-    </div>
-    <div class="drawer-body">
-      <div class="field">
-        <label class="label">Key <span class="req">*</span></label>
-        <input class="input" id="telAddKey" placeholder="e.g. Temperature" autocomplete="off" />
-      </div>
-      <div class="field">
-        <label class="label">Data type</label>
-        <div class="tel-type-wrap">
-          <button class="tel-type-btn" id="telTypeBtn" type="button" onclick="event.stopPropagation();toggleTelType()">
-            <span class="ico" id="telTypeIco">${TEL_TYPE_ICON.string}</span>
-            <span id="telTypeLabel">String</span>
-            <svg class="arrow-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <div class="tel-type-list" id="telTypeList">
-            ${types.map(id => `
-              <div class="tel-type-item${id==='string'?' selected':''}" data-id="${id}" onclick="event.stopPropagation();selectTelType('${id}')">
-                <span class="ico">${TEL_TYPE_ICON[id]}</span>
-                <span>${TEL_TYPE_LABEL[id]}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Value <span class="req">*</span></label>
-        <input class="input" id="telAddValue" placeholder="String value" autocomplete="off" />
-      </div>
-    </div>
-    <div class="drawer-foot">
-      <button class="btn btn-ghost" onclick="closeTelAdd()">Cancel</button>
-      <button class="btn btn-primary" id="telAddBtn" onclick="submitTelAdd()" disabled>Add telemetry</button>
-    </div>
-  `;
-
-  document.body.appendChild(backdrop);
-  document.body.appendChild(drawer);
-
-  requestAnimationFrame(() => {
-    backdrop.classList.add('open');
-    drawer.classList.add('open');
+  openKVDrawer({
+    title: 'Add telemetry',
+    sub: `Append a new reading to ${d.name}.`,
+    submitLabel: 'Add telemetry',
+    type: 'string',
+    onSubmit: ({ key, value, type }) => {
+      if (!state._telemetryCache) state._telemetryCache = {};
+      if (!state._telemetryCache[d.id]) getDeviceTelemetry(d);
+      const pad = n => String(n).padStart(2, '0');
+      const now = new Date();
+      const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      const rowId = 't-' + (state._telSeq = (state._telSeq || 0) + 1);
+      state._telemetryCache[d.id].unshift({ id: rowId, time: fmt, key, value, valueType: type });
+      state.telemetryPage = 1;
+      toast('Telemetry added', 'success');
+      renderDeviceDetails();
+    }
   });
-
-  setTimeout(() => { const k = document.getElementById('telAddKey'); if (k) k.focus(); }, 280);
-
-  ['telAddKey', 'telAddValue'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('input', validateTelAdd);
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter')  { e.preventDefault(); if (!document.getElementById('telAddBtn').disabled) submitTelAdd(); }
-      if (e.key === 'Escape') { e.preventDefault(); closeTelAdd(); }
-    });
-  });
-
-  setTimeout(() => { document.addEventListener('click', telTypeOutside, true); }, 50);
 }
 
 function telTypeOutside(e) {
@@ -3639,6 +3548,346 @@ function deleteTelemetryRow(id) {
       toast('Telemetry deleted', 'danger');
       renderDeviceDetails();
     });
+}
+
+/* ---- Attributes tab ---- */
+const ATTR_SCOPES = [
+  { id: 'client', label: 'Client attributes' },
+  { id: 'server', label: 'Server attributes' },
+  { id: 'shared', label: 'Shared attributes' }
+];
+
+function _kvEscape(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function getDeviceAttributes(d, scope) {
+  if (!state._attrCache) state._attrCache = {};
+  const cacheKey = d.id + ':' + scope;
+  if (state._attrCache[cacheKey]) return state._attrCache[cacheKey];
+  const pad = n => String(n).padStart(2, '0');
+  const fmt = ts => `${ts.getFullYear()}-${pad(ts.getMonth()+1)}-${pad(ts.getDate())} ${pad(ts.getHours())}:${pad(ts.getMinutes())}:${pad(ts.getSeconds())}`;
+  const t1 = fmt(new Date('2026-04-22T15:49:06'));
+  const t2 = fmt(new Date('2026-04-22T16:00:05'));
+  const newId = () => 'a-' + (state._attrSeq = (state._attrSeq || 0) + 1);
+  let rows;
+  if (scope === 'server') {
+    rows = [
+      { id: newId(), time: t1, key: 'temperatureAlarmThreshold', value: '25',           valueType: 'integer' },
+      { id: newId(), time: t1, key: 'temperatureAlarmFlag',      value: 'true',         valueType: 'boolean' },
+      { id: newId(), time: t1, key: 'longitude',                 value: '-121.948769',  valueType: 'double' },
+      { id: newId(), time: t1, key: 'latitude',                  value: '37.493801',    valueType: 'double' },
+      { id: newId(), time: t2, key: 'inactivityAlarmTime',       value: '1776853805290', valueType: 'integer' },
+      { id: newId(), time: t1, key: 'lastConnectTime',           value: '1776853805000', valueType: 'integer' },
+      { id: newId(), time: t1, key: 'firmwareUrl',               value: 'https://fw.axiot.io/v2.4.1.bin', valueType: 'string' },
+      { id: newId(), time: t1, key: 'configHash',                value: 'a3f5c7b14b8c92e', valueType: 'string' }
+    ];
+  } else if (scope === 'client') {
+    rows = [
+      { id: newId(), time: t1, key: 'fwVersion',      value: d.firmware || '2.4.1',  valueType: 'string' },
+      { id: newId(), time: t1, key: 'lastReportedAt', value: fmt(new Date('2026-04-30T11:51:00')), valueType: 'string' },
+      { id: newId(), time: t1, key: 'modelType',      value: d.type || 'Compressor', valueType: 'string' },
+      { id: newId(), time: t1, key: 'serialNumber',   value: d.serial || ('SN-' + d.id.replace(/\D/g,'').slice(-5)), valueType: 'string' }
+    ];
+  } else {
+    rows = [
+      { id: newId(), time: t1, key: 'targetTemp',           value: '22',    valueType: 'integer' },
+      { id: newId(), time: t1, key: 'scheduleEnabled',      value: 'true',  valueType: 'boolean' },
+      { id: newId(), time: t1, key: 'reportingIntervalSec', value: '60',    valueType: 'integer' },
+      { id: newId(), time: t1, key: 'maintenanceMode',      value: 'false', valueType: 'boolean' }
+    ];
+  }
+  state._attrCache[cacheKey] = rows;
+  return rows;
+}
+
+function setAttributesScope(s)   { state.attributesScope = s; state.attributesPage = 1; renderDeviceDetails(); }
+function setAttributesPage(n)    { state.attributesPage = Math.max(1, n); renderDeviceDetails(); }
+function setAttributesPerPage(n) { state.attributesPerPage = parseInt(n, 10) || 10; state.attributesPage = 1; renderDeviceDetails(); }
+
+function renderDeviceAttributesTab(d) {
+  state.attributesScope   = state.attributesScope   || 'server';
+  state.attributesPage    = state.attributesPage    || 1;
+  state.attributesPerPage = state.attributesPerPage || 10;
+
+  const scope = state.attributesScope;
+  const all   = getDeviceAttributes(d, scope);
+  const total = all.length;
+  const per   = state.attributesPerPage;
+  const totalPages = Math.max(1, Math.ceil(total / per));
+  if (state.attributesPage > totalPages) state.attributesPage = totalPages;
+  const start   = (state.attributesPage - 1) * per;
+  const visible = all.slice(start, start + per);
+  const page    = state.attributesPage;
+  const scopeLabel = (ATTR_SCOPES.find(s => s.id === scope) || ATTR_SCOPES[1]).label;
+
+  return `
+    <style>
+      .tel-card { background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:14px }
+      .tel-head { padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:18px;flex-wrap:wrap }
+      .tel-title { font-size:18px;font-weight:600;color:var(--text) }
+      .attr-scope-wrap { display:flex;flex-direction:column;gap:2px }
+      .attr-scope-wrap .lbl { font-size:11.5px;color:var(--text-muted);font-weight:500 }
+      .attr-scope-select { font-size:14px;font-weight:500;font-family:inherit;color:var(--text);border:none;border-bottom:1px solid var(--border-strong);padding:4px 22px 4px 0;background:#fff no-repeat right center;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");cursor:pointer;outline:none;appearance:none;-webkit-appearance:none }
+      .attr-scope-select:focus { border-bottom-color:var(--primary) }
+      .tel-actions { margin-left:auto;display:flex;gap:4px }
+      .tel-actions .icon-btn { width:34px;height:34px;border-radius:8px;display:grid;place-items:center;color:var(--text-muted);cursor:pointer;background:none;border:none }
+      .tel-actions .icon-btn:hover { background:var(--bg) }
+      .tel-actions .icon-btn [data-lucide] { width:18px;height:18px }
+      .tel-table { width:100%;border-collapse:collapse }
+      .tel-table th { text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);background:#fff;border-bottom:1px solid var(--border);user-select:none }
+      .tel-table td { padding:14px 22px;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle }
+      .tel-table tbody tr:last-child td { border-bottom:none }
+      .tel-table tbody tr:hover td { background:#FAFBFC }
+      .tel-table tbody tr:hover .row-edit { opacity:1 }
+      .tel-table input[type="checkbox"] { accent-color:var(--primary);width:16px;height:16px;cursor:pointer;vertical-align:middle }
+      .tel-sort-arrow { color:var(--text);margin-left:4px;font-size:14px;display:inline-block }
+      .row-edit { opacity:0;transition:opacity .12s;color:var(--text-muted);background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:6px;display:grid;place-items:center }
+      .row-edit:hover { background:var(--bg);color:var(--primary) }
+      .row-edit [data-lucide] { width:16px;height:16px }
+      .tel-pager { display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:14px 22px;font-size:13px;color:var(--text-muted);border-top:1px solid var(--border);flex-wrap:wrap }
+      .tel-pager .pp-select { display:flex;align-items:center;gap:8px }
+      .tel-pager select { font-size:13px;padding:5px 26px 5px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 8px center }
+      .tel-pager .pg-icon { background:none;border:none;cursor:pointer;color:var(--text-muted);width:30px;height:30px;border-radius:6px;display:grid;place-items:center }
+      .tel-pager .pg-icon:hover:not(:disabled) { background:var(--bg);color:var(--text) }
+      .tel-pager .pg-icon:disabled { opacity:.4;cursor:default }
+      .tel-pager .pg-icon [data-lucide] { width:18px;height:18px }
+    </style>
+    <div class="tel-card">
+      <div class="tel-head">
+        <div class="tel-title">${scopeLabel}</div>
+        <div class="attr-scope-wrap">
+          <span class="lbl">Entity attributes scope</span>
+          <select class="attr-scope-select" onchange="setAttributesScope(this.value)">
+            ${ATTR_SCOPES.map(s => `<option value="${s.id}" ${scope===s.id?'selected':''}>${s.label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="tel-actions">
+          <button class="icon-btn" title="Add attribute" onclick="addAttribute()">${li('plus')}</button>
+          <button class="icon-btn" title="Refresh" onclick="renderDeviceDetails()">${li('rotate-cw')}</button>
+          <button class="icon-btn" title="Search" onclick="toast('Search attributes — coming soon')">${li('search')}</button>
+        </div>
+      </div>
+      <table class="tel-table">
+        <thead>
+          <tr>
+            <th style="width:48px"><input type="checkbox" /></th>
+            <th>Last update time</th>
+            <th>Key <span class="tel-sort-arrow">↓</span></th>
+            <th>Value</th>
+            <th style="width:48px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${visible.length ? visible.map(r => `
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>${r.time}</td>
+              <td>${_kvEscape(r.key)}</td>
+              <td>${_kvEscape(r.value)}</td>
+              <td><button class="row-edit" title="Edit" onclick="editAttribute('${r.id}')">${li('pencil')}</button></td>
+            </tr>
+          `).join('') : `
+            <tr><td colspan="5" style="padding:40px;text-align:center;color:var(--text-muted)">No ${scope} attributes yet.</td></tr>
+          `}
+        </tbody>
+      </table>
+      <div class="tel-pager">
+        <div class="pp-select">
+          <span>Items per page:</span>
+          <select onchange="setAttributesPerPage(this.value)">
+            ${[10, 25, 50, 100].map(n => `<option value="${n}" ${per === n ? 'selected' : ''}>${n}</option>`).join('')}
+          </select>
+        </div>
+        <span>${total === 0 ? '0 – 0' : `${start + 1} – ${Math.min(start + per, total)}`} of ${total}</span>
+        <div style="display:flex;gap:2px">
+          <button class="pg-icon" title="First page" onclick="setAttributesPage(1)" ${page === 1 ? 'disabled' : ''}>${li('chevrons-left')}</button>
+          <button class="pg-icon" title="Previous page" onclick="setAttributesPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>${li('chevron-left')}</button>
+          <button class="pg-icon" title="Next page" onclick="setAttributesPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>${li('chevron-right')}</button>
+          <button class="pg-icon" title="Last page" onclick="setAttributesPage(${totalPages})" ${page === totalPages ? 'disabled' : ''}>${li('chevrons-right')}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---- Generic key/value drawer (used by Add telemetry, Add/Edit attribute) ---- */
+function openKVDrawer(opts) {
+  closeTelAdd();
+  const initType = opts.type || 'string';
+  state._telAdd = { type: initType };
+  state._kvOnSubmit = opts.onSubmit || function() {};
+
+  const types = ['string', 'integer', 'double', 'boolean', 'json'];
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'drawer-backdrop';
+  backdrop.id = 'telAddBackdrop';
+  backdrop.onclick = closeTelAdd;
+
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+  drawer.id = 'telAddDrawer';
+  drawer.innerHTML = `
+    <style>
+      .tel-type-wrap { position:relative }
+      .tel-type-btn { width:100%;padding:9px 12px;background:var(--surface);border:1px solid var(--border-strong);border-radius:5px;font-size:14px;font-family:inherit;color:var(--text);cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px;transition:border-color .1s, box-shadow .1s;box-sizing:border-box }
+      .tel-type-btn:hover { border-color:var(--text-subtle) }
+      .tel-type-btn.open { border-color:var(--primary);box-shadow:0 0 0 3px rgba(31,78,158,0.15) }
+      .tel-type-btn .ico { width:20px;display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted) }
+      .tel-type-btn .arrow-svg { margin-left:auto;color:var(--text-subtle);transition:transform .15s }
+      .tel-type-btn.open .arrow-svg { transform:rotate(180deg);color:var(--primary) }
+      .tel-type-list { position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px;z-index:10;box-shadow:0 12px 32px rgba(16,24,40,0.12);max-height:280px;overflow-y:auto;display:none }
+      .tel-type-list.open { display:block }
+      .tel-type-item { padding:8px 10px;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);border-radius:5px }
+      .tel-type-item:hover { background:var(--bg) }
+      .tel-type-item.selected { background:var(--primary-soft);color:var(--primary) }
+      .tel-type-item .ico { width:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted) }
+      .tel-type-item.selected .ico { color:var(--primary) }
+    </style>
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">${_kvEscape(opts.title || 'Add')}</div>
+        <div class="drawer-sub">${_kvEscape(opts.sub || '')}</div>
+      </div>
+      <button class="icon-btn" onclick="closeTelAdd()" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="field">
+        <label class="label">Key <span class="req">*</span></label>
+        <input class="input" id="telAddKey" placeholder="e.g. temperatureAlarmThreshold" value="${_kvEscape(opts.key || '')}" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label class="label">Data type</label>
+        <div class="tel-type-wrap">
+          <button class="tel-type-btn" id="telTypeBtn" type="button" onclick="event.stopPropagation();toggleTelType()">
+            <span class="ico" id="telTypeIco">${TEL_TYPE_ICON[initType]}</span>
+            <span id="telTypeLabel">${TEL_TYPE_LABEL[initType]}</span>
+            <svg class="arrow-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="tel-type-list" id="telTypeList">
+            ${types.map(id => `
+              <div class="tel-type-item${id===initType?' selected':''}" data-id="${id}" onclick="event.stopPropagation();selectTelType('${id}')">
+                <span class="ico">${TEL_TYPE_ICON[id]}</span>
+                <span>${TEL_TYPE_LABEL[id]}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Value <span class="req">*</span></label>
+        <input class="input" id="telAddValue" placeholder="${_kvEscape(TEL_TYPE_PLACEHOLDER[initType])}" value="${_kvEscape(opts.value || '')}" autocomplete="off" />
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn btn-ghost" onclick="closeTelAdd()">Cancel</button>
+      <button class="btn btn-primary" id="telAddBtn" onclick="kvSubmit()" disabled>${_kvEscape(opts.submitLabel || 'Add')}</button>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+
+  requestAnimationFrame(() => {
+    backdrop.classList.add('open');
+    drawer.classList.add('open');
+  });
+
+  setTimeout(() => {
+    const k = document.getElementById('telAddKey');
+    if (k) k.focus();
+    validateTelAdd();
+  }, 280);
+
+  ['telAddKey', 'telAddValue'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', validateTelAdd);
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter')  { e.preventDefault(); if (!document.getElementById('telAddBtn').disabled) kvSubmit(); }
+      if (e.key === 'Escape') { e.preventDefault(); closeTelAdd(); }
+    });
+  });
+
+  setTimeout(() => { document.addEventListener('click', telTypeOutside, true); }, 50);
+}
+
+function kvSubmit() {
+  const keyEl = document.getElementById('telAddKey');
+  const valEl = document.getElementById('telAddValue');
+  if (!keyEl || !valEl) return;
+  const key = keyEl.value.trim();
+  let val = valEl.value.trim();
+  const type = (state._telAdd && state._telAdd.type) || 'string';
+  if (!key || !val) { toast('Key and value are required', 'danger'); return; }
+  if (type === 'integer'  && !/^-?\d+$/.test(val))         { toast('Integer must be a whole number', 'danger'); return; }
+  if (type === 'double'   && !/^-?\d+(\.\d+)?$/.test(val)) { toast('Double must be a number', 'danger'); return; }
+  if (type === 'boolean'  && !/^(true|false)$/i.test(val)) { toast('Boolean must be true or false', 'danger'); return; }
+  if (type === 'json')    { try { JSON.parse(val); } catch (e) { toast('Value is not valid JSON', 'danger'); return; } }
+  if (type === 'boolean') val = val.toLowerCase();
+  const cb = state._kvOnSubmit;
+  closeTelAdd();
+  if (typeof cb === 'function') cb({ key, value: val, type });
+}
+
+function addAttribute() {
+  const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+  if (!d) return;
+  const scope = state.attributesScope || 'server';
+  const singular = ({ client: 'client attribute', server: 'server attribute', shared: 'shared attribute' })[scope];
+  openKVDrawer({
+    title: 'Add ' + singular,
+    sub: 'New ' + singular + ' on ' + d.name + '.',
+    submitLabel: 'Add attribute',
+    type: 'string',
+    onSubmit: ({ key, value, type }) => {
+      if (!state._attrCache) state._attrCache = {};
+      const cacheKey = d.id + ':' + scope;
+      if (!state._attrCache[cacheKey]) getDeviceAttributes(d, scope);
+      const pad = n => String(n).padStart(2, '0');
+      const now = new Date();
+      const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      const rowId = 'a-' + (state._attrSeq = (state._attrSeq || 0) + 1);
+      state._attrCache[cacheKey].unshift({ id: rowId, time: fmt, key, value, valueType: type });
+      state.attributesPage = 1;
+      toast('Attribute added', 'success');
+      renderDeviceDetails();
+    }
+  });
+}
+
+function editAttribute(id) {
+  const d = DEVICES.find(x => x.id === state.detailsDeviceId);
+  if (!d) return;
+  const scope = state.attributesScope || 'server';
+  const cacheKey = d.id + ':' + scope;
+  if (!state._attrCache || !state._attrCache[cacheKey]) return;
+  const arr = state._attrCache[cacheKey];
+  const row = arr.find(r => r.id === id);
+  if (!row) return;
+  openKVDrawer({
+    title: 'Edit attribute',
+    sub: 'Update ' + row.key + ' on ' + d.name + '.',
+    submitLabel: 'Save changes',
+    key: row.key,
+    value: row.value,
+    type: row.valueType || 'string',
+    onSubmit: ({ key, value, type }) => {
+      row.key = key;
+      row.value = value;
+      row.valueType = type;
+      const pad = n => String(n).padStart(2, '0');
+      const now = new Date();
+      row.time = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      toast('Attribute updated', 'success');
+      renderDeviceDetails();
+    }
+  });
 }
 
 /* ---- Data Explorer ---- */
