@@ -3386,19 +3386,17 @@ function renderDeviceTelemetryTab(d) {
           `}
         </tbody>
       </table>
-      <div class="tel-pager">
-        <div class="pp-select">
-          <span>Items per page:</span>
-          <select onchange="setTelemetryPerPage(this.value)">
-            ${[10, 25, 50, 100].map(n => `<option value="${n}" ${per === n ? 'selected' : ''}>${n}</option>`).join('')}
-          </select>
+      <div class="tbl-footer">
+        <div>${total === 0 ? '0 of 0' : `${start + 1}–${Math.min(start + per, total)} of ${total}`}</div>
+        <div class="pager">
+          <button onclick="setTelemetryPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:.4;cursor:default"' : ''}>‹</button>
+          <button class="active">${page}</button>
+          <button onclick="setTelemetryPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:.4;cursor:default"' : ''}>›</button>
         </div>
-        <span>${total === 0 ? '0 – 0' : `${start + 1} – ${Math.min(start + per, total)}`} of ${total}</span>
-        <div style="display:flex;gap:2px">
-          <button class="pg-icon" title="First page" onclick="setTelemetryPage(1)" ${page === 1 ? 'disabled' : ''}>${li('chevrons-left')}</button>
-          <button class="pg-icon" title="Previous page" onclick="setTelemetryPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>${li('chevron-left')}</button>
-          <button class="pg-icon" title="Next page" onclick="setTelemetryPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>${li('chevron-right')}</button>
-          <button class="pg-icon" title="Last page" onclick="setTelemetryPage(${totalPages})" ${page === totalPages ? 'disabled' : ''}>${li('chevrons-right')}</button>
+        <div>
+          <select class="select-sm" onchange="setTelemetryPerPage(this.value)">
+            ${[10, 25, 50, 100].map(n => `<option value="${n}" ${per === n ? 'selected' : ''}>${n} per page</option>`).join('')}
+          </select>
         </div>
       </div>
     </div>
@@ -3686,19 +3684,17 @@ function renderDeviceAttributesTab(d) {
           `}
         </tbody>
       </table>
-      <div class="tel-pager">
-        <div class="pp-select">
-          <span>Items per page:</span>
-          <select onchange="setAttributesPerPage(this.value)">
-            ${[10, 25, 50, 100].map(n => `<option value="${n}" ${per === n ? 'selected' : ''}>${n}</option>`).join('')}
-          </select>
+      <div class="tbl-footer">
+        <div>${total === 0 ? '0 of 0' : `${start + 1}–${Math.min(start + per, total)} of ${total}`}</div>
+        <div class="pager">
+          <button onclick="setAttributesPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:.4;cursor:default"' : ''}>‹</button>
+          <button class="active">${page}</button>
+          <button onclick="setAttributesPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:.4;cursor:default"' : ''}>›</button>
         </div>
-        <span>${total === 0 ? '0 – 0' : `${start + 1} – ${Math.min(start + per, total)}`} of ${total}</span>
-        <div style="display:flex;gap:2px">
-          <button class="pg-icon" title="First page" onclick="setAttributesPage(1)" ${page === 1 ? 'disabled' : ''}>${li('chevrons-left')}</button>
-          <button class="pg-icon" title="Previous page" onclick="setAttributesPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>${li('chevron-left')}</button>
-          <button class="pg-icon" title="Next page" onclick="setAttributesPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>${li('chevron-right')}</button>
-          <button class="pg-icon" title="Last page" onclick="setAttributesPage(${totalPages})" ${page === totalPages ? 'disabled' : ''}>${li('chevrons-right')}</button>
+        <div>
+          <select class="select-sm" onchange="setAttributesPerPage(this.value)">
+            ${[10, 25, 50, 100].map(n => `<option value="${n}" ${per === n ? 'selected' : ''}>${n} per page</option>`).join('')}
+          </select>
         </div>
       </div>
     </div>
