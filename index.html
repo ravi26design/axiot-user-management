@@ -3423,15 +3423,17 @@ function addTelemetryRow() {
   closeTelAdd();
   state._telAdd = { type: 'string' };
 
-  const wrap = document.createElement('div');
-  wrap.id = 'telAddBackdrop';
-  wrap.className = 'modal-backdrop open';
-  wrap.style.zIndex = '300';
-  wrap.onclick = (e) => { if (e.target === wrap) closeTelAdd(); };
-
   const types = ['string', 'integer', 'double', 'boolean', 'json'];
 
-  wrap.innerHTML = `
+  const backdrop = document.createElement('div');
+  backdrop.className = 'drawer-backdrop';
+  backdrop.id = 'telAddBackdrop';
+  backdrop.onclick = closeTelAdd;
+
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+  drawer.id = 'telAddDrawer';
+  drawer.innerHTML = `
     <style>
       .tel-type-wrap { position:relative }
       .tel-type-btn {
@@ -3465,50 +3467,58 @@ function addTelemetryRow() {
       .tel-type-item .ico { width:22px;display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted) }
       .tel-type-item.selected .ico { color:var(--primary) }
     </style>
-    <div class="modal" style="width:520px;max-width:92vw" onclick="event.stopPropagation()">
-      <div class="modal-head">
-        <div class="modal-title">Add telemetry</div>
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">Add telemetry</div>
+        <div class="drawer-sub">Append a new reading to ${d.name}.</div>
       </div>
-      <div class="modal-body" style="color:var(--text)">
-        <div class="hint" style="margin-bottom:14px">Append a new reading to <span style="color:var(--text);font-weight:500">${d.name}</span>.</div>
-        <div class="field">
-          <label class="label">Key <span class="req">*</span></label>
-          <input class="input" id="telAddKey" placeholder="e.g. Temperature" autocomplete="off" />
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label class="label">Data type</label>
-            <div class="tel-type-wrap">
-              <button class="tel-type-btn" id="telTypeBtn" type="button" onclick="event.stopPropagation();toggleTelType()">
-                <span class="ico" id="telTypeIco">${TEL_TYPE_ICON.string}</span>
-                <span id="telTypeLabel">String</span>
-                <svg class="arrow-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-              </button>
-              <div class="tel-type-list" id="telTypeList">
-                ${types.map(id => `
-                  <div class="tel-type-item${id==='string'?' selected':''}" data-id="${id}" onclick="event.stopPropagation();selectTelType('${id}')">
-                    <span class="ico">${TEL_TYPE_ICON[id]}</span>
-                    <span>${TEL_TYPE_LABEL[id]}</span>
-                  </div>
-                `).join('')}
+      <button class="icon-btn" onclick="closeTelAdd()" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="field">
+        <label class="label">Key <span class="req">*</span></label>
+        <input class="input" id="telAddKey" placeholder="e.g. Temperature" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label class="label">Data type</label>
+        <div class="tel-type-wrap">
+          <button class="tel-type-btn" id="telTypeBtn" type="button" onclick="event.stopPropagation();toggleTelType()">
+            <span class="ico" id="telTypeIco">${TEL_TYPE_ICON.string}</span>
+            <span id="telTypeLabel">String</span>
+            <svg class="arrow-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="tel-type-list" id="telTypeList">
+            ${types.map(id => `
+              <div class="tel-type-item${id==='string'?' selected':''}" data-id="${id}" onclick="event.stopPropagation();selectTelType('${id}')">
+                <span class="ico">${TEL_TYPE_ICON[id]}</span>
+                <span>${TEL_TYPE_LABEL[id]}</span>
               </div>
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Value <span class="req">*</span></label>
-            <input class="input" id="telAddValue" placeholder="String value" autocomplete="off" />
+            `).join('')}
           </div>
         </div>
       </div>
-      <div class="modal-foot">
-        <button class="btn btn-ghost btn-sm" onclick="closeTelAdd()">Cancel</button>
-        <button class="btn btn-primary btn-sm" id="telAddBtn" onclick="submitTelAdd()" disabled>Add telemetry</button>
+      <div class="field">
+        <label class="label">Value <span class="req">*</span></label>
+        <input class="input" id="telAddValue" placeholder="String value" autocomplete="off" />
       </div>
     </div>
+    <div class="drawer-foot">
+      <button class="btn btn-ghost" onclick="closeTelAdd()">Cancel</button>
+      <button class="btn btn-primary" id="telAddBtn" onclick="submitTelAdd()" disabled>Add telemetry</button>
+    </div>
   `;
-  document.body.appendChild(wrap);
 
-  setTimeout(() => { const k = document.getElementById('telAddKey'); if (k) k.focus(); }, 30);
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+
+  requestAnimationFrame(() => {
+    backdrop.classList.add('open');
+    drawer.classList.add('open');
+  });
+
+  setTimeout(() => { const k = document.getElementById('telAddKey'); if (k) k.focus(); }, 280);
 
   ['telAddKey', 'telAddValue'].forEach(id => {
     const el = document.getElementById(id);
@@ -3572,8 +3582,17 @@ function validateTelAdd() {
 
 function closeTelAdd() {
   document.removeEventListener('click', telTypeOutside, true);
-  const w = document.getElementById('telAddBackdrop');
-  if (w) w.remove();
+  const backdrop = document.getElementById('telAddBackdrop');
+  const drawer   = document.getElementById('telAddDrawer');
+  if (!backdrop && !drawer) return;
+  if (backdrop) backdrop.classList.remove('open');
+  if (drawer)   drawer.classList.remove('open');
+  setTimeout(() => {
+    const b = document.getElementById('telAddBackdrop');
+    const dr = document.getElementById('telAddDrawer');
+    if (b)  b.remove();
+    if (dr) dr.remove();
+  }, 260);
 }
 
 function submitTelAdd() {
