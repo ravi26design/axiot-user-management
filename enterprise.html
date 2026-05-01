@@ -3656,12 +3656,9 @@ function renderDeviceAttributesTab(d) {
     </style>
     <div class="tel-card">
       <div class="tel-head">
-        <div class="tel-title">${scopeLabel}</div>
-        <div class="attr-scope-wrap">
-          <span class="lbl">Entity attributes scope</span>
-          <select class="attr-scope-select" onchange="setAttributesScope(this.value)">
-            ${ATTR_SCOPES.map(s => `<option value="${s.id}" ${scope===s.id?'selected':''}>${s.label}</option>`).join('')}
-          </select>
+        <div class="tel-title">Attributes</div>
+        <div class="de-chart-tabs">
+          ${ATTR_SCOPES.map(s => `<div class="de-chart-tab ${scope===s.id?'active':''}" onclick="setAttributesScope('${s.id}')">${s.label}</div>`).join('')}
         </div>
         <div class="tel-actions">
           <button class="icon-btn" title="Add attribute" onclick="addAttribute()">${li('plus')}</button>
