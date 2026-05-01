@@ -2909,7 +2909,10 @@ function openProfile(evt) {
 function profileAction(kind) {
   closeAllPopovers();
   if (kind === 'signout') {
-    confirmDialog('Sign out of AXIoT?', 'You will be returned to the sign-in page.', () => toast('Signed out', 'danger'));
+    confirmDialog('Sign out of AXIoT?', 'You will be returned to the sign-in page.', () => {
+      try { localStorage.removeItem('axiot-login'); } catch (e) {}
+      window.location.href = 'login.html';
+    });
     return;
   }
   const labels = { profile: 'My profile', sessions: 'My sessions', prefs: 'Preferences', client: 'Switch client', help: 'Help & documentation' };
@@ -3849,9 +3852,7 @@ function renderDeviceOverview(d, isCritical) {
         <button class="icon-btn" title="Refresh" style="width:28px;height:28px">${li('rotate-cw')}</button>
       </div>
       <div class="right">
-        <span class="link">${li('circle-help')} Help</span>
         <button class="icon-btn" title="Expand" style="width:28px;height:28px">${li('maximize-2')}</button>
-        <button class="btn btn-secondary btn-sm">Dashboard Actions <span class="caret" style="font-size:10px">▾</span></button>
       </div>
     </div>
 

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verify it's you — AXIoT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --primary: #1F4E9E;
+    --primary-hover: #173F82;
+    --primary-soft: #E8EEF8;
+    --text-base: 11, 18, 32;
+    --text: rgba(var(--text-base), 1);
+    --text-muted: rgba(var(--text-base), 0.72);
+    --text-subtle: rgba(var(--text-base), 0.52);
+    --border: #D8DEE5;
+    --border-strong: #B8C0CC;
+    --bg: #F5F7FA;
+    --bg-hover: #EEF1F5;
+    --surface: #FFFFFF;
+    --success: #047048;
+    --success-soft: #E6F4EC;
+    --danger: #9F1A0F;
+    --danger-soft: #FCEBE9;
+    --warn: #8A3A05;
+    --radius: 8px;
+    --radius-lg: 12px;
+
+    --fs-xxs: 11px; --fs-xs: 12px; --fs-sm: 13px;
+    --fs-base: 14px; --fs-md: 15px; --fs-lg: 16px;
+    --fs-xl: 20px; --fs-2xl: 24px; --fs-3xl: 30px;
+    --fw-reg: 400; --fw-med: 500; --fw-semi: 600; --fw-bold: 700;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: var(--fs-base); line-height: 1.5;
+    color: var(--text); background: var(--surface);
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: inherit; text-decoration: none; cursor: pointer; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input { font-family: inherit; font-size: inherit; color: inherit; }
+
+  [data-lucide] { width: 16px; height: 16px; stroke-width: 1.8; flex-shrink: 0; }
+
+  .auth-wrap {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    background: var(--surface);
+  }
+  @media (max-width: 900px) {
+    .auth-wrap { grid-template-columns: 1fr; }
+    .auth-visual { display: none; }
+  }
+
+  .auth-visual {
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    padding: 56px 64px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .auth-visual::before {
+    content: ''; position: absolute;
+    top: -140px; right: -140px;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(31, 78, 158, 0.1), transparent 70%);
+  }
+  .auth-visual::after {
+    content: ''; position: absolute;
+    bottom: -120px; left: -60px;
+    width: 340px; height: 340px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(4, 112, 72, 0.08), transparent 70%);
+  }
+  .auth-brand {
+    display: flex; align-items: center; gap: 12px;
+    font-weight: var(--fw-semi); font-size: var(--fs-lg);
+    position: relative; z-index: 1;
+  }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 7px;
+    background: var(--text); color: #fff;
+    display: grid; place-items: center;
+    font-weight: var(--fw-bold); font-size: 13px;
+  }
+  .auth-quote { position: relative; z-index: 1; }
+  .auth-quote h2 {
+    font-size: 32px; font-weight: var(--fw-semi);
+    letter-spacing: -0.7px; line-height: 1.2;
+    margin-bottom: 16px; max-width: 460px;
+  }
+  .auth-quote p {
+    font-size: var(--fs-md); color: var(--text-muted);
+    line-height: 1.6; max-width: 420px;
+  }
+  .trust-list {
+    position: relative; z-index: 1;
+    padding-top: 28px; border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 14px; max-width: 460px;
+  }
+  .trust-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: var(--fs-sm); color: var(--text-muted);
+  }
+  .trust-item [data-lucide] { color: var(--success); margin-top: 2px; }
+  .trust-item strong { color: var(--text); font-weight: var(--fw-semi); display: block; margin-bottom: 2px; }
+
+  .auth-form {
+    padding: 56px 64px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  @media (max-width: 640px) { .auth-form { padding: 32px 24px; } }
+
+  .auth-card { max-width: 440px; width: 100%; margin: 0 auto; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: var(--fs-sm); color: var(--text-muted);
+    font-weight: var(--fw-med); margin-bottom: 24px;
+  }
+  .back-link:hover { color: var(--primary); }
+
+  .icon-pill {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--primary-soft); color: var(--primary);
+    display: grid; place-items: center; margin-bottom: 16px;
+  }
+  .icon-pill [data-lucide] { width: 20px; height: 20px; }
+
+  .auth-card h1 {
+    font-size: var(--fs-2xl); font-weight: var(--fw-semi);
+    letter-spacing: -0.5px;
+  }
+  .auth-card .sub {
+    color: var(--text-muted); margin-top: 6px; margin-bottom: 24px;
+    font-size: var(--fs-base); line-height: 1.55;
+  }
+  .auth-card .sub .email-em {
+    color: var(--text); font-weight: var(--fw-semi);
+  }
+
+  /* OTP inputs */
+  .otp-row {
+    display: flex; gap: 10px; margin: 8px 0 18px;
+  }
+  .otp-input {
+    flex: 1; height: 56px; min-width: 0;
+    text-align: center;
+    font-size: var(--fs-xl); font-weight: var(--fw-semi);
+    letter-spacing: 0.5px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color .12s, box-shadow .12s, background .12s;
+  }
+  .otp-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(31, 78, 158, 0.15);
+  }
+  .otp-input.filled {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+  }
+  .otp-row.error .otp-input {
+    border-color: var(--danger);
+    background: var(--danger-soft);
+    animation: shake .4s ease;
+  }
+  .otp-row.success .otp-input {
+    border-color: var(--success);
+    background: var(--success-soft);
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  .feedback {
+    display: none; align-items: center; gap: 8px;
+    padding: 10px 12px; border-radius: 8px;
+    font-size: var(--fs-sm); font-weight: var(--fw-med);
+    margin-bottom: 16px;
+  }
+  .feedback.show { display: flex; }
+  .feedback.error { background: var(--danger-soft); color: var(--danger); }
+  .feedback.success { background: var(--success-soft); color: var(--success); }
+  .feedback.info { background: var(--primary-soft); color: var(--primary); }
+
+  .resend-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: var(--fs-sm); margin-bottom: 18px;
+    color: var(--text-muted);
+  }
+  .resend-row .resend-btn {
+    color: var(--primary); font-weight: var(--fw-med);
+  }
+  .resend-row .resend-btn:hover:not(:disabled) { text-decoration: underline; }
+  .resend-row .resend-btn:disabled {
+    color: var(--text-subtle); cursor: not-allowed;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 16px; font-size: var(--fs-base); font-weight: var(--fw-med);
+    border-radius: 8px; border: 1px solid transparent;
+    transition: background .12s, border-color .12s, opacity .12s;
+    width: 100%;
+  }
+  .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-hover); border-color: var(--primary-hover); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-ghost {
+    color: var(--text-muted); font-size: var(--fs-sm); margin-top: 14px;
+    background: none; border: none;
+  }
+  .btn-ghost:hover { color: var(--primary); }
+
+  .help-card {
+    margin-top: 22px; padding: 12px 14px;
+    border: 1px dashed var(--border-strong); border-radius: 10px;
+    background: var(--bg);
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: var(--fs-xs); color: var(--text-muted);
+    line-height: 1.55;
+  }
+  .help-card [data-lucide] {
+    color: var(--text-subtle); margin-top: 1px;
+  }
+  .help-card strong { color: var(--text); font-weight: var(--fw-semi); }
+  .help-card code {
+    background: var(--surface); padding: 1px 6px; border-radius: 4px;
+    border: 1px solid var(--border); font-family: 'SF Mono', Menlo, monospace;
+    font-size: 11px; color: var(--text);
+  }
+
+  .foot {
+    text-align: center; margin-top: 24px;
+    font-size: var(--fs-xs); color: var(--text-muted);
+  }
+  .foot a { color: var(--primary); font-weight: var(--fw-med); }
+</style>
+</head>
+<body>
+
+<div class="auth-wrap">
+  <aside class="auth-visual">
+    <div class="auth-brand">
+      <div class="brand-mark">AX</div>
+      AXIoT
+    </div>
+    <div class="auth-quote">
+      <h2>One more step to keep your fleet secure.</h2>
+      <p>Two-factor authentication adds an extra layer of protection to every AXIoT account — required for all enterprise and client workspaces.</p>
+    </div>
+    <div class="trust-list">
+      <div class="trust-item">
+        <i data-lucide="shield-check"></i>
+        <div>
+          <strong>End-to-end encrypted</strong>
+          Codes are sent over TLS 1.3 and expire in 10 minutes.
+        </div>
+      </div>
+      <div class="trust-item">
+        <i data-lucide="lock"></i>
+        <div>
+          <strong>Required for compliance</strong>
+          Mandated for SOC 2 Type II and ISO 27001 certified workspaces.
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <section class="auth-form">
+    <div class="auth-card">
+      <a class="back-link" href="login.html">
+        <i data-lucide="arrow-left"></i> Back to sign in
+      </a>
+
+      <div class="icon-pill">
+        <i data-lucide="mail-check"></i>
+      </div>
+
+      <h1>Check your email</h1>
+      <p class="sub">
+        We sent a 6-digit verification code to
+        <span class="email-em" id="emailDisplay">your registered email</span>.
+        Enter it below to continue.
+      </p>
+
+      <div class="feedback" id="feedback"></div>
+
+      <form id="mfaForm" onsubmit="verifyCode(event)">
+        <div class="otp-row" id="otpRow">
+          <input class="otp-input" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1" />
+          <input class="otp-input" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+          <input class="otp-input" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+          <input class="otp-input" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+          <input class="otp-input" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+          <input class="otp-input" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+        </div>
+
+        <div class="resend-row">
+          <span id="expiryText">Code expires in 10:00</span>
+          <button type="button" class="resend-btn" id="resendBtn" onclick="resendCode()" disabled>
+            Resend in 30s
+          </button>
+        </div>
+
+        <button class="btn btn-primary" type="submit" id="verifyBtn" disabled>
+          Verify and continue
+          <i data-lucide="arrow-right"></i>
+        </button>
+
+        <button class="btn-ghost" type="button" onclick="useBackup()">
+          Use a backup code instead
+        </button>
+      </form>
+
+      <div class="help-card">
+        <i data-lucide="info"></i>
+        <div>
+          <strong>Demo mode:</strong> any 6-digit code works. Try <code>123456</code> to sign in,
+          or <code>000000</code> to see the error state.
+        </div>
+      </div>
+
+      <div class="foot">
+        Didn't get the code? <a href="#" onclick="resendCode(); return false;">Send a new one</a> or
+        <a href="login.html">use a different email</a>.
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ---- State ----
+const params = new URLSearchParams(window.location.search);
+let storedLogin = {};
+try { storedLogin = JSON.parse(localStorage.getItem('axiot-login') || '{}'); } catch (e) {}
+
+const email = params.get('email') || storedLogin.email || '';
+const next  = params.get('next')  || storedLogin.next  || 'enterprise.html';
+
+// ---- Render masked email ----
+function maskEmail(e) {
+  if (!e || !e.includes('@')) return 'your registered email';
+  const [user, domain] = e.split('@');
+  const head = user.slice(0, 2);
+  const tail = user.length > 3 ? user.slice(-1) : '';
+  return `${head}${'•'.repeat(Math.max(user.length - 3, 2))}${tail}@${domain}`;
+}
+document.getElementById('emailDisplay').textContent = maskEmail(email);
+
+// ---- OTP input behavior ----
+const inputs = Array.from(document.querySelectorAll('.otp-input'));
+const otpRow = document.getElementById('otpRow');
+const verifyBtn = document.getElementById('verifyBtn');
+
+function syncState() {
+  inputs.forEach(i => i.classList.toggle('filled', !!i.value));
+  const code = inputs.map(i => i.value).join('');
+  verifyBtn.disabled = code.length !== 6;
+  return code;
+}
+
+inputs.forEach((input, idx) => {
+  input.addEventListener('input', (e) => {
+    // strip non-digits
+    const v = e.target.value.replace(/\D/g, '');
+    e.target.value = v.slice(-1);
+    otpRow.classList.remove('error');
+    hideFeedback();
+    if (e.target.value && idx < inputs.length - 1) inputs[idx + 1].focus();
+    if (syncState().length === 6) verifyBtn.focus();
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !input.value && idx > 0) {
+      inputs[idx - 1].focus();
+      inputs[idx - 1].value = '';
+      syncState();
+    }
+    if (e.key === 'ArrowLeft' && idx > 0) inputs[idx - 1].focus();
+    if (e.key === 'ArrowRight' && idx < inputs.length - 1) inputs[idx + 1].focus();
+  });
+
+  input.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+    if (!text) return;
+    text.split('').forEach((ch, i) => { if (inputs[i]) inputs[i].value = ch; });
+    const nextEmpty = Math.min(text.length, inputs.length - 1);
+    inputs[nextEmpty].focus();
+    syncState();
+  });
+});
+
+// ---- Feedback ----
+const feedback = document.getElementById('feedback');
+function showFeedback(type, msg, iconName) {
+  feedback.className = `feedback show ${type}`;
+  feedback.innerHTML = `<i data-lucide="${iconName}"></i><span>${msg}</span>`;
+  if (window.lucide) window.lucide.createIcons();
+}
+function hideFeedback() { feedback.className = 'feedback'; }
+
+// ---- Verify ----
+function verifyCode(evt) {
+  evt.preventDefault();
+  const code = inputs.map(i => i.value).join('');
+  if (code.length !== 6) return;
+
+  if (code === '000000') {
+    otpRow.classList.add('error');
+    showFeedback('error', 'That code is incorrect or has expired. Please try again.', 'alert-circle');
+    inputs.forEach(i => { i.value = ''; });
+    inputs[0].focus();
+    syncState();
+    return;
+  }
+
+  // Demo: any other 6-digit code passes
+  otpRow.classList.add('success');
+  verifyBtn.disabled = true;
+  verifyBtn.innerHTML = '<i data-lucide="loader-2"></i> Verifying…';
+  if (window.lucide) window.lucide.createIcons();
+  showFeedback('success', 'Verified. Redirecting to your workspace…', 'check-circle-2');
+
+  try {
+    localStorage.setItem('axiot-login', JSON.stringify({
+      ...storedLogin, email, mfaVerifiedAt: new Date().toISOString()
+    }));
+  } catch (e) {}
+
+  setTimeout(() => { window.location.href = next; }, 900);
+}
+
+// ---- Resend countdown ----
+const resendBtn = document.getElementById('resendBtn');
+let resendSecs = 30;
+function tickResend() {
+  if (resendSecs <= 0) {
+    resendBtn.disabled = false;
+    resendBtn.textContent = 'Resend code';
+    return;
+  }
+  resendBtn.textContent = `Resend in ${resendSecs}s`;
+  resendSecs--;
+  setTimeout(tickResend, 1000);
+}
+tickResend();
+
+function resendCode() {
+  if (resendBtn.disabled) return;
+  resendSecs = 30;
+  resendBtn.disabled = true;
+  tickResend();
+  showFeedback('info', `New code sent to ${maskEmail(email)}.`, 'send');
+  inputs.forEach(i => { i.value = ''; });
+  otpRow.classList.remove('error', 'success');
+  inputs[0].focus();
+  syncState();
+}
+
+// ---- Expiry countdown ----
+const expiryText = document.getElementById('expiryText');
+let expirySecs = 10 * 60;
+function tickExpiry() {
+  const m = Math.floor(expirySecs / 60);
+  const s = String(expirySecs % 60).padStart(2, '0');
+  expiryText.textContent = expirySecs > 0 ? `Code expires in ${m}:${s}` : 'Code expired — please resend';
+  if (expirySecs > 0) { expirySecs--; setTimeout(tickExpiry, 1000); }
+}
+tickExpiry();
+
+function useBackup() {
+  showFeedback('info', 'Backup codes are managed in your account settings (demo only).', 'key-round');
+}
+
+// ---- Init ----
+inputs[0].focus();
+if (window.lucide) window.lucide.createIcons();
+</script>
+</body>
+</html>

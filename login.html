@@ -333,7 +333,7 @@
             <input type="checkbox" checked />
             Keep me signed in
           </label>
-          <a href="#">Forgot password?</a>
+          <a href="forgot-password.html">Forgot password?</a>
         </div>
 
         <button class="btn btn-primary" type="submit">
@@ -395,12 +395,14 @@ function submitLogin(evt) {
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
   if (!email || !password) return;
+  const next = routeForEmail(email);
   try {
     localStorage.setItem('axiot-login', JSON.stringify({
-      email, signedInAt: new Date().toISOString()
+      email, next, signedInAt: new Date().toISOString()
     }));
   } catch (e) {}
-  window.location.href = routeForEmail(email);
+  const qs = new URLSearchParams({ email, next }).toString();
+  window.location.href = `mfa.html?${qs}`;
 }
 
 // Init

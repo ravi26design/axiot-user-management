@@ -2909,7 +2909,10 @@ function openProfile(evt) {
 function profileAction(kind) {
   closeAllPopovers();
   if (kind === 'signout') {
-    confirmDialog('Sign out of AXIoT?', 'You will be returned to the sign-in page.', () => toast('Signed out', 'danger'));
+    confirmDialog('Sign out of AXIoT?', 'You will be returned to the sign-in page.', () => {
+      try { localStorage.removeItem('axiot-login'); } catch (e) {}
+      window.location.href = 'login.html';
+    });
     return;
   }
   const labels = { profile: 'My profile', sessions: 'My sessions', prefs: 'Preferences', client: 'Switch client', help: 'Help & documentation' };
