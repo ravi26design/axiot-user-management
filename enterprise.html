@@ -2751,7 +2751,7 @@ const SVG = {
 
 const NAV = [
   { section: 'Administration' },
-  { key: 'customers',   label: 'Clients',            ico: li('user-round'), screen: 'customers' },
+  { key: 'customers',   label: 'Clients',            ico: li('user-round'), screen: 'customers', hideInClientView: true },
   { key: 'users',       label: 'Users',                ico: SVG.users,      screen: 'users' },
   { key: 'roles',       label: 'Roles & permissions',  ico: SVG.roles,      screen: 'roles' },
   { key: 'industries',  label: 'Industries',           ico: SVG.industries, screen: 'industries' },
@@ -3005,7 +3005,7 @@ function renderSidebar(activeScreen) {
       <div class="brand-mark">AX</div>
       <div>AXIoT<div class="brand-sub">${workspaceLabel}</div></div>
     </div>
-    ${NAV.map(item => {
+    ${NAV.filter(item => !(item.hideInClientView && VIEW_CLIENT)).map(item => {
       if (item.section) return `<div class="nav-section">${item.section}</div>`;
       if (item.group) {
         if (!state.navExpanded) state.navExpanded = {};
