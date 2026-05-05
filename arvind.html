@@ -2643,10 +2643,13 @@ const SVG = {
 
 const NAV = [
   { section: 'Administration' },
-  { key: 'users',      label: 'Users',                ico: SVG.users,      screen: 'users' },
-  { key: 'roles',      label: 'Roles & permissions',  ico: SVG.roles,      screen: 'roles' },
-  { key: 'industries', label: 'Industries',           ico: SVG.industries, screen: 'industries' },
-  { key: 'devices',    label: 'Devices',              ico: SVG.devices,    screen: 'devices' }
+  { key: 'users',       label: 'Users',                ico: SVG.users,        screen: 'users' },
+  { key: 'roles',       label: 'Roles & permissions',  ico: SVG.roles,        screen: 'roles' },
+  { key: 'industries',  label: 'Industries',           ico: SVG.industries,   screen: 'industries' },
+  { section: 'Entities' },
+  { key: 'devices',     label: 'Devices',              ico: SVG.devices,      screen: 'devices' },
+  { key: 'entityViews', label: 'Entity views',         ico: li('layout-grid'), comingSoon: true },
+  { key: 'gateways',    label: 'Gateways',             ico: li('router'),     comingSoon: true }
 ];
 
 const RESOURCES = [
@@ -2831,7 +2834,9 @@ function renderSidebar(activeScreen) {
     ${NAV.map(item => {
       if (item.section) return `<div class="nav-section">${item.section}</div>`;
       const isActive = item.screen === activeScreen;
-      const clickable = item.screen ? `onclick="switchScreen('${item.screen}')"` : '';
+      const clickable = item.screen
+        ? `onclick="switchScreen('${item.screen}')"`
+        : (item.comingSoon ? `onclick="toast('${item.label} — coming soon')"` : '');
       const badge = item.badge ? `<span class="nav-badge ${item.badgeClass || ''}">${item.badge}</span>` : '';
       return `<a class="nav-item ${isActive ? 'active' : ''}" ${clickable} title="${item.label}"><span class="ico">${item.ico}</span><span class="nav-label">${item.label}</span>${badge}</a>`;
     }).join('')}
