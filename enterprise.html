@@ -2348,12 +2348,12 @@
       <div class="content">
         <div class="page-head">
           <div>
-            <div class="page-title">Customers <span id="customersCount" style="color:var(--text-muted);font-weight:500;font-size:18px"></span></div>
-            <div class="page-sub">Manage customers and their associated entities.</div>
+            <div class="page-title">Clients <span id="customersCount" style="color:var(--text-muted);font-weight:500;font-size:18px"></span></div>
+            <div class="page-sub">Manage clients and their associated entities.</div>
           </div>
           <button class="btn btn-primary" onclick="addCustomer()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-            Add customer
+            Add client
           </button>
         </div>
 
@@ -2361,7 +2361,7 @@
           <div class="toolbar">
             <div class="search-box">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-              <input id="customerSearch" placeholder="Search customers…" oninput="renderCustomersPage()" />
+              <input id="customerSearch" placeholder="Search clients…" oninput="renderCustomersPage()" />
             </div>
           </div>
           <div class="tbl-wrap">
@@ -2369,7 +2369,7 @@
               <thead>
                 <tr>
                   <th style="width:40px"><input type="checkbox" /></th>
-                  <th>Customer name</th>
+                  <th>Client name</th>
                   <th>Email</th>
                   <th>Created time</th>
                   <th>Country</th>
@@ -2749,7 +2749,7 @@ const SVG = {
 
 const NAV = [
   { section: 'Administration' },
-  { key: 'customers',   label: 'Customers',            ico: li('user-round'), screen: 'customers' },
+  { key: 'customers',   label: 'Clients',            ico: li('user-round'), screen: 'customers' },
   { key: 'users',       label: 'Users',                ico: SVG.users,      screen: 'users' },
   { key: 'roles',       label: 'Roles & permissions',  ico: SVG.roles,      screen: 'roles' },
   { key: 'industries',  label: 'Industries',           ico: SVG.industries, screen: 'industries' },
@@ -5487,10 +5487,10 @@ function toggleIndustryClientFilter(evt) {
    Customers
    ============================================================ */
 const CUSTOMERS = [
-  { id: 'cu-1', createdTime: '2026-04-24 11:20:25', title: 'Thara Customer', email: 'ops@thara.in',           country: 'India',          city: 'Thara',     state: 'Gujarat',     zip: '385565',  address: '12 Industrial Area',    address2: '',         phone: '9876543210',  phoneCountry: '+91', description: 'Textile manufacturing customer in north Gujarat.' },
-  { id: 'cu-2', createdTime: '2026-04-22 15:49:05', title: 'Customer C',     email: 'support@customer-c.com', country: 'United Kingdom', city: 'London',    state: 'England',     zip: 'EC1A 1BB', address: '24 Tabernacle Street',  address2: '',         phone: '2079460000',  phoneCountry: '+44', description: '' },
-  { id: 'cu-3', createdTime: '2026-04-22 15:49:05', title: 'Customer B',     email: 'hello@customer-b.io',    country: 'Germany',        city: 'Berlin',    state: 'Berlin',      zip: '10115',   address: 'Friedrichstraße 88',    address2: '',         phone: '3025550143',  phoneCountry: '+49', description: '' },
-  { id: 'cu-4', createdTime: '2026-04-22 15:49:05', title: 'Customer A',     email: 'info@customer-a.com',    country: 'United States',  city: 'Austin',    state: 'TX',          zip: '78701',   address: '500 W 2nd St',          address2: 'Suite 1900', phone: '5125550101', phoneCountry: '+1',  description: '' },
+  { id: 'cu-1', createdTime: '2026-04-24 11:20:25', title: 'Thara Client', email: 'ops@thara.in',           country: 'India',          city: 'Thara',     state: 'Gujarat',     zip: '385565',  address: '12 Industrial Area',    address2: '',         phone: '9876543210',  phoneCountry: '+91', description: 'Textile manufacturing client in north Gujarat.' },
+  { id: 'cu-2', createdTime: '2026-04-22 15:49:05', title: 'Client C',     email: 'support@customer-c.com', country: 'United Kingdom', city: 'London',    state: 'England',     zip: 'EC1A 1BB', address: '24 Tabernacle Street',  address2: '',         phone: '2079460000',  phoneCountry: '+44', description: '' },
+  { id: 'cu-3', createdTime: '2026-04-22 15:49:05', title: 'Client B',     email: 'hello@customer-b.io',    country: 'Germany',        city: 'Berlin',    state: 'Berlin',      zip: '10115',   address: 'Friedrichstraße 88',    address2: '',         phone: '3025550143',  phoneCountry: '+49', description: '' },
+  { id: 'cu-4', createdTime: '2026-04-22 15:49:05', title: 'Client A',     email: 'info@customer-a.com',    country: 'United States',  city: 'Austin',    state: 'TX',          zip: '78701',   address: '500 W 2nd St',          address2: 'Suite 1900', phone: '5125550101', phoneCountry: '+1',  description: '' },
   { id: 'cu-5', createdTime: '2026-04-20 09:14:11', title: 'Arvind Mills',   email: 'iot@arvind.com',         country: 'India',          city: 'Ahmedabad', state: 'Gujarat',     zip: '380025',  address: 'Naroda Road',           address2: '',         phone: '7926827000',  phoneCountry: '+91', description: 'Strategic textiles partner.' },
   { id: 'cu-6', createdTime: '2026-04-18 14:02:48', title: 'Dynamic Looms',  email: 'priya@dynamiclooms.com', country: 'India',          city: 'Pune',      state: 'Maharashtra', zip: '411001',  address: 'Hadapsar Industrial Estate', address2: '',    phone: '2026123456',  phoneCountry: '+91', description: 'Enterprise host workspace.' },
   { id: 'cu-7', createdTime: '2026-04-15 17:38:22', title: 'NovaWeave KK',   email: 'contact@novaweave.jp',   country: 'Japan',          city: 'Osaka',     state: 'Osaka',       zip: '530-0001', address: '1-1 Umeda',            address2: '',         phone: '662222222',   phoneCountry: '+81', description: '' },
@@ -5509,15 +5509,15 @@ function renderCustomersPage() {
   const countEl = document.getElementById('customersCount');
   if (countEl) countEl.textContent = `(${list.length})`;
   const meta = document.getElementById('customerListMeta');
-  if (meta) meta.textContent = `${list.length} of ${CUSTOMERS.length} customers`;
+  if (meta) meta.textContent = `${list.length} of ${CUSTOMERS.length} clients`;
 
   const tbody = document.getElementById('customerRows');
   if (!tbody) return;
   if (!list.length) {
     tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
-      <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">No customers match</div>
-      <div style="font-size:13px;color:var(--text-muted)">Try adjusting your search or add a customer.</div>
-      <div style="margin-top:14px"><button class="btn btn-primary btn-sm" onclick="addCustomer()">+ Add customer</button></div>
+      <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">No clients match</div>
+      <div style="font-size:13px;color:var(--text-muted)">Try adjusting your search or add a client.</div>
+      <div style="margin-top:14px"><button class="btn btn-primary btn-sm" onclick="addCustomer()">+ Add client</button></div>
     </div></td></tr>`;
     return;
   }
@@ -5532,11 +5532,11 @@ function renderCustomersPage() {
       <td style="color:var(--text-muted)">${_kvEscape(c.city || '')}</td>
       <td onclick="event.stopPropagation()">
         <div class="row-actions">
-          <button class="icon-btn" title="Customer users" onclick="toast('Customer users — coming soon')">${li('user')}</button>
-          <button class="icon-btn" title="Customer industries" onclick="toast('Customer industries — coming soon')">${li('building-2')}</button>
-          <button class="icon-btn" title="Customer devices" onclick="toast('Customer devices — coming soon')">${li('cpu')}</button>
-          <button class="icon-btn" title="Customer dashboards" onclick="toast('Customer dashboards — coming soon')">${li('layout-grid')}</button>
-          <button class="icon-btn" title="Customer gateways" onclick="toast('Customer gateways — coming soon')">${li('share-2')}</button>
+          <button class="icon-btn" title="Client users" onclick="toast('Client users — coming soon')">${li('user')}</button>
+          <button class="icon-btn" title="Client industries" onclick="toast('Client industries — coming soon')">${li('building-2')}</button>
+          <button class="icon-btn" title="Client devices" onclick="toast('Client devices — coming soon')">${li('cpu')}</button>
+          <button class="icon-btn" title="Client dashboards" onclick="toast('Client dashboards — coming soon')">${li('layout-grid')}</button>
+          <button class="icon-btn" title="Client gateways" onclick="toast('Client gateways — coming soon')">${li('share-2')}</button>
           <button class="icon-btn" title="Delete" onclick="deleteCustomer('${c.id}')" style="color:var(--danger)">${li('trash-2')}</button>
         </div>
       </td>
@@ -5588,8 +5588,8 @@ function addCustomer(existing) {
     </style>
     <div class="drawer-head">
       <div>
-        <div class="drawer-title">${editing ? 'Edit' : 'Add'} customer</div>
-        <div class="drawer-sub">Customer profile and contact details.</div>
+        <div class="drawer-title">${editing ? 'Edit' : 'Add'} client</div>
+        <div class="drawer-sub">Client profile and contact details.</div>
       </div>
       <button class="icon-btn" onclick="closeCustomerDrawer()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -5597,7 +5597,7 @@ function addCustomer(existing) {
     </div>
     <div class="drawer-body">
       <div class="field">
-        <label class="label">Customer name <span class="req">*</span></label>
+        <label class="label">Client name <span class="req">*</span></label>
         <input class="input" id="custTitle" placeholder="e.g. Acme Corp" value="${_kvEscape(state._customerDraft.title)}" oninput="state._customerDraft.title=this.value;validateCustomerForm()" />
       </div>
       <div class="field">
@@ -5696,11 +5696,11 @@ function submitCustomer() {
   if (draft.id) {
     const existing = CUSTOMERS.find(c => c.id === draft.id);
     if (existing) Object.assign(existing, draft);
-    toast('Customer updated', 'success');
+    toast('Client updated', 'success');
   } else {
     const newId = 'cu-' + (state._customerSeq = (state._customerSeq || CUSTOMERS.length) + 1);
     CUSTOMERS.unshift({ id: newId, createdTime: fmt, ...draft });
-    toast('Customer added', 'success');
+    toast('Client added', 'success');
   }
   closeCustomerDrawer();
   renderCustomersPage();
@@ -5714,11 +5714,11 @@ function editCustomer(id) {
 function deleteCustomer(id) {
   const c = CUSTOMERS.find(x => x.id === id);
   if (!c) return;
-  confirmDialog(`Delete customer "${c.title}"?`, 'This permanently removes the customer.', () => {
+  confirmDialog(`Delete client "${c.title}"?`, 'This permanently removes the client.', () => {
     const idx = CUSTOMERS.findIndex(x => x.id === id);
     if (idx >= 0) CUSTOMERS.splice(idx, 1);
     renderCustomersPage();
-    toast('Customer deleted', 'danger');
+    toast('Client deleted', 'danger');
   });
 }
 
