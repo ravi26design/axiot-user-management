@@ -2369,9 +2369,9 @@
               <thead>
                 <tr>
                   <th style="width:40px"><input type="checkbox" /></th>
-                  <th>Created time</th>
-                  <th>Title</th>
+                  <th>Customer name</th>
                   <th>Email</th>
+                  <th>Created time</th>
                   <th>Country</th>
                   <th>City</th>
                   <th style="width:240px"></th>
@@ -5520,9 +5520,9 @@ function renderCustomersPage() {
   tbody.innerHTML = list.map(c => `
     <tr class="row-clickable" onclick="editCustomer('${c.id}')">
       <td onclick="event.stopPropagation()"><input type="checkbox" /></td>
-      <td>${c.createdTime}</td>
       <td>${_kvEscape(c.title)}</td>
       <td style="color:var(--text-muted)">${_kvEscape(c.email || '')}</td>
+      <td style="color:var(--text-muted)">${c.createdTime}</td>
       <td style="color:var(--text-muted)">${_kvEscape(c.country || '')}</td>
       <td style="color:var(--text-muted)">${_kvEscape(c.city || '')}</td>
       <td onclick="event.stopPropagation()">
@@ -5592,7 +5592,7 @@ function addCustomer(existing) {
     </div>
     <div class="drawer-body">
       <div class="field">
-        <label class="label">Title <span class="req">*</span></label>
+        <label class="label">Customer name <span class="req">*</span></label>
         <input class="input" id="custTitle" placeholder="e.g. Acme Corp" value="${_kvEscape(state._customerDraft.title)}" oninput="state._customerDraft.title=this.value;validateCustomerForm()" />
       </div>
       <div class="field">
