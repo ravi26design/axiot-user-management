@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AXIoT — User Management</title>
+<title>AXIoT â User Management</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -36,7 +36,7 @@
     --radius: 6px;
     --radius-lg: 8px;
 
-    /* Type scale — use these, not raw px */
+    /* Type scale â use these, not raw px */
     --fs-xxs: 11px;     /* micro uppercase labels, tiny badges */
     --fs-xs:  12px;     /* captions, helper text */
     --fs-sm:  13px;     /* secondary labels, compact UI */
@@ -68,12 +68,12 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
-  /* ===== Typographic hierarchy (primary → tertiary) =====
-     1. .page-title, .details-name       → 24px / 600   (primary focus)
-     2. .matrix-title, .info-section-title, .drawer-title → 16px / 600  (secondary)
-     3. body text, .btn, .nav-item, td   → 14px / 400-500 (default reading)
-     4. .page-sub, hints, meta, cell-sub → 13px / 400 muted
-     5. .stat-label, th, form-section-title, .tab-count → 11px / 600 uppercase
+  /* ===== Typographic hierarchy (primary â tertiary) =====
+     1. .page-title, .details-name       â 24px / 600   (primary focus)
+     2. .matrix-title, .info-section-title, .drawer-title â 16px / 600  (secondary)
+     3. body text, .btn, .nav-item, td   â 14px / 400-500 (default reading)
+     4. .page-sub, hints, meta, cell-sub â 13px / 400 muted
+     5. .stat-label, th, form-section-title, .tab-count â 11px / 600 uppercase
   */
   button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
   input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
@@ -487,7 +487,7 @@
   .tbl-wrap { overflow: auto; }
   table { width: 100%; border-collapse: collapse; }
   thead th {
-    /* TERTIARY: table column labels — micro uppercase */
+    /* TERTIARY: table column labels â micro uppercase */
     font-size: var(--fs-xxs); font-weight: var(--fw-semi); text-transform: uppercase;
     letter-spacing: var(--track-loose); color: var(--text-muted); text-align: left;
     padding: 10px 16px; background: var(--bg);
@@ -524,7 +524,7 @@
     background: var(--surface); color: var(--text);
     border: 1px solid var(--border); font-weight: 500;
   }
-  /* Colored role tags — soft backgrounds + matching text + border */
+  /* Colored role tags â soft backgrounds + matching text + border */
   .role-tag {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 3px 9px; border-radius: 4px;
@@ -912,7 +912,7 @@
 
   .ico svg { width: 100%; height: 100%; display: block; }
 
-  /* Lucide icons — defaults; individual contexts override */
+  /* Lucide icons â defaults; individual contexts override */
   [data-lucide] {
     width: 16px; height: 16px; flex-shrink: 0;
     stroke-width: 1.8;
@@ -929,7 +929,7 @@
   .info-section-head .ico-box [data-lucide] { width: 18px; height: 18px; }
   .dev-ico [data-lucide] { width: 14px; height: 14px; }
 
-  /* ===== User details page — horizontal hero card ===== */
+  /* ===== User details page â horizontal hero card ===== */
   .user-hero {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-lg); padding: 22px 24px;
@@ -955,7 +955,7 @@
 
   .user-hero-main { flex: 1; min-width: 0; }
   .user-hero-name {
-    /* PRIMARY focus on details page — person's name */
+    /* PRIMARY focus on details page â person's name */
     font-size: var(--fs-xl); font-weight: var(--fw-bold); letter-spacing: var(--track-tight);
     line-height: 1.25; color: var(--text);
   }
@@ -1110,7 +1110,7 @@
     .info-row-cell { border-right: none !important; }
   }
 
-  /* Overview — clean two-column property lists */
+  /* Overview â clean two-column property lists */
   .overview-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
   }
@@ -1190,10 +1190,10 @@
     color: var(--text-muted);
   }
   .perm-cell.inherit-on::after {
-    content: '✓'; font-size: 13px; font-weight: 700;
+    content: 'â'; font-size: 13px; font-weight: 700;
   }
   .perm-cell.on::after {
-    content: '✓'; font-size: 14px; font-weight: 700;
+    content: 'â'; font-size: 14px; font-weight: 700;
   }
   .perm-cell.off::after {
     content: ''; width: 10px; height: 2px; background: var(--border-strong);
@@ -1218,7 +1218,7 @@
   .row-clickable { cursor: pointer; }
   .row-clickable:hover .cell-user-name { color: var(--primary); }
 
-  /* ===== Device details — header card on top, tabs + content below ===== */
+  /* ===== Device details â header card on top, tabs + content below ===== */
   .dd-header {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-lg); margin-bottom: 16px;
@@ -1273,7 +1273,7 @@
   }
   .dd-alarm-count.zero { background: var(--bg-hover); color: var(--text-muted); }
 
-  /* Meta grid — second row of header card */
+  /* Meta grid â second row of header card */
   .dd-meta-grid {
     display: grid; grid-template-columns: repeat(4, 1fr);
     border-top: 1px solid var(--border);
@@ -1816,7 +1816,7 @@
   }
   .de-chart-legend .swatch { width: 14px; height: 14px; border-radius: 3px; }
 
-  /* Timeline tab — refined */
+  /* Timeline tab â refined */
   .tl-head {
     display: flex; align-items: flex-end; justify-content: space-between;
     margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
@@ -1999,7 +1999,7 @@
   .dd-power .punit { font-size: var(--fs-sm); color: var(--text-muted); margin-left: 4px; font-weight: var(--fw-med); }
   .dd-power .plbl { font-size: var(--fs-xxs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
 
-  /* Client view — hide client-level UI since everything is scoped to one client */
+  /* Client view â hide client-level UI since everything is scoped to one client */
   body.client-view #filterClientBtn,
   body.client-view .client-col,
   body.client-view .role-filter-bar,
@@ -2133,20 +2133,20 @@
           <div class="toolbar" id="userToolbar">
             <div class="search-box">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-              <input id="userSearch" placeholder="Search by name or email…" oninput="renderUsers()" />
-              <button id="userSearchClear" onclick="clearSearch()" style="display:none;color:var(--text-subtle);padding:0 2px" title="Clear">✕</button>
+              <input id="userSearch" placeholder="Search by name or emailâ¦" oninput="renderUsers()" />
+              <button id="userSearchClear" onclick="clearSearch()" style="display:none;color:var(--text-subtle);padding:0 2px" title="Clear">â</button>
             </div>
-            <div class="filter-wrap"><button class="chip-select" id="filterRoleBtn" onclick="toggleFilter('role', this)">Role <span class="caret">▾</span></button></div>
-            <div class="filter-wrap"><button class="chip-select" id="filterStatusBtn" onclick="toggleFilter('status', this)">Status <span class="caret">▾</span></button></div>
-            <div class="filter-wrap"><button class="chip-select" id="filterClientBtn" onclick="toggleFilter('client', this)">Client <span class="caret">▾</span></button></div>
-            <div class="filter-wrap"><button class="chip-select" id="filterLocationBtn" onclick="toggleFilter('location', this)">Industry <span class="caret">▾</span></button></div>
+            <div class="filter-wrap"><button class="chip-select" id="filterRoleBtn" onclick="toggleFilter('role', this)">Role <span class="caret">â¾</span></button></div>
+            <div class="filter-wrap"><button class="chip-select" id="filterStatusBtn" onclick="toggleFilter('status', this)">Status <span class="caret">â¾</span></button></div>
+            <div class="filter-wrap"><button class="chip-select" id="filterClientBtn" onclick="toggleFilter('client', this)">Client <span class="caret">â¾</span></button></div>
+            <div class="filter-wrap"><button class="chip-select" id="filterLocationBtn" onclick="toggleFilter('location', this)">Industry <span class="caret">â¾</span></button></div>
             <button class="chip-select" id="clearFiltersBtn" onclick="clearAllFilters()" style="display:none;color:var(--danger);border-color:var(--danger)">Clear all</button>
             <div class="toolbar-right">
               <button class="icon-btn" onclick="renderUsers()" title="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-6.4-2.6L3 16"/><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 6.4 2.6L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></svg></button>
             </div>
           </div>
           <div class="bulk-bar" id="bulkBar">
-            <span><span class="count">3</span> selected</span><span class="sep">·</span>
+            <span><span class="count">3</span> selected</span><span class="sep">Â·</span>
             <button class="bulk-btn">Assign role</button>
             <button class="bulk-btn">Deactivate</button>
             <button class="bulk-btn">Export</button>
@@ -2156,7 +2156,7 @@
             <table>
               <thead><tr>
                 <th style="width:36px"><input type="checkbox" class="check" onchange="toggleAll(this)" /></th>
-                <th>Name <span class="sort">▲</span></th>
+                <th>Name <span class="sort">â²</span></th>
                 <th class="client-col">Client</th>
                 <th>Industry</th>
                 <th>Role</th>
@@ -2168,9 +2168,9 @@
             </table>
           </div>
           <div class="tbl-footer">
-            <div id="tblCount">—</div>
+            <div id="tblCount">â</div>
             <div class="pager">
-              <button>‹</button><button class="active">1</button><button>›</button>
+              <button>â¹</button><button class="active">1</button><button>âº</button>
             </div>
             <div><select class="select-sm"><option>25 per page</option><option>50 per page</option><option>100 per page</option></select></div>
           </div>
@@ -2199,7 +2199,7 @@
           <div class="role-list">
             <div class="role-list-head">
               <span>Roles</span>
-              <span class="count" id="roleCount">—</span>
+              <span class="count" id="roleCount">â</span>
             </div>
             <div class="role-list-items" id="roleList"></div>
           </div>
@@ -2244,13 +2244,13 @@
           <div class="toolbar">
             <div class="search-box">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-              <input id="deviceSearch" placeholder="Search devices…" oninput="renderDevicesPage()" />
+              <input id="deviceSearch" placeholder="Search devicesâ¦" oninput="renderDevicesPage()" />
             </div>
             <div class="filter-wrap device-client-filter">
-              <button class="chip-select" id="filterDeviceClientBtn" onclick="toggleDeviceClientFilter(event)">Client <span class="caret">▾</span></button>
+              <button class="chip-select" id="filterDeviceClientBtn" onclick="toggleDeviceClientFilter(event)">Client <span class="caret">â¾</span></button>
             </div>
             <div class="filter-wrap">
-              <button class="chip-select" id="filterDeviceIndustryBtn" onclick="toggleDeviceIndustryFilter(event)">Industry <span class="caret">▾</span></button>
+              <button class="chip-select" id="filterDeviceIndustryBtn" onclick="toggleDeviceIndustryFilter(event)">Industry <span class="caret">â¾</span></button>
             </div>
           </div>
           <div class="tbl-wrap">
@@ -2270,9 +2270,9 @@
             </table>
           </div>
           <div class="tbl-footer">
-            <div id="deviceListMeta">—</div>
+            <div id="deviceListMeta">â</div>
             <div class="pager">
-              <button disabled style="opacity:.4;cursor:default">‹</button><button class="active">1</button><button disabled style="opacity:.4;cursor:default">›</button>
+              <button disabled style="opacity:.4;cursor:default">â¹</button><button class="active">1</button><button disabled style="opacity:.4;cursor:default">âº</button>
             </div>
             <div><select class="select-sm"><option>25 per page</option><option>50 per page</option><option>100 per page</option></select></div>
           </div>
@@ -2304,10 +2304,10 @@
           <div class="toolbar">
             <div class="search-box">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-              <input id="industrySearch" placeholder="Search industries…" oninput="renderIndustries()" />
+              <input id="industrySearch" placeholder="Search industriesâ¦" oninput="renderIndustries()" />
             </div>
             <div class="filter-wrap industry-client-filter">
-              <button class="chip-select" id="filterIndustryClientBtn" onclick="toggleIndustryClientFilter(event)">Client <span class="caret">▾</span></button>
+              <button class="chip-select" id="filterIndustryClientBtn" onclick="toggleIndustryClientFilter(event)">Client <span class="caret">â¾</span></button>
             </div>
           </div>
           <div class="tbl-wrap">
@@ -2327,9 +2327,9 @@
             </table>
           </div>
           <div class="tbl-footer">
-            <div id="industryListMeta">—</div>
+            <div id="industryListMeta">â</div>
             <div class="pager">
-              <button disabled style="opacity:.4;cursor:default">‹</button><button class="active">1</button><button disabled style="opacity:.4;cursor:default">›</button>
+              <button disabled style="opacity:.4;cursor:default">â¹</button><button class="active">1</button><button disabled style="opacity:.4;cursor:default">âº</button>
             </div>
             <div><select class="select-sm"><option>25 per page</option><option>50 per page</option><option>100 per page</option></select></div>
           </div>
@@ -2361,7 +2361,11 @@
           <div class="toolbar">
             <div class="search-box">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-              <input id="customerSearch" placeholder="Search clients…" oninput="renderCustomersPage()" />
+              <input id="customerSearch" placeholder="Search clientsâ¦" oninput="renderCustomersPage()" />
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <div class="filter-wrap"><button class="chip-select" id="filterClientCountryBtn" onclick="toggleClientCountryFilter(event)">Country <span class="caret">▾</span></button></div>
+              <div class="filter-wrap"><button class="chip-select" id="filterClientCityBtn" onclick="toggleClientCityFilter(event)">City <span class="caret">▾</span></button></div>
             </div>
           </div>
           <div class="tbl-wrap">
@@ -2381,9 +2385,9 @@
             </table>
           </div>
           <div class="tbl-footer">
-            <div id="customerListMeta">—</div>
+            <div id="customerListMeta">â</div>
             <div class="pager">
-              <button disabled style="opacity:.4;cursor:default">‹</button><button class="active">1</button><button disabled style="opacity:.4;cursor:default">›</button>
+              <button disabled style="opacity:.4;cursor:default">â¹</button><button class="active">1</button><button disabled style="opacity:.4;cursor:default">âº</button>
             </div>
             <div><select class="select-sm"><option>25 per page</option><option>50 per page</option><option>100 per page</option></select></div>
           </div>
@@ -2545,7 +2549,7 @@
                 <line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
               <div style="font-size:12px;font-weight:500;color:#0B1220;margin-top:8px">Click or drag</div>
-              <div style="font-size:11px;color:rgba(11,18,32,0.52);margin-top:2px">PNG · JPG · WEBP</div>
+              <div style="font-size:11px;color:rgba(11,18,32,0.52);margin-top:2px">PNG Â· JPG Â· WEBP</div>
             </div>
             <img id="deviceImagePreviewImg" alt="Device" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
           </div>
@@ -2614,7 +2618,7 @@
       <div class="form-section-title">Details</div>
       <div class="field">
         <label class="label">Industry name <span class="req">*</span></label>
-        <input class="input" id="industryName" placeholder="e.g. Pune Plant — Line A" />
+        <input class="input" id="industryName" placeholder="e.g. Pune Plant â Line A" />
         <div class="hint">A clear name that identifies this location.</div>
       </div>
       <div class="field invite-client-field">
@@ -2690,7 +2694,7 @@
 /* ============================================================
    Data
    ============================================================ */
-// View mode — scoped by ?client=<Name> OR by filename (arvind.html → Arvind)
+// View mode â scoped by ?client=<Name> OR by filename (arvind.html â Arvind)
 const VIEW_CLIENT = (() => {
   try {
     const q = new URLSearchParams(window.location.search).get('client');
@@ -2705,7 +2709,7 @@ const VIEW_CLIENT = (() => {
 if (VIEW_CLIENT) document.body.classList.add('client-view');
 
 const li = (name) => `<i data-lucide="${name}"></i>`;
-// Render any <i data-lucide> placeholders into SVGs — debounced to avoid feedback loops
+// Render any <i data-lucide> placeholders into SVGs â debounced to avoid feedback loops
 let _iconsTick = null;
 function renderIcons() {
   if (_iconsTick) return;
@@ -2802,14 +2806,14 @@ const adminPerms = () => {
 };
 
 const initialRoles = [
-  { id: 'dl-super', name: 'Super Admin', system: false, client: 'Dynamic Looms', industry: 'Textiles & Apparel', users: 1, updated: 'Mar 12', desc: 'Full platform access for Dynamic Looms — can manage all clients, users, devices, and settings.', perms: fullPerms() },
-  { id: 'av-super', name: 'Super Admin', system: false, client: 'Arvind',        industry: 'Textiles & Apparel', users: 1, updated: 'Feb 28', desc: 'Full admin rights — manage everything in the workspace.', perms: fullPerms() }
+  { id: 'dl-super', name: 'Super Admin', system: false, client: 'Dynamic Looms', industry: 'Textiles & Apparel', users: 1, updated: 'Mar 12', desc: 'Full platform access for Dynamic Looms â can manage all clients, users, devices, and settings.', perms: fullPerms() },
+  { id: 'av-super', name: 'Super Admin', system: false, client: 'Arvind',        industry: 'Textiles & Apparel', users: 1, updated: 'Feb 28', desc: 'Full admin rights â manage everything in the workspace.', perms: fullPerms() }
 ];
 
 const initialIndustries = [
   { id: 'i-1', name: 'Mumbai HQ',           client: 'Dynamic Looms', type: 'Textiles & Apparel', address: 'Nariman Point', city: 'Mumbai',     country: 'India', active: true,  users: 1, devices: 2 },
-  { id: 'i-2', name: 'Pune Plant — Line A', client: 'Arvind',        type: 'Textiles & Apparel', address: 'MIDC Hinjewadi', city: 'Pune',      country: 'India', active: true,  users: 1, devices: 6 },
-  { id: 'i-3', name: 'Pune Plant — Line B', client: 'Arvind',        type: 'Textiles & Apparel', address: 'MIDC Hinjewadi', city: 'Pune',      country: 'India', active: true,  users: 0, devices: 4 },
+  { id: 'i-2', name: 'Pune Plant â Line A', client: 'Arvind',        type: 'Textiles & Apparel', address: 'MIDC Hinjewadi', city: 'Pune',      country: 'India', active: true,  users: 1, devices: 6 },
+  { id: 'i-3', name: 'Pune Plant â Line B', client: 'Arvind',        type: 'Textiles & Apparel', address: 'MIDC Hinjewadi', city: 'Pune',      country: 'India', active: true,  users: 0, devices: 4 },
   { id: 'i-4', name: 'Chennai Plant',       client: 'Arvind',        type: 'Manufacturing',      address: 'Sriperumbudur',  city: 'Chennai',   country: 'India', active: true,  users: 0, devices: 4 },
   { id: 'i-5', name: 'Ahmedabad HQ',        client: 'Arvind',        type: 'Textiles & Apparel', address: 'Naroda',         city: 'Ahmedabad', country: 'India', active: false, users: 0, devices: 2 }
 ];
@@ -2835,7 +2839,7 @@ const state = {
 const CLIENTS = ['Dynamic Looms', 'Arvind'];
 const LOCATIONS_BY_CLIENT = {
   'Dynamic Looms': ['Mumbai HQ'],
-  'Arvind':        ['Pune Plant — Line A', 'Pune Plant — Line B', 'Chennai Plant', 'Ahmedabad HQ']
+  'Arvind':        ['Pune Plant â Line A', 'Pune Plant â Line B', 'Chennai Plant', 'Ahmedabad HQ']
 };
 // NOTE: In our product, this field is called "Location" (surfaced as Location in the UI).
 // Kept as INDUSTRIES in code for future flexibility. Values below represent
@@ -2860,31 +2864,31 @@ const INDUSTRY_BY_CLIENT = {
 };
 
 const DEVICES = [
-  // Dynamic Looms — Mumbai HQ (platform ops)
+  // Dynamic Looms â Mumbai HQ (platform ops)
   { id: 'd-001', name: 'Platform Gateway GW-DL01',  type: 'Gateway', client: 'Dynamic Looms', industry: 'Textiles & Apparel', location: 'Mumbai HQ' },
   { id: 'd-002', name: 'Monitoring Server MS-01',   type: 'Server',  client: 'Dynamic Looms', industry: 'Textiles & Apparel', location: 'Mumbai HQ' },
 
-  // Arvind — Pune Plant — Line A
-  { id: 'd-010', name: 'Compressor #4',             type: 'Compressor', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
-  { id: 'd-011', name: 'Valve Cluster V12',         type: 'Valve',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
-  { id: 'd-012', name: 'Conveyor Motor M3',         type: 'Motor',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
-  { id: 'd-013', name: 'Temperature Sensor TS-A7',  type: 'Sensor',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
-  { id: 'd-014', name: 'Flow Meter FM-12',          type: 'Flow meter', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
-  { id: 'd-015', name: 'Pressure Gauge PG-A1',      type: 'Gauge',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line A' },
+  // Arvind â Pune Plant â Line A
+  { id: 'd-010', name: 'Compressor #4',             type: 'Compressor', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line A' },
+  { id: 'd-011', name: 'Valve Cluster V12',         type: 'Valve',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line A' },
+  { id: 'd-012', name: 'Conveyor Motor M3',         type: 'Motor',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line A' },
+  { id: 'd-013', name: 'Temperature Sensor TS-A7',  type: 'Sensor',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line A' },
+  { id: 'd-014', name: 'Flow Meter FM-12',          type: 'Flow meter', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line A' },
+  { id: 'd-015', name: 'Pressure Gauge PG-A1',      type: 'Gauge',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line A' },
 
-  // Arvind — Pune Plant — Line B
-  { id: 'd-020', name: 'Pump Station P2',           type: 'Pump',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line B' },
-  { id: 'd-021', name: 'Heat Exchanger H1',         type: 'Exchanger', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line B' },
-  { id: 'd-022', name: 'Cooling Tower CT-B2',       type: 'Cooling',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line B' },
-  { id: 'd-023', name: 'Conveyor Motor M5',         type: 'Motor',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant — Line B' },
+  // Arvind â Pune Plant â Line B
+  { id: 'd-020', name: 'Pump Station P2',           type: 'Pump',      client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line B' },
+  { id: 'd-021', name: 'Heat Exchanger H1',         type: 'Exchanger', client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line B' },
+  { id: 'd-022', name: 'Cooling Tower CT-B2',       type: 'Cooling',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line B' },
+  { id: 'd-023', name: 'Conveyor Motor M5',         type: 'Motor',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Pune Plant â Line B' },
 
-  // Arvind — Chennai Plant
+  // Arvind â Chennai Plant
   { id: 'd-030', name: 'Press Line PR-1',           type: 'Press',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant' },
   { id: 'd-031', name: 'Boiler B-07',               type: 'Boiler',    client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant' },
   { id: 'd-032', name: 'Robotic Arm RA-02',         type: 'Robot',     client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant' },
   { id: 'd-033', name: 'Welder Station WS-14',      type: 'Welder',    client: 'Arvind', industry: 'Textiles & Apparel', location: 'Chennai Plant' },
 
-  // Arvind — Ahmedabad HQ
+  // Arvind â Ahmedabad HQ
   { id: 'd-040', name: 'HQ Gateway GW-AHM01',       type: 'Gateway',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Ahmedabad HQ' },
   { id: 'd-041', name: 'Network Switch NSW-12',     type: 'Network',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Ahmedabad HQ' }
 ];
@@ -2926,14 +2930,14 @@ function isOverridden(user, device, action) {
 
 const users = [
   { name: 'Priya Sharma', email: 'priya@dynamiclooms.com', role: 'Super Admin', client: 'Dynamic Looms', industry: 'Textiles & Apparel', location: 'Mumbai HQ',           status: 'active', last: '2 min ago',  init: 'PS' },
-  { name: 'Marcus Chen',  email: 'marcus.chen@arvind.com', role: 'Super Admin', client: 'Arvind',        industry: 'Textiles & Apparel', location: 'Pune Plant — Line A', status: 'active', last: '28 min ago', init: 'MC' }
+  { name: 'Marcus Chen',  email: 'marcus.chen@arvind.com', role: 'Super Admin', client: 'Arvind',        industry: 'Textiles & Apparel', location: 'Pune Plant â Line A', status: 'active', last: '28 min ago', init: 'MC' }
 ];
 
 /* ============================================================
-   Rendering — shared shell
+   Rendering â shared shell
    ============================================================ */
 function renderSidebar(activeScreen) {
-  const workspaceLabel = VIEW_CLIENT ? `Client · ${VIEW_CLIENT}` : 'Dynamic Looms';
+  const workspaceLabel = VIEW_CLIENT ? `Client Â· ${VIEW_CLIENT}` : 'Dynamic Looms';
   const html = `
     <button class="sidebar-collapse" onclick="toggleSidebar()" title="Collapse sidebar" aria-label="Toggle sidebar">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
@@ -2954,7 +2958,7 @@ function renderSidebar(activeScreen) {
           const cActive = c.screen === activeScreen;
           const cClick = c.screen
             ? `onclick="switchScreen('${c.screen}')"`
-            : (c.comingSoon ? `onclick="toast('${c.label} — coming soon')"` : '');
+            : (c.comingSoon ? `onclick="toast('${c.label} â coming soon')"` : '');
           return `<a class="nav-item nav-sub ${cActive ? 'active' : ''}" ${cClick} title="${c.label}"><span class="ico">${c.ico}</span><span class="nav-label">${c.label}</span></a>`;
         }).join('');
         return `<div class="nav-group ${isExpanded ? 'expanded' : ''}">
@@ -2965,7 +2969,7 @@ function renderSidebar(activeScreen) {
       const isActive = item.screen === activeScreen;
       const clickable = item.screen
         ? `onclick="switchScreen('${item.screen}')"`
-        : (item.comingSoon ? `onclick="toast('${item.label} — coming soon')"` : '');
+        : (item.comingSoon ? `onclick="toast('${item.label} â coming soon')"` : '');
       const badge = item.badge ? `<span class="nav-badge ${item.badgeClass || ''}">${item.badge}</span>` : '';
       return `<a class="nav-item ${isActive ? 'active' : ''}" ${clickable} title="${item.label}"><span class="ico">${item.ico}</span><span class="nav-label">${item.label}</span>${badge}</a>`;
     }).join('')}
@@ -2990,21 +2994,21 @@ function toggleNavGroup(key) {
 
 /* ==== Notifications data ==== */
 const NOTIF_ICONS = {
-  // Device / system alert — lightning bolt (something triggered)
+  // Device / system alert â lightning bolt (something triggered)
   alert:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>',
   // Mail / invite
   mail:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
-  // Shield check — security/role change
+  // Shield check â security/role change
   shield:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>',
-  // User plus — new member
+  // User plus â new member
   userAdd: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>',
-  // Bar chart — digest/report
+  // Bar chart â digest/report
   chart:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>',
   // Device / hardware
   device:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20h10M12 16v4"/></svg>',
-  // Clock — expiring / time-based
+  // Clock â expiring / time-based
   clock:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-  // Check circle — success
+  // Check circle â success
   check:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4L12 14.01l-3-3"/></svg>'
 };
 
@@ -3013,7 +3017,7 @@ const NOTIFS = [
   { id: 2, type: 'warn',    ico: 'clock',   title: '8 invites expiring soon', msg: 'Pending user invitations will expire in the next 3 days.', time: '1 hour ago', unread: true },
   { id: 3, type: 'success', ico: 'shield',  title: 'Role "Plant Operator" updated', msg: 'You saved changes to 3 permissions.', time: '3 hours ago', unread: true },
   { id: 4, type: 'info',    ico: 'userAdd', title: 'New user joined', msg: 'Marcus Chen accepted the invitation to Dynamic Looms.', time: 'Yesterday', unread: false },
-  { id: 5, type: 'info',    ico: 'chart',   title: 'Weekly digest available', msg: 'Your summary for April 14–20 is ready.', time: '2 days ago', unread: false }
+  { id: 5, type: 'info',    ico: 'chart',   title: 'Weekly digest available', msg: 'Your summary for April 14â20 is ready.', time: '2 days ago', unread: false }
 ];
 
 function closeAllPopovers() {
@@ -3093,7 +3097,7 @@ function openProfile(evt) {
       <button onclick="profileAction('client')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>Switch client</button>
       <button onclick="profileAction('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>Help & documentation</button>
       <div class="sep"></div>
-      <button class="danger" onclick="profileAction('signout')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Sign out<span class="prof-kbd">⇧⌘Q</span></button>
+      <button class="danger" onclick="profileAction('signout')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Sign out<span class="prof-kbd">â§âQ</span></button>
     </div>
   `;
   document.body.appendChild(pop);
@@ -3171,7 +3175,7 @@ function renderTopbar() {
           <span class="name">Ravi Prasad</span>
           <span class="sub">Administrator</span>
         </div>
-        <span class="caret">▾</span>
+        <span class="caret">â¾</span>
       </div>
     </div>
   `;
@@ -3204,13 +3208,13 @@ function renderDevicesPage() {
   const cbtn = document.getElementById('filterDeviceClientBtn');
   if (cbtn && !VIEW_CLIENT) {
     cbtn.classList.toggle('active', cf !== 'all');
-    cbtn.innerHTML = (cf === 'all' ? 'Client' : `${cf} <span style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">1</span>`) + ' <span class="caret">▾</span>';
+    cbtn.innerHTML = (cf === 'all' ? 'Client' : `${cf} <span style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">1</span>`) + ' <span class="caret">â¾</span>';
   }
   const inf = state.deviceIndustryFilter;
   const ibtn = document.getElementById('filterDeviceIndustryBtn');
   if (ibtn) {
     ibtn.classList.toggle('active', inf !== 'all');
-    ibtn.innerHTML = (inf === 'all' ? 'Industry' : `${inf} <span style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">1</span>`) + ' <span class="caret">▾</span>';
+    ibtn.innerHTML = (inf === 'all' ? 'Industry' : `${inf} <span style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">1</span>`) + ' <span class="caret">â¾</span>';
   }
 
   const tbody = document.getElementById('deviceRows');
@@ -3230,7 +3234,7 @@ function renderDevicesPage() {
           <div class="dev-ico">${SVG.devices}</div>
           <div>
             <div class="cell-user-name">${d.name}</div>
-            <div class="cell-user-sub">${d.serial || '—'} · v${d.firmware || '—'}</div>
+            <div class="cell-user-sub">${d.serial || 'â'} Â· v${d.firmware || 'â'}</div>
           </div>
         </div>
       </td>
@@ -3238,7 +3242,7 @@ function renderDevicesPage() {
       <td class="device-client-col" style="color:var(--text-muted)">${d.client}</td>
       <td style="color:var(--text-muted)">${d.location}</td>
       <td>${d.active !== false ? '<span class="chip chip-active"><span class="dot"></span>Active</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Inactive</span>'}</td>
-      <td style="color:var(--text-muted)">${d.lastSeen || '—'}</td>
+      <td style="color:var(--text-muted)">${d.lastSeen || 'â'}</td>
       <td onclick="event.stopPropagation()">
         <div class="row-actions">
           <button class="icon-btn" title="Edit" onclick="openDeviceDrawer('${d.id}')">${SVG.edit}</button>
@@ -3302,11 +3306,11 @@ function renderDeviceDetails() {
         <div class="dd-head-status">
           <div class="dd-status-block">
             ${statusChipHtml}
-            <div class="meta">${d.lastSeen || '—'}</div>
+            <div class="meta">${d.lastSeen || 'â'}</div>
           </div>
           <div class="dd-status-block">
             ${onlineChipHtml}
-            <div class="meta">${d.active !== false ? 'Just now' : (d.lastSeen || '—')}</div>
+            <div class="meta">${d.active !== false ? 'Just now' : (d.lastSeen || 'â')}</div>
           </div>
         </div>
       </div>
@@ -3326,7 +3330,7 @@ function renderDeviceDetails() {
         </div>
         <div class="dd-meta-cell">
           <div class="lbl">${li('cpu')} Firmware</div>
-          <div class="val">v${d.firmware || '—'}</div>
+          <div class="val">v${d.firmware || 'â'}</div>
         </div>
       </div>
     </div>
@@ -3423,7 +3427,7 @@ function renderDeviceTimelineTab(d) {
         <h3>Recent activity</h3>
         <div class="sub">${totalEvents} events across the last 7 days</div>
       </div>
-      <span class="tl-period">${li('calendar')} Last 7 days <span style="color:var(--text-subtle);font-size:10px">▾</span></span>
+      <span class="tl-period">${li('calendar')} Last 7 days <span style="color:var(--text-subtle);font-size:10px">â¾</span></span>
     </div>
 
     <div class="tl-feed">
@@ -3521,7 +3525,7 @@ function renderDeviceTelemetryTab(d) {
           <tr>
             <th style="width:48px"><input type="checkbox" /></th>
             <th>Last update time</th>
-            <th>Key <span class="tel-sort-arrow">↑</span></th>
+            <th>Key <span class="tel-sort-arrow">â</span></th>
             <th>Value</th>
             <th style="width:48px"></th>
           </tr>
@@ -3541,11 +3545,11 @@ function renderDeviceTelemetryTab(d) {
         </tbody>
       </table>
       <div class="tbl-footer">
-        <div>${total === 0 ? '0 of 0' : `${start + 1}–${Math.min(start + per, total)} of ${total}`}</div>
+        <div>${total === 0 ? '0 of 0' : `${start + 1}â${Math.min(start + per, total)} of ${total}`}</div>
         <div class="pager">
-          <button onclick="setTelemetryPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:.4;cursor:default"' : ''}>‹</button>
+          <button onclick="setTelemetryPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:.4;cursor:default"' : ''}>â¹</button>
           <button class="active">${page}</button>
-          <button onclick="setTelemetryPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:.4;cursor:default"' : ''}>›</button>
+          <button onclick="setTelemetryPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:.4;cursor:default"' : ''}>âº</button>
         </div>
         <div>
           <select class="select-sm" onchange="setTelemetryPerPage(this.value)">
@@ -3558,7 +3562,7 @@ function renderDeviceTelemetryTab(d) {
 }
 function setTelemetryPage(n)    { state.telemetryPage = Math.max(1, n); renderDeviceDetails(); }
 function setTelemetryPerPage(n) { state.telemetryPerPage = parseInt(n, 10) || 10; state.telemetryPage = 1; renderDeviceDetails(); }
-function searchTelemetry()      { toast('Search telemetry — coming soon'); }
+function searchTelemetry()      { toast('Search telemetry â coming soon'); }
 
 const TEL_TYPE_ICON = {
   string:  '<span style="font-family:Georgia,serif;font-style:italic;font-weight:700;font-size:16px;line-height:1">T</span>',
@@ -3820,7 +3824,7 @@ function renderDeviceAttributesTab(d) {
           <tr>
             <th style="width:48px"><input type="checkbox" /></th>
             <th>Last update time</th>
-            <th>Key <span class="tel-sort-arrow">↓</span></th>
+            <th>Key <span class="tel-sort-arrow">â</span></th>
             <th>Value</th>
             <th style="width:48px"></th>
           </tr>
@@ -3840,11 +3844,11 @@ function renderDeviceAttributesTab(d) {
         </tbody>
       </table>
       <div class="tbl-footer">
-        <div>${total === 0 ? '0 of 0' : `${start + 1}–${Math.min(start + per, total)} of ${total}`}</div>
+        <div>${total === 0 ? '0 of 0' : `${start + 1}â${Math.min(start + per, total)} of ${total}`}</div>
         <div class="pager">
-          <button onclick="setAttributesPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:.4;cursor:default"' : ''}>‹</button>
+          <button onclick="setAttributesPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:.4;cursor:default"' : ''}>â¹</button>
           <button class="active">${page}</button>
-          <button onclick="setAttributesPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:.4;cursor:default"' : ''}>›</button>
+          <button onclick="setAttributesPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:.4;cursor:default"' : ''}>âº</button>
         </div>
         <div>
           <select class="select-sm" onchange="setAttributesPerPage(this.value)">
@@ -4082,7 +4086,7 @@ function renderDeviceCalculatedTab(d) {
         <thead>
           <tr>
             <th style="width:48px"><input type="checkbox" /></th>
-            <th>Created time <span class="tel-sort-arrow">↓</span></th>
+            <th>Created time <span class="tel-sort-arrow">â</span></th>
             <th>Name</th>
             <th>Type</th>
             <th style="width:48px"></th>
@@ -4103,11 +4107,11 @@ function renderDeviceCalculatedTab(d) {
         </tbody>
       </table>
       <div class="tbl-footer">
-        <div>${total === 0 ? '0 of 0' : `${start + 1}–${Math.min(start + per, total)} of ${total}`}</div>
+        <div>${total === 0 ? '0 of 0' : `${start + 1}â${Math.min(start + per, total)} of ${total}`}</div>
         <div class="pager">
-          <button onclick="setCalculatedPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:.4;cursor:default"' : ''}>‹</button>
+          <button onclick="setCalculatedPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:.4;cursor:default"' : ''}>â¹</button>
           <button class="active">${page}</button>
-          <button onclick="setCalculatedPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:.4;cursor:default"' : ''}>›</button>
+          <button onclick="setCalculatedPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:.4;cursor:default"' : ''}>âº</button>
         </div>
         <div>
           <select class="select-sm" onchange="setCalculatedPerPage(this.value)">
@@ -4632,7 +4636,7 @@ function renderDeviceAlarmsTab(d) {
     { sev:'critical', name:'Phase R voltage out of range', msg:'Phase R line-to-neutral voltage exceeded threshold of 440V (current: 458.2V). Trip may occur if not addressed.', source:'Voltage monitor', state:'open', stateLbl:'Open', modified:'Apr 30, 2026 02:35 PM', assignedInit:'MC', assignedName:'Marcus Chen', prevSev:'major', unresolved:'2h 15m', model:'CMPR-X7', occurred:'Apr 30, 2026 12:20 PM', acknowledged:false },
     { sev:'major', name:'Compressor pressure spike', msg:'Pressure crossed warning threshold (78 psi) on Compressor #4. Operator review recommended.', source:'Pressure sensor', state:'ack', stateLbl:'Acknowledged', modified:'Apr 30, 2026 11:48 AM', assignedInit:'DO', assignedName:'David Okafor', prevSev:'minor', unresolved:'5h 02m', model:'PRS-12', occurred:'Apr 30, 2026 09:46 AM', acknowledged:true, ackBy:'David Okafor', ackAt:'Apr 30, 2026 10:14 AM' },
     { sev:'minor', name:'Network latency elevated', msg:'Round-trip time to gateway exceeded 250ms for 3 consecutive samples.', source:'Gateway link', state:'ack', stateLbl:'Acknowledged', modified:'Apr 30, 2026 09:12 AM', assignedInit:'PS', assignedName:'Priya Sharma', prevSev:'cleared', unresolved:'7h 38m', model:'NET-GW-01', occurred:'Apr 30, 2026 07:34 AM', acknowledged:true, ackBy:'Priya Sharma', ackAt:'Apr 30, 2026 08:01 AM' },
-    { sev:'cleared', name:'Temperature returned to normal', msg:'Bearing temperature recovered below 65°C. Alarm auto-cleared after 12-minute stable window.', source:'Temp sensor TS-A7', state:'resolved', stateLbl:'Resolved', modified:'Apr 29, 2026 10:42 PM', assignedInit:'RM', assignedName:'Rahul Menon', prevSev:'major', unresolved:'45m 18s', model:'TMP-A7', occurred:'Apr 29, 2026 09:57 PM', acknowledged:true, ackBy:'Rahul Menon', ackAt:'Apr 29, 2026 10:10 PM' }
+    { sev:'cleared', name:'Temperature returned to normal', msg:'Bearing temperature recovered below 65Â°C. Alarm auto-cleared after 12-minute stable window.', source:'Temp sensor TS-A7', state:'resolved', stateLbl:'Resolved', modified:'Apr 29, 2026 10:42 PM', assignedInit:'RM', assignedName:'Rahul Menon', prevSev:'major', unresolved:'45m 18s', model:'TMP-A7', occurred:'Apr 29, 2026 09:57 PM', acknowledged:true, ackBy:'Rahul Menon', ackAt:'Apr 29, 2026 10:10 PM' }
   ];
 
   const counts = alarms.reduce((acc, a) => (acc[a.sev] = (acc[a.sev]||0)+1, acc), {});
@@ -4660,11 +4664,11 @@ function renderDeviceAlarmsTab(d) {
     <div class="alarms-toolbar">
       <div class="search-box" style="flex:0 0 320px">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-        <input placeholder="Search alarms…" />
+        <input placeholder="Search alarmsâ¦" />
       </div>
-      <button class="chip-select">Severity <span class="caret">▾</span></button>
-      <button class="chip-select">State <span class="caret">▾</span></button>
-      <button class="chip-select">Assignee <span class="caret">▾</span></button>
+      <button class="chip-select">Severity <span class="caret">â¾</span></button>
+      <button class="chip-select">State <span class="caret">â¾</span></button>
+      <button class="chip-select">Assignee <span class="caret">â¾</span></button>
       <div style="margin-left:auto;font-size:13px;color:var(--text-muted)">${alarms.length} alarms</div>
     </div>
 
@@ -4676,7 +4680,7 @@ function renderDeviceAlarmsTab(d) {
               <div class="alarm-head-row">
                 <span class="sev-pill ${a.sev}"><span class="dot"></span>${a.sev.toUpperCase()}</span>
                 <span class="state-pill ${a.state}"><span class="dot"></span>${a.stateLbl}</span>
-                <span class="alarm-source">Source: ${a.source} · ${d.name}</span>
+                <span class="alarm-source">Source: ${a.source} Â· ${d.name}</span>
               </div>
               <div class="alarm-name">${a.name}</div>
               <div class="alarm-msg">${a.msg}</div>
@@ -4719,7 +4723,7 @@ function renderDeviceAlarmsTab(d) {
 
           <div class="alarm-foot">
             ${a.acknowledged
-              ? `<span class="ack-yes">${li('check-circle-2')} Acknowledged <span class="ack-meta">by ${a.ackBy} · ${a.ackAt}</span></span>`
+              ? `<span class="ack-yes">${li('check-circle-2')} Acknowledged <span class="ack-meta">by ${a.ackBy} Â· ${a.ackAt}</span></span>`
               : `<span class="ack-no">${li('circle-alert')} Not acknowledged yet</span>`}
             <div style="display:flex;gap:8px">
               ${!a.acknowledged ? `<button class="btn btn-primary btn-sm">${li('check')} Acknowledge</button>` : ''}
@@ -4744,12 +4748,12 @@ function msgStat({ title, num, delta, deltaDir, prev, prevLbl }) {
   return `
     <div class="msg-stat">
       <div class="msg-stat-head">${title}</div>
-      <div class="msg-stat-period">Today <span class="caret">▾</span></div>
+      <div class="msg-stat-period">Today <span class="caret">â¾</span></div>
       <div class="msg-stat-ico">${li('message-square')}</div>
       <div class="msg-stat-body">
         <div class="msg-stat-row">
           <div class="msg-stat-num">${num.toLocaleString()}</div>
-          <span class="msg-stat-delta ${deltaDir}">${deltaDir === 'down' ? '↓' : deltaDir === 'up' ? '↑' : '—'} ${delta}%</span>
+          <span class="msg-stat-delta ${deltaDir}">${deltaDir === 'down' ? 'â' : deltaDir === 'up' ? 'â' : 'â'} ${delta}%</span>
         </div>
         <div class="msg-stat-prev">${prev.toLocaleString()}<span class="msg-stat-prev-lbl">${prevLbl}</span></div>
       </div>
@@ -4785,7 +4789,7 @@ function renderMessagesSummary() {
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted)">
           ${li('chart-column')}
-          <span>Last 7 Days <span style="font-size:10px">▾</span></span>
+          <span>Last 7 Days <span style="font-size:10px">â¾</span></span>
         </div>
       </div>
 
@@ -4794,7 +4798,7 @@ function renderMessagesSummary() {
           <div class="num" style="display:flex;align-items:center;gap:8px;justify-content:center">
             ${li('message-square')} 7,587
           </div>
-          <div class="lbl" style="justify-content:center">Last 7 Days <span class="delta">↓ 10.85 %</span></div>
+          <div class="lbl" style="justify-content:center">Last 7 Days <span class="delta">â 10.85 %</span></div>
         </div>
         <div class="trend-stat muted" style="text-align:center">
           <div class="num">8,510</div>
@@ -4804,7 +4808,7 @@ function renderMessagesSummary() {
 
       <div class="trend-chart">
         <div style="position:relative">
-          <span class="trend-y-label">Message Received — SUM</span>
+          <span class="trend-y-label">Message Received â SUM</span>
           <div class="trend-bar-row">
             <div class="y-axis">
               ${ySteps.map(n => `<div>${n.toLocaleString()}</div>`).join('')}
@@ -4851,7 +4855,7 @@ function renderHistoricMessages() {
       <div class="trend-head">
         <div class="l">Historic Messages</div>
         <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted)">
-          <span>Last 7 days · ${rows.length} messages</span>
+          <span>Last 7 days Â· ${rows.length} messages</span>
         </div>
       </div>
       <div class="tbl-wrap">
@@ -4897,7 +4901,7 @@ function renderMessagesLive() {
         </div>
       </div>
       <div style="padding:30px 20px;text-align:center;color:var(--text-muted);font-size:14px">
-        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px">Listening for messages…</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px">Listening for messagesâ¦</div>
         <div>New messages from this device will appear here in real time.</div>
       </div>
     </div>
@@ -4934,8 +4938,8 @@ function renderDeviceDetailsTab(d) {
       <div class="info-rows">
         <div class="info-row-cell"><div class="info-row-label">Device name</div><div class="info-row-value">${d.name}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Type</div><div class="info-row-value">${d.type}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Serial number</div><div class="info-row-value" style="font-family:ui-monospace,Menlo,monospace;font-size:14px">${d.serial || '—'}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Firmware version</div><div class="info-row-value">v${d.firmware || '—'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Serial number</div><div class="info-row-value" style="font-family:ui-monospace,Menlo,monospace;font-size:14px">${d.serial || 'â'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Firmware version</div><div class="info-row-value">v${d.firmware || 'â'}</div></div>
       </div>
     </div>
 
@@ -4966,7 +4970,7 @@ function renderDeviceDetailsTab(d) {
           <div class="info-row-label">Status</div>
           <div class="info-row-value">${d.active !== false ? '<span class="chip chip-active"><span class="dot"></span>Active</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Inactive</span>'}</div>
         </div>
-        <div class="info-row-cell"><div class="info-row-label">Last seen</div><div class="info-row-value">${d.lastSeen || '—'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Last seen</div><div class="info-row-value">${d.lastSeen || 'â'}</div></div>
       </div>
     </div>
 
@@ -4985,7 +4989,7 @@ function renderDeviceOverview(d, isCritical) {
   return `
     <div class="dd-toolbar">
       <div class="left">
-        Overview Dashboard <span class="caret">▾</span>
+        Overview Dashboard <span class="caret">â¾</span>
         <button class="icon-btn" title="Refresh" style="width:28px;height:28px">${li('rotate-cw')}</button>
       </div>
       <div class="right">
@@ -5008,7 +5012,7 @@ function renderDeviceOverview(d, isCritical) {
       </div>
       <div class="dd-stat">
         <div class="head">${li('clock')} Last activity</div>
-        <div class="val lg">${d.lastSeen === 'just now' ? 'Just now' : (d.lastSeen || '—')}</div>
+        <div class="val lg">${d.lastSeen === 'just now' ? 'Just now' : (d.lastSeen || 'â')}</div>
       </div>
     </div>
 
@@ -5042,7 +5046,7 @@ function renderDeviceOverview(d, isCritical) {
                   </div>
                 </td>
                 <td class="dd-metric-val">
-                  <div class="num ${v === null ? 'muted' : ''}">${v === null ? '—' : v}</div>
+                  <div class="num ${v === null ? 'muted' : ''}">${v === null ? 'â' : v}</div>
                   <div class="ts">${v === null ? 'No data' : 'Just now'}</div>
                 </td>
               </tr>
@@ -5052,7 +5056,7 @@ function renderDeviceOverview(d, isCritical) {
       </div>
 
       <div class="dd-panel">
-        <div class="panel-title">Power Consumption <span class="menu-trigger" style="color:var(--primary);font-weight:500;font-size:13px">Today <span class="caret" style="font-size:9px">▾</span></span></div>
+        <div class="panel-title">Power Consumption <span class="menu-trigger" style="color:var(--primary);font-weight:500;font-size:13px">Today <span class="caret" style="font-size:9px">â¾</span></span></div>
         <div class="dd-power">
           <div class="pico">${li('zap')}</div>
           <div>
@@ -5145,7 +5149,7 @@ function refreshDeviceIndustries() {
   const opts = state.industries.filter(i => i.client === cs.value && i.active !== false);
   is.innerHTML = opts.length
     ? opts.map(i => `<option value="${i.name}">${i.name}</option>`).join('')
-    : '<option value="" disabled>No industries — add one first</option>';
+    : '<option value="" disabled>No industries â add one first</option>';
 }
 function closeDeviceDrawer() {
   document.getElementById('deviceDrawer').classList.remove('open');
@@ -5194,7 +5198,7 @@ function deleteDevice(id) {
     });
 }
 
-// ── Device image upload helpers ──
+// ââ Device image upload helpers ââ
 function _formatBytes(b) {
   if (b == null) return '';
   if (b < 1024) return b + ' B';
@@ -5241,7 +5245,7 @@ function _handleDeviceImageFile(file) {
   reader.onload = (e) => {
     const tmp = new Image();
     tmp.onload = () => {
-      // Center-crop to square, capped at 512×512
+      // Center-crop to square, capped at 512Ã512
       const side = Math.min(tmp.naturalWidth, tmp.naturalHeight);
       const sx = (tmp.naturalWidth  - side) / 2;
       const sy = (tmp.naturalHeight - side) / 2;
@@ -5353,7 +5357,7 @@ function renderIndustries() {
   const fbtn = document.getElementById('filterIndustryClientBtn');
   if (fbtn && !VIEW_CLIENT) {
     fbtn.classList.toggle('active', f !== 'all');
-    fbtn.innerHTML = (f === 'all' ? 'Client' : `${f} <span class="chip-select-count" style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">1</span>`) + ' <span class="caret">▾</span>';
+    fbtn.innerHTML = (f === 'all' ? 'Client' : `${f} <span class="chip-select-count" style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">1</span>`) + ' <span class="caret">â¾</span>';
   }
 
   const tbody = document.getElementById('industryRows');
@@ -5373,12 +5377,12 @@ function renderIndustries() {
           <div class="dev-ico">${SVG.industries}</div>
           <div>
             <div class="cell-user-name">${i.name}</div>
-            <div class="cell-user-sub">${i.type || '—'}</div>
+            <div class="cell-user-sub">${i.type || 'â'}</div>
           </div>
         </div>
       </td>
       <td class="industry-client-col" style="color:var(--text-muted)">${i.client}</td>
-      <td style="color:var(--text-muted)">${[i.address, i.city, i.country].filter(Boolean).join(', ') || '—'}</td>
+      <td style="color:var(--text-muted)">${[i.address, i.city, i.country].filter(Boolean).join(', ') || 'â'}</td>
       <td style="color:var(--text-muted)">${i.users || 0}</td>
       <td style="color:var(--text-muted)">${i.devices || 0}</td>
       <td>${i.active ? '<span class="chip chip-active"><span class="dot"></span>Active</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Inactive</span>'}</td>
@@ -5485,10 +5489,90 @@ function toggleIndustryClientFilter(evt) {
 /* ============================================================
    Customers
    ============================================================ */
+function viewClientUsers(clientName) {
+  if (typeof userFilters !== 'undefined') {
+    if (userFilters.role     && userFilters.role.clear)     userFilters.role.clear();
+    if (userFilters.status   && userFilters.status.clear)   userFilters.status.clear();
+    if (userFilters.location && userFilters.location.clear) userFilters.location.clear();
+    userFilters.search = '';
+    let target = clientName;
+    if (typeof CLIENTS !== 'undefined' && Array.isArray(CLIENTS)) {
+      const match = CLIENTS.find(cl => clientName === cl)
+                 || CLIENTS.find(cl => clientName.includes(cl) || cl.includes(clientName));
+      if (match) target = match;
+    }
+    userFilters.client = new Set([target]);
+  }
+  switchScreen('users');
+  if (typeof renderUsers === 'function') renderUsers();
+  toast(`Showing users for ${clientName}`);
+}
+
+function toggleClientCountryFilter(evt) {
+  evt.stopPropagation();
+  const existing = document.getElementById('clientCountryPop');
+  if (existing) { existing.remove(); return; }
+  const btn = evt.currentTarget;
+  const wrap = btn.parentElement;
+  const countries = ['all', ...new Set(CUSTOMERS.map(c => c.country).filter(Boolean))]
+    .sort((a, b) => a === 'all' ? -1 : b === 'all' ? 1 : String(a).localeCompare(String(b)));
+  const html = `
+    <div class="filter-pop open" id="clientCountryPop" style="min-width:220px">
+      <div class="filter-pop-head"><span>Filter by country</span></div>
+      ${countries.map(c => `
+        <label class="filter-opt" onclick="state.clientCountryFilter='${String(c).replace(/'/g, "\\'")}';document.getElementById('clientCountryPop').remove();renderCustomersPage()">
+          <span>${c === 'all' ? 'All countries' : _kvEscape(c)}</span>
+        </label>
+      `).join('')}
+    </div>`;
+  wrap.insertAdjacentHTML('beforeend', html);
+  setTimeout(() => {
+    const closer = (e) => {
+      if (!e.target.closest('#clientCountryPop') && !e.target.closest('#filterClientCountryBtn')) {
+        const p = document.getElementById('clientCountryPop'); if (p) p.remove();
+        document.removeEventListener('click', closer);
+      }
+    };
+    document.addEventListener('click', closer);
+  }, 0);
+}
+
+function toggleClientCityFilter(evt) {
+  evt.stopPropagation();
+  const existing = document.getElementById('clientCityPop');
+  if (existing) { existing.remove(); return; }
+  const btn = evt.currentTarget;
+  const wrap = btn.parentElement;
+  const scope = (state.clientCountryFilter && state.clientCountryFilter !== 'all')
+    ? CUSTOMERS.filter(c => c.country === state.clientCountryFilter)
+    : CUSTOMERS;
+  const cities = ['all', ...new Set(scope.map(c => c.city).filter(Boolean))]
+    .sort((a, b) => a === 'all' ? -1 : b === 'all' ? 1 : String(a).localeCompare(String(b)));
+  const html = `
+    <div class="filter-pop open" id="clientCityPop" style="min-width:220px">
+      <div class="filter-pop-head"><span>Filter by city${state.clientCountryFilter && state.clientCountryFilter !== 'all' ? ' · ' + _kvEscape(state.clientCountryFilter) : ''}</span></div>
+      ${cities.map(c => `
+        <label class="filter-opt" onclick="state.clientCityFilter='${String(c).replace(/'/g, "\\'")}';document.getElementById('clientCityPop').remove();renderCustomersPage()">
+          <span>${c === 'all' ? 'All cities' : _kvEscape(c)}</span>
+        </label>
+      `).join('')}
+    </div>`;
+  wrap.insertAdjacentHTML('beforeend', html);
+  setTimeout(() => {
+    const closer = (e) => {
+      if (!e.target.closest('#clientCityPop') && !e.target.closest('#filterClientCityBtn')) {
+        const p = document.getElementById('clientCityPop'); if (p) p.remove();
+        document.removeEventListener('click', closer);
+      }
+    };
+    document.addEventListener('click', closer);
+  }, 0);
+}
+
 const CUSTOMERS = [
   { id: 'cu-1', createdTime: '2026-04-24 11:20:25', title: 'Thara Client', email: 'ops@thara.in',           country: 'India',          city: 'Thara',     state: 'Gujarat',     zip: '385565',   address: '12 Industrial Area',         address2: '',         phone: '9876543210', phoneCountry: '+91',  description: 'Textile manufacturing client in north Gujarat.' },
   { id: 'cu-2', createdTime: '2026-04-22 15:49:05', title: 'Client C',     email: 'support@customer-c.com', country: 'United Kingdom', city: 'London',    state: 'England',     zip: 'EC1A 1BB', address: '24 Tabernacle Street',       address2: '',         phone: '2079460000', phoneCountry: '+44',  description: '' },
-  { id: 'cu-3', createdTime: '2026-04-22 15:49:05', title: 'Client B',     email: 'hello@customer-b.io',    country: 'Germany',        city: 'Berlin',    state: 'Berlin',      zip: '10115',    address: 'Friedrichstraße 88',         address2: '',         phone: '3025550143', phoneCountry: '+49',  description: '' },
+  { id: 'cu-3', createdTime: '2026-04-22 15:49:05', title: 'Client B',     email: 'hello@customer-b.io',    country: 'Germany',        city: 'Berlin',    state: 'Berlin',      zip: '10115',    address: 'FriedrichstraÃe 88',         address2: '',         phone: '3025550143', phoneCountry: '+49',  description: '' },
   { id: 'cu-4', createdTime: '2026-04-22 15:49:05', title: 'Client A',     email: 'info@customer-a.com',    country: 'United States',  city: 'Austin',    state: 'TX',          zip: '78701',    address: '500 W 2nd St',               address2: 'Suite 1900', phone: '5125550101', phoneCountry: '+1', description: '' },
   { id: 'cu-5', createdTime: '2026-04-20 09:14:11', title: 'Arvind Mills',   email: 'iot@arvind.com',         country: 'India',          city: 'Ahmedabad', state: 'Gujarat',     zip: '380025',   address: 'Naroda Road',                address2: '',         phone: '7926827000', phoneCountry: '+91',  description: 'Strategic textiles partner.' },
   { id: 'cu-6', createdTime: '2026-04-18 14:02:48', title: 'Dynamic Looms',  email: 'priya@dynamiclooms.com', country: 'India',          city: 'Pune',      state: 'Maharashtra', zip: '411001',   address: 'Hadapsar Industrial Estate', address2: '',         phone: '2026123456', phoneCountry: '+91',  description: 'Enterprise host workspace.' },
@@ -5497,14 +5581,33 @@ const CUSTOMERS = [
 ];
 
 function renderCustomersPage() {
-  const q = (document.getElementById('customerSearch') && document.getElementById('customerSearch').value || '').toLowerCase();
-  const list = q
-    ? CUSTOMERS.filter(c =>
-        (c.title || '').toLowerCase().includes(q) ||
-        (c.email || '').toLowerCase().includes(q) ||
-        (c.country || '').toLowerCase().includes(q) ||
-        (c.city || '').toLowerCase().includes(q))
-    : CUSTOMERS;
+  state.clientCountryFilter = state.clientCountryFilter || 'all';
+  state.clientCityFilter    = state.clientCityFilter    || 'all';
+  const q     = (document.getElementById('customerSearch') && document.getElementById('customerSearch').value || '').toLowerCase();
+  const cf    = state.clientCountryFilter;
+  const cityF = state.clientCityFilter;
+  let list = CUSTOMERS;
+  if (cf    !== 'all') list = list.filter(c => c.country === cf);
+  if (cityF !== 'all') list = list.filter(c => c.city    === cityF);
+  if (q) list = list.filter(c =>
+    (c.title   || '').toLowerCase().includes(q) ||
+    (c.email   || '').toLowerCase().includes(q) ||
+    (c.country || '').toLowerCase().includes(q) ||
+    (c.city    || '').toLowerCase().includes(q));
+
+  // Update filter chip labels
+  const _chipBadge = (label) => `${label} <span style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px;margin-left:4px">1</span>`;
+  const cBtn = document.getElementById('filterClientCountryBtn');
+  if (cBtn) {
+    cBtn.classList.toggle('active', cf !== 'all');
+    cBtn.innerHTML = (cf === 'all' ? 'Country' : _chipBadge(cf)) + ' <span class="caret">▾</span>';
+  }
+  const cityBtn = document.getElementById('filterClientCityBtn');
+  if (cityBtn) {
+    cityBtn.classList.toggle('active', cityF !== 'all');
+    cityBtn.innerHTML = (cityF === 'all' ? 'City' : _chipBadge(cityF)) + ' <span class="caret">▾</span>';
+  }
+
   const countEl = document.getElementById('customersCount');
   if (countEl) countEl.textContent = `(${list.length})`;
   const meta = document.getElementById('customerListMeta');
@@ -5531,11 +5634,11 @@ function renderCustomersPage() {
       <td style="color:var(--text-muted)">${_kvEscape(c.city || '')}</td>
       <td onclick="event.stopPropagation()">
         <div class="row-actions">
-          <button class="icon-btn" title="Client users" onclick="toast('Client users — coming soon')">${li('user')}</button>
-          <button class="icon-btn" title="Client industries" onclick="toast('Client industries — coming soon')">${li('building-2')}</button>
-          <button class="icon-btn" title="Client devices" onclick="toast('Client devices — coming soon')">${li('cpu')}</button>
-          <button class="icon-btn" title="Client dashboards" onclick="toast('Client dashboards — coming soon')">${li('layout-grid')}</button>
-          <button class="icon-btn" title="Client gateways" onclick="toast('Client gateways — coming soon')">${li('share-2')}</button>
+          <button class="icon-btn" title="Client users" onclick="viewClientUsers('${(c.title || '').replace(/'/g, "\\'")}')">${li('user')}</button>
+          <button class="icon-btn" title="Client industries" onclick="toast('Client industries â coming soon')">${li('building-2')}</button>
+          <button class="icon-btn" title="Client devices" onclick="toast('Client devices â coming soon')">${li('cpu')}</button>
+          <button class="icon-btn" title="Client dashboards" onclick="toast('Client dashboards â coming soon')">${li('layout-grid')}</button>
+          <button class="icon-btn" title="Client gateways" onclick="toast('Client gateways â coming soon')">${li('share-2')}</button>
           <button class="icon-btn" title="Delete" onclick="deleteCustomer('${c.id}')" style="color:var(--danger)">${li('trash-2')}</button>
         </div>
       </td>
@@ -5606,8 +5709,8 @@ function addCustomer(existing) {
       <div class="field">
         <label class="label">Country</label>
         <select class="select" onchange="state._customerDraft.country=this.value">
-          ${['', 'Australia', 'Brazil', 'Canada', 'China', 'France', 'Germany', 'India', 'Indonesia', 'Italy', 'Japan', 'Malaysia', 'Mexico', 'Netherlands', 'Philippines', 'Saudi Arabia', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Thailand', 'Türkiye', 'United Arab Emirates', 'United Kingdom', 'United States', 'Vietnam']
-            .map(c => `<option value="${c}" ${state._customerDraft.country===c?'selected':''}>${c || 'Select country…'}</option>`).join('')}
+          ${['', 'Australia', 'Brazil', 'Canada', 'China', 'France', 'Germany', 'India', 'Indonesia', 'Italy', 'Japan', 'Malaysia', 'Mexico', 'Netherlands', 'Philippines', 'Saudi Arabia', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Thailand', 'TÃ¼rkiye', 'United Arab Emirates', 'United Kingdom', 'United States', 'Vietnam']
+            .map(c => `<option value="${c}" ${state._customerDraft.country===c?'selected':''}>${c || 'Select countryâ¦'}</option>`).join('')}
         </select>
       </div>
       <div class="field-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -5627,15 +5730,15 @@ function addCustomer(existing) {
         <label class="label">Phone</label>
         <div class="cust-phone-row">
           <select class="cust-phone-flag" onchange="state._customerDraft.phoneCountry=this.value">
-            <option value="+1"   ${state._customerDraft.phoneCountry==='+1'  ?'selected':''}>🇺🇸 +1</option>
-            <option value="+91"  ${state._customerDraft.phoneCountry==='+91' ?'selected':''}>🇮🇳 +91</option>
-            <option value="+44"  ${state._customerDraft.phoneCountry==='+44' ?'selected':''}>🇬🇧 +44</option>
-            <option value="+86"  ${state._customerDraft.phoneCountry==='+86' ?'selected':''}>🇨🇳 +86</option>
-            <option value="+81"  ${state._customerDraft.phoneCountry==='+81' ?'selected':''}>🇯🇵 +81</option>
-            <option value="+49"  ${state._customerDraft.phoneCountry==='+49' ?'selected':''}>🇩🇪 +49</option>
-            <option value="+33"  ${state._customerDraft.phoneCountry==='+33' ?'selected':''}>🇫🇷 +33</option>
-            <option value="+61"  ${state._customerDraft.phoneCountry==='+61' ?'selected':''}>🇦🇺 +61</option>
-            <option value="+971" ${state._customerDraft.phoneCountry==='+971'?'selected':''}>🇦🇪 +971</option>
+            <option value="+1"   ${state._customerDraft.phoneCountry==='+1'  ?'selected':''}>ðºð¸ +1</option>
+            <option value="+91"  ${state._customerDraft.phoneCountry==='+91' ?'selected':''}>ð®ð³ +91</option>
+            <option value="+44"  ${state._customerDraft.phoneCountry==='+44' ?'selected':''}>ð¬ð§ +44</option>
+            <option value="+86"  ${state._customerDraft.phoneCountry==='+86' ?'selected':''}>ð¨ð³ +86</option>
+            <option value="+81"  ${state._customerDraft.phoneCountry==='+81' ?'selected':''}>ð¯ðµ +81</option>
+            <option value="+49"  ${state._customerDraft.phoneCountry==='+49' ?'selected':''}>ð©ðª +49</option>
+            <option value="+33"  ${state._customerDraft.phoneCountry==='+33' ?'selected':''}>ð«ð· +33</option>
+            <option value="+61"  ${state._customerDraft.phoneCountry==='+61' ?'selected':''}>ð¦ðº +61</option>
+            <option value="+971" ${state._customerDraft.phoneCountry==='+971'?'selected':''}>ð¦ðª +971</option>
           </select>
           <input class="input" placeholder="Phone" value="${_kvEscape(state._customerDraft.phone)}" oninput="state._customerDraft.phone=this.value" />
         </div>
@@ -5782,9 +5885,9 @@ function renderUserDetails() {
   })[u.role] || 'av-blue';
 
   const statusPill = ({
-    active:   '<span class="pill-green">● Active</span>',
-    inactive: '<span class="pill-gray">● Inactive</span>',
-    pending:  '<span class="pill-amber">● Pending invite</span>'
+    active:   '<span class="pill-green">â Active</span>',
+    inactive: '<span class="pill-gray">â Inactive</span>',
+    pending:  '<span class="pill-amber">â Pending invite</span>'
   })[u.status];
 
   content.innerHTML = `
@@ -5822,14 +5925,14 @@ function renderUserDetails() {
         <div class="user-hero-meta">
           <span class="pill-amber">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            ${u.location || '—'}
+            ${u.location || 'â'}
           </span>
-          <span class="meta-sep">·</span>
+          <span class="meta-sep">Â·</span>
           <span class="item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             Joined Feb 12, 2024
           </span>
-          <span class="meta-sep">·</span>
+          <span class="meta-sep">Â·</span>
           <span class="item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
             Last active ${u.last}
@@ -5877,7 +5980,7 @@ function renderDetailsTab(u) {
 
 function renderOverviewTab(u) {
   const [first, ...rest] = u.name.split(' ');
-  const last = rest.join(' ') || '—';
+  const last = rest.join(' ') || 'â';
   return `
     <div class="info-section">
       <div class="info-section-head">
@@ -5924,7 +6027,7 @@ function renderDevicesTab(u) {
             <div class="dev-ico">${deviceIcon(d.type)}</div>
             <div>
               ${d.name}
-              <div class="dev-sub">${d.type} · ${d.location}</div>
+              <div class="dev-sub">${d.type} Â· ${d.location}</div>
             </div>
           </div>
         </td>
@@ -5935,7 +6038,7 @@ function renderDevicesTab(u) {
           return `<td class="center"><span class="perm-cell ${cls}" title="${overridden?'Custom':'Inherited from role'}: ${a} ${on?'granted':'revoked'}" onclick="toggleDevicePerm(${state.detailsUserIdx},'${d.id}','${a}')"></span></td>`;
         }).join('')}
         <td class="center">
-          ${u.deviceOverrides && u.deviceOverrides[d.id] ? `<button class="btn btn-ghost btn-sm" onclick="resetDeviceOverride(${state.detailsUserIdx},'${d.id}')" title="Reset to role defaults">Reset</button>` : '<span style="color:var(--text-subtle);font-size:12px">—</span>'}
+          ${u.deviceOverrides && u.deviceOverrides[d.id] ? `<button class="btn btn-ghost btn-sm" onclick="resetDeviceOverride(${state.detailsUserIdx},'${d.id}')" title="Reset to role defaults">Reset</button>` : '<span style="color:var(--text-subtle);font-size:12px">â</span>'}
         </td>
       </tr>
     `).join('');
@@ -5944,7 +6047,7 @@ function renderDevicesTab(u) {
     defaults.view && 'View',
     defaults.control && 'Control',
     defaults.configure && 'Configure'
-  ].filter(Boolean).join(' · ') || 'No default access';
+  ].filter(Boolean).join(' Â· ') || 'No default access';
 
   return `
     <div class="perm-banner">
@@ -5952,7 +6055,7 @@ function renderDevicesTab(u) {
       <div class="banner-body">
         <div style="font-weight:600;margin-bottom:3px">Default permissions from ${u.role}</div>
         <div style="color:var(--text-muted);font-size:13px">
-          <strong style="color:var(--text)">${permSummary}</strong> on devices at <strong style="color:var(--text)">${u.location || '—'}</strong>. Click any cell to override.
+          <strong style="color:var(--text)">${permSummary}</strong> on devices at <strong style="color:var(--text)">${u.location || 'â'}</strong>. Click any cell to override.
         </div>
       </div>
     </div>
@@ -5960,8 +6063,8 @@ function renderDevicesTab(u) {
     <div class="panel">
       <div class="toolbar">
         <div style="font-size:13.5px;color:var(--text-muted)">
-          <strong style="color:var(--text)">${tenantDevices.length}</strong> device${tenantDevices.length===1?'':'s'} at <strong style="color:var(--text)">${u.location || '—'}</strong>
-          ${overrideCount > 0 ? ` · <strong style="color:var(--warn)">${overrideCount}</strong> override${overrideCount===1?'':'s'}` : ''}
+          <strong style="color:var(--text)">${tenantDevices.length}</strong> device${tenantDevices.length===1?'':'s'} at <strong style="color:var(--text)">${u.location || 'â'}</strong>
+          ${overrideCount > 0 ? ` Â· <strong style="color:var(--warn)">${overrideCount}</strong> override${overrideCount===1?'':'s'}` : ''}
         </div>
         <div class="toolbar-right" style="display:flex;gap:14px;align-items:center">
           <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted)"><span class="perm-cell inherit-on" style="width:16px;height:16px"></span>Inherited</span>
@@ -6052,7 +6155,7 @@ function renderSessionsTab(u) {
 
 function renderActivityTab(u) {
   const activity = [
-    { when: '2 min ago', what: 'Logged in from MacBook Pro · Pune, IN' },
+    { when: '2 min ago', what: 'Logged in from MacBook Pro Â· Pune, IN' },
     { when: '1 hour ago', what: 'Acknowledged alert "Compressor #4 pressure high"' },
     { when: '3 hours ago', what: 'Updated device configuration: Valve Cluster V12' },
     { when: 'Yesterday', what: 'Exported report: Line A Weekly Summary' },
@@ -6155,7 +6258,7 @@ function renderUsers() {
       <td onclick="event.stopPropagation()"><input type="checkbox" class="check" onchange="rowSelect()" /></td>
       <td><div class="cell-user"><div class="avatar avatar-28">${u.init}</div><div><div class="cell-user-name">${u.name}</div><div class="cell-user-sub">${u.email}</div></div></div></td>
       <td class="client-col" style="color:var(--text-muted)">${u.client}</td>
-      <td style="color:var(--text-muted)">${u.location || '—'}</td>
+      <td style="color:var(--text-muted)">${u.location || 'â'}</td>
       <td>${roleTag(u.role)}</td>
       <td>${statusChip(u.status)}</td>
       <td style="color:var(--text-muted)">${u.last}</td>
@@ -6195,7 +6298,7 @@ function renderFilterChips() {
     if (!btn) return;
     const n = set.size;
     btn.classList.toggle('active', n > 0);
-    btn.innerHTML = `${baseLabel}${n ? ` <span class="chip-select-count" style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">${n}</span>` : ''} <span class="caret">▾</span>`;
+    btn.innerHTML = `${baseLabel}${n ? ` <span class="chip-select-count" style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px">${n}</span>` : ''} <span class="caret">â¾</span>`;
   };
   setChip('filterRoleBtn', 'Role', userFilters.role);
   setChip('filterStatusBtn', 'Status', userFilters.status);
@@ -6370,7 +6473,7 @@ function clearSelection() {
 }
 
 /* ============================================================
-   Roles — list + matrix
+   Roles â list + matrix
    ============================================================ */
 function selectedRole() {
   return state.roles.find(r => r.id === state.selectedRoleId);
@@ -6479,7 +6582,7 @@ function toggleClientPop(evt) {
   pop.innerHTML = `
     <div class="rf-pop-search">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-      <input id="rfClientSearch" placeholder="Search clients…" oninput="filterClientPop()" autofocus />
+      <input id="rfClientSearch" placeholder="Search clientsâ¦" oninput="filterClientPop()" autofocus />
     </div>
     <div class="rf-pop-list" id="rfClientList">
       <div class="rf-opt ${cur === 'all' ? 'selected' : ''}" data-client="All" onclick="setRoleFilter('all');closeRfPop()">
@@ -6574,8 +6677,8 @@ function renderRoles() {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>
         </span>
         <span class="dd-label">${label}</span>
-        ${f !== 'all' ? `<span class="dd-clear" onclick="event.stopPropagation();setRoleFilter('all')" title="Clear filter">✕</span>` : ''}
-        <span class="dd-caret">▾</span>
+        ${f !== 'all' ? `<span class="dd-clear" onclick="event.stopPropagation();setRoleFilter('all')" title="Clear filter">â</span>` : ''}
+        <span class="dd-caret">â¾</span>
       </button>
     </div>
     ${visible.length === 0 ? `
@@ -6584,7 +6687,7 @@ function renderRoles() {
       <div class="role-item ${r.id === state.selectedRoleId ? 'active' : ''}" onclick="selectRole('${r.id}')">
         <div class="name">${r.name}</div>
         ${VIEW_CLIENT ? '' : `<div style="margin-top:4px">${scopeBadge(r.client)}</div>`}
-        <div class="meta">${r.users.toLocaleString()} user${r.users === 1 ? '' : 's'} · Updated ${r.updated}</div>
+        <div class="meta">${r.users.toLocaleString()} user${r.users === 1 ? '' : 's'} Â· Updated ${r.updated}</div>
         <div class="item-actions" onclick="event.stopPropagation()">
           <button class="icon-btn" title="Edit" onclick="editRole('${r.id}')">${SVG.edit}</button>
           <button class="icon-btn" title="Duplicate" onclick="duplicateRole('${r.id}')">${SVG.copy}</button>
@@ -6635,7 +6738,7 @@ function toggleColumn(action) {
   if (r.system) { toast('System roles cannot be modified', 'danger'); return; }
   const keys = Object.keys(state.dirtyPerms);
   const allOn = keys.every(k => state.dirtyPerms[k][action]);
-  const target = !allOn;  // if all on → turn off; else → turn all on
+  const target = !allOn;  // if all on â turn off; else â turn all on
   keys.forEach(k => state.dirtyPerms[k][action] = target);
   renderMatrix();
 }
@@ -6647,7 +6750,7 @@ function renderMatrix() {
   const rows = RESOURCES.map(res => {
     const isOpen = state.expanded[res.key];
     const hasChildren = res.children && res.children.length;
-    const chev = hasChildren ? `<span class="chev ${isOpen ? 'open' : ''}">▸</span>` : `<span style="display:inline-block;width:18px"></span>`;
+    const chev = hasChildren ? `<span class="chev ${isOpen ? 'open' : ''}">â¸</span>` : `<span style="display:inline-block;width:18px"></span>`;
 
     let html = `
       <tr class="group">
@@ -6700,7 +6803,7 @@ function renderMatrix() {
     ${isSystem ? '' : `
       <div class="matrix-toolbar">
         <span>${r.users.toLocaleString()} user${r.users === 1 ? '' : 's'} assigned</span>
-        <span style="color:var(--text-subtle)">·</span>
+        <span style="color:var(--text-subtle)">Â·</span>
         <span class="bulk-action" onclick="grantAll()">Grant all</span>
         <span class="bulk-action" onclick="revokeAll()">Revoke all</span>
       </div>
@@ -6762,7 +6865,7 @@ function openNewRoleDrawer() {
   document.getElementById('newRoleName').value = '';
   document.getElementById('newRoleDesc').value = '';
   const scope = document.getElementById('newRoleScope');
-  scope.innerHTML = '<option value="" disabled>Select a client…</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  scope.innerHTML = '<option value="" disabled>Select a clientâ¦</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
   scope.onchange = syncRoleIndustry;
   if (VIEW_CLIENT) {
     scope.value = VIEW_CLIENT;
@@ -6777,7 +6880,7 @@ function openNewRoleDrawer() {
   }
   // Industry dropdown
   const ind = document.getElementById('newRoleIndustry');
-  ind.innerHTML = '<option value="" disabled>Select an industry…</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
+  ind.innerHTML = '<option value="" disabled>Select an industryâ¦</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
   syncRoleIndustry();
   // Change submit button label
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
@@ -6795,12 +6898,12 @@ function editRole(id) {
   document.getElementById('newRoleName').value = r.name;
   document.getElementById('newRoleDesc').value = r.desc || '';
   const scope = document.getElementById('newRoleScope');
-  scope.innerHTML = '<option value="" disabled>Select a client…</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  scope.innerHTML = '<option value="" disabled>Select a clientâ¦</option>' + CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
   scope.value = r.client || '';
   scope.disabled = !!VIEW_CLIENT;
   scope.onchange = syncRoleIndustry;
   const ind = document.getElementById('newRoleIndustry');
-  ind.innerHTML = '<option value="" disabled>Select an industry…</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
+  ind.innerHTML = '<option value="" disabled>Select an industryâ¦</option>' + INDUSTRIES.map(i => `<option value="${i}">${i}</option>`).join('');
   ind.value = r.industry || INDUSTRY_BY_CLIENT[r.client] || '';
   const submitBtn = document.querySelector('#roleDrawer .drawer-foot .btn-primary');
   if (submitBtn) submitBtn.textContent = 'Save changes';
@@ -6830,7 +6933,7 @@ function submitNewRole() {
   if (!scope) { toast('Please select which client this role is for', 'danger'); return; }
   if (!industry) { toast('Please select an industry', 'danger'); return; }
 
-  // Edit mode — update existing role
+  // Edit mode â update existing role
   if (state.editingRoleId) {
     const r = state.roles.find(x => x.id === state.editingRoleId);
     if (r) {
@@ -6847,7 +6950,7 @@ function submitNewRole() {
     return;
   }
 
-  // Create mode — blank permissions by default
+  // Create mode â blank permissions by default
   const basePerms = emptyPerms();
   const newRole = {
     id: 'r_' + Date.now(),
@@ -6904,7 +7007,7 @@ renderDevicesPage();
 renderCustomersPage();
 if (window.lucide) window.lucide.createIcons();
 
-/* Hover tooltip activation: convert title→data-tip on icon-only controls
+/* Hover tooltip activation: convert titleâdata-tip on icon-only controls
    so the custom CSS tooltip shows instead of the slow native browser tip.
    Nav items keep their title attribute so sidebar-collapsed mode works. */
 const _TIP_SELECTOR = '.icon-btn, .row-edit, .tel-row-del, .pg-icon, .pager button';

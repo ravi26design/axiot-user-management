@@ -2363,6 +2363,10 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
               <input id="customerSearch" placeholder="Search clients…" oninput="renderCustomersPage()" />
             </div>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <div class="filter-wrap"><button class="chip-select" id="filterClientCountryBtn" onclick="toggleClientCountryFilter(event)">Country <span class="caret">▾</span></button></div>
+              <div class="filter-wrap"><button class="chip-select" id="filterClientCityBtn" onclick="toggleClientCityFilter(event)">City <span class="caret">▾</span></button></div>
+            </div>
           </div>
           <div class="tbl-wrap">
             <table>
@@ -5486,6 +5490,86 @@ function toggleIndustryClientFilter(evt) {
 /* ============================================================
    Customers
    ============================================================ */
+function viewClientUsers(clientName) {
+  if (typeof userFilters !== 'undefined') {
+    if (userFilters.role     && userFilters.role.clear)     userFilters.role.clear();
+    if (userFilters.status   && userFilters.status.clear)   userFilters.status.clear();
+    if (userFilters.location && userFilters.location.clear) userFilters.location.clear();
+    userFilters.search = '';
+    let target = clientName;
+    if (typeof CLIENTS !== 'undefined' && Array.isArray(CLIENTS)) {
+      const match = CLIENTS.find(cl => clientName === cl)
+                 || CLIENTS.find(cl => clientName.includes(cl) || cl.includes(clientName));
+      if (match) target = match;
+    }
+    userFilters.client = new Set([target]);
+  }
+  switchScreen('users');
+  if (typeof renderUsers === 'function') renderUsers();
+  toast(`Showing users for ${clientName}`);
+}
+
+function toggleClientCountryFilter(evt) {
+  evt.stopPropagation();
+  const existing = document.getElementById('clientCountryPop');
+  if (existing) { existing.remove(); return; }
+  const btn = evt.currentTarget;
+  const wrap = btn.parentElement;
+  const countries = ['all', ...new Set(CUSTOMERS.map(c => c.country).filter(Boolean))]
+    .sort((a, b) => a === 'all' ? -1 : b === 'all' ? 1 : String(a).localeCompare(String(b)));
+  const html = `
+    <div class="filter-pop open" id="clientCountryPop" style="min-width:220px">
+      <div class="filter-pop-head"><span>Filter by country</span></div>
+      ${countries.map(c => `
+        <label class="filter-opt" onclick="state.clientCountryFilter='${String(c).replace(/'/g, "\\'")}';document.getElementById('clientCountryPop').remove();renderCustomersPage()">
+          <span>${c === 'all' ? 'All countries' : _kvEscape(c)}</span>
+        </label>
+      `).join('')}
+    </div>`;
+  wrap.insertAdjacentHTML('beforeend', html);
+  setTimeout(() => {
+    const closer = (e) => {
+      if (!e.target.closest('#clientCountryPop') && !e.target.closest('#filterClientCountryBtn')) {
+        const p = document.getElementById('clientCountryPop'); if (p) p.remove();
+        document.removeEventListener('click', closer);
+      }
+    };
+    document.addEventListener('click', closer);
+  }, 0);
+}
+
+function toggleClientCityFilter(evt) {
+  evt.stopPropagation();
+  const existing = document.getElementById('clientCityPop');
+  if (existing) { existing.remove(); return; }
+  const btn = evt.currentTarget;
+  const wrap = btn.parentElement;
+  const scope = (state.clientCountryFilter && state.clientCountryFilter !== 'all')
+    ? CUSTOMERS.filter(c => c.country === state.clientCountryFilter)
+    : CUSTOMERS;
+  const cities = ['all', ...new Set(scope.map(c => c.city).filter(Boolean))]
+    .sort((a, b) => a === 'all' ? -1 : b === 'all' ? 1 : String(a).localeCompare(String(b)));
+  const html = `
+    <div class="filter-pop open" id="clientCityPop" style="min-width:220px">
+      <div class="filter-pop-head"><span>Filter by city${state.clientCountryFilter && state.clientCountryFilter !== 'all' ? ' · ' + _kvEscape(state.clientCountryFilter) : ''}</span></div>
+      ${cities.map(c => `
+        <label class="filter-opt" onclick="state.clientCityFilter='${String(c).replace(/'/g, "\\'")}';document.getElementById('clientCityPop').remove();renderCustomersPage()">
+          <span>${c === 'all' ? 'All cities' : _kvEscape(c)}</span>
+        </label>
+      `).join('')}
+    </div>`;
+  wrap.insertAdjacentHTML('beforeend', html);
+  setTimeout(() => {
+    const closer = (e) => {
+      if (!e.target.closest('#clientCityPop') && !e.target.closest('#filterClientCityBtn')) {
+        const p = document.getElementById('clientCityPop'); if (p) p.remove();
+        document.removeEventListener('click', closer);
+      }
+    };
+    document.addEventListener('click', closer);
+  }, 0);
+}
+
 const CUSTOMERS = [
   { id: 'cu-1', createdTime: '2026-04-24 11:20:25', title: 'Thara Client', email: 'ops@thara.in',           country: 'India',          city: 'Thara',     state: 'Gujarat',     zip: '385565',  address: '12 Industrial Area',    address2: '',         phone: '9876543210',  phoneCountry: '+91', description: 'Textile manufacturing client in north Gujarat.' },
   { id: 'cu-2', createdTime: '2026-04-22 15:49:05', title: 'Client C',     email: 'support@customer-c.com', country: 'United Kingdom', city: 'London',    state: 'England',     zip: 'EC1A 1BB', address: '24 Tabernacle Street',  address2: '',         phone: '2079460000',  phoneCountry: '+44', description: '' },
@@ -5498,14 +5582,33 @@ const CUSTOMERS = [
 ];
 
 function renderCustomersPage() {
-  const q = (document.getElementById('customerSearch') && document.getElementById('customerSearch').value || '').toLowerCase();
-  const list = q
-    ? CUSTOMERS.filter(c =>
-        (c.title || '').toLowerCase().includes(q) ||
-        (c.email || '').toLowerCase().includes(q) ||
-        (c.country || '').toLowerCase().includes(q) ||
-        (c.city || '').toLowerCase().includes(q))
-    : CUSTOMERS;
+  state.clientCountryFilter = state.clientCountryFilter || 'all';
+  state.clientCityFilter    = state.clientCityFilter    || 'all';
+  const q     = (document.getElementById('customerSearch') && document.getElementById('customerSearch').value || '').toLowerCase();
+  const cf    = state.clientCountryFilter;
+  const cityF = state.clientCityFilter;
+  let list = CUSTOMERS;
+  if (cf    !== 'all') list = list.filter(c => c.country === cf);
+  if (cityF !== 'all') list = list.filter(c => c.city    === cityF);
+  if (q) list = list.filter(c =>
+    (c.title   || '').toLowerCase().includes(q) ||
+    (c.email   || '').toLowerCase().includes(q) ||
+    (c.country || '').toLowerCase().includes(q) ||
+    (c.city    || '').toLowerCase().includes(q));
+
+  // Update filter chip labels
+  const _chipBadge = (label) => `${label} <span style="background:var(--primary);color:#fff;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:10px;margin-left:4px">1</span>`;
+  const cBtn = document.getElementById('filterClientCountryBtn');
+  if (cBtn) {
+    cBtn.classList.toggle('active', cf !== 'all');
+    cBtn.innerHTML = (cf === 'all' ? 'Country' : _chipBadge(cf)) + ' <span class="caret">▾</span>';
+  }
+  const cityBtn = document.getElementById('filterClientCityBtn');
+  if (cityBtn) {
+    cityBtn.classList.toggle('active', cityF !== 'all');
+    cityBtn.innerHTML = (cityF === 'all' ? 'City' : _chipBadge(cityF)) + ' <span class="caret">▾</span>';
+  }
+
   const countEl = document.getElementById('customersCount');
   if (countEl) countEl.textContent = `(${list.length})`;
   const meta = document.getElementById('customerListMeta');
@@ -5532,7 +5635,7 @@ function renderCustomersPage() {
       <td style="color:var(--text-muted)">${_kvEscape(c.city || '')}</td>
       <td onclick="event.stopPropagation()">
         <div class="row-actions">
-          <button class="icon-btn" title="Client users" onclick="toast('Client users — coming soon')">${li('user')}</button>
+          <button class="icon-btn" title="Client users" onclick="viewClientUsers('${(c.title || '').replace(/'/g, "\'")}')">${li('user')}</button>
           <button class="icon-btn" title="Client industries" onclick="toast('Client industries — coming soon')">${li('building-2')}</button>
           <button class="icon-btn" title="Client devices" onclick="toast('Client devices — coming soon')">${li('cpu')}</button>
           <button class="icon-btn" title="Client dashboards" onclick="toast('Client dashboards — coming soon')">${li('layout-grid')}</button>
