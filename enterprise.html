@@ -167,6 +167,40 @@
   body.sidebar-collapsed .nav-group .nav-sub { padding-left: 0; justify-content: center; }
   body.sidebar-collapsed .nav-group-head .nav-chevron { display: none; }
 
+  /* Hover tooltip for icon-only buttons (replaces native title bubble) */
+  [data-tip] { position: relative; }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(11, 18, 32, 0.92);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 1000;
+    letter-spacing: 0.2px;
+    animation: tipFadeIn .12s ease;
+  }
+  [data-tip]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: rgba(11, 18, 32, 0.92);
+    pointer-events: none;
+    z-index: 1000;
+    animation: tipFadeIn .12s ease;
+  }
+  @keyframes tipFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
   .main { display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
   .topbar {
     height: 54px; background: var(--surface);
@@ -2378,7 +2412,7 @@
       <div class="drawer-title">Invite new user</div>
       <div class="drawer-sub">They'll receive an email to set up their account.</div>
     </div>
-    <button class="icon-btn" onclick="closeUserDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <button class="icon-btn" title="Close" onclick="closeUserDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="drawer-body">
     <div class="form-section">
@@ -2423,7 +2457,7 @@
       <div class="drawer-title" id="roleDrawerTitle">Create new role</div>
       <div class="drawer-sub">Define what users with this role can do.</div>
     </div>
-    <button class="icon-btn" onclick="closeRoleDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <button class="icon-btn" title="Close" onclick="closeRoleDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="drawer-body">
     <div class="form-section">
@@ -2463,7 +2497,7 @@
       <div class="drawer-title" id="deviceDrawerTitle">Add device</div>
       <div class="drawer-sub">Register a new IoT device for a client industry.</div>
     </div>
-    <button class="icon-btn" onclick="closeDeviceDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <button class="icon-btn" title="Close" onclick="closeDeviceDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="drawer-body">
     <div class="form-section">
@@ -2573,7 +2607,7 @@
       <div class="drawer-title" id="industryDrawerTitle">Add industry</div>
       <div class="drawer-sub">An industry represents a physical or business location for a client.</div>
     </div>
-    <button class="icon-btn" onclick="closeIndustryDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <button class="icon-btn" title="Close" onclick="closeIndustryDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="drawer-body">
     <div class="form-section">
@@ -6855,6 +6889,30 @@ renderIndustries();
 renderDevicesPage();
 renderCustomersPage();
 if (window.lucide) window.lucide.createIcons();
+
+/* Hover tooltip activation: convert title→data-tip on icon-only controls
+   so the custom CSS tooltip shows instead of the slow native browser tip.
+   Nav items keep their title attribute so sidebar-collapsed mode works. */
+const _TIP_SELECTOR = '.icon-btn, .row-edit, .tel-row-del, .pg-icon, .pager button';
+function activateTips(root) {
+  (root || document).querySelectorAll(_TIP_SELECTOR).forEach(el => {
+    if (el.dataset.tip) return;
+    const t = el.getAttribute('title') || el.getAttribute('aria-label');
+    if (!t) return;
+    el.dataset.tip = t;
+    if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', t);
+    el.removeAttribute('title');
+  });
+}
+activateTips();
+const _tipObs = new MutationObserver(muts => {
+  for (const m of muts) {
+    for (const n of m.addedNodes) {
+      if (n.nodeType === 1) activateTips(n);
+    }
+  }
+});
+_tipObs.observe(document.body, { childList: true, subtree: true });
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
