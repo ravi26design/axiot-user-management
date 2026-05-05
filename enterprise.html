@@ -2305,6 +2305,60 @@
   </div>
 </div>
 
+<!-- CUSTOMERS SCREEN -->
+<div class="screen" id="screen-customers">
+  <div class="app">
+    <aside class="sidebar" data-sidebar></aside>
+    <div class="main">
+      <header class="topbar" data-topbar></header>
+      <div class="content">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Customers <span id="customersCount" style="color:var(--text-muted);font-weight:500;font-size:18px"></span></div>
+            <div class="page-sub">Manage customers and their associated entities.</div>
+          </div>
+          <button class="btn btn-primary" onclick="addCustomer()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Add customer
+          </button>
+        </div>
+
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search-box">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+              <input id="customerSearch" placeholder="Search customers…" oninput="renderCustomersPage()" />
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:40px"><input type="checkbox" /></th>
+                  <th>Created time</th>
+                  <th>Title</th>
+                  <th>Email</th>
+                  <th>Country</th>
+                  <th>City</th>
+                  <th style="width:240px"></th>
+                </tr>
+              </thead>
+              <tbody id="customerRows"></tbody>
+            </table>
+          </div>
+          <div class="tbl-footer">
+            <div id="customerListMeta">—</div>
+            <div class="pager">
+              <button disabled style="opacity:.4;cursor:default">‹</button><button class="active">1</button><button disabled style="opacity:.4;cursor:default">›</button>
+            </div>
+            <div><select class="select-sm"><option>25 per page</option><option>50 per page</option><option>100 per page</option></select></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- USER DETAILS SCREEN -->
 <div class="screen" id="screen-userDetails">
   <div class="app">
@@ -2661,6 +2715,7 @@ const SVG = {
 
 const NAV = [
   { section: 'Administration' },
+  { key: 'customers',   label: 'Customers',            ico: li('user-round'), screen: 'customers' },
   { key: 'users',       label: 'Users',                ico: SVG.users,      screen: 'users' },
   { key: 'roles',       label: 'Roles & permissions',  ico: SVG.roles,      screen: 'roles' },
   { key: 'industries',  label: 'Industries',           ico: SVG.industries, screen: 'industries' },
@@ -5394,6 +5449,230 @@ function toggleIndustryClientFilter(evt) {
   }, 0);
 }
 
+/* ============================================================
+   Customers
+   ============================================================ */
+const CUSTOMERS = [
+  { id: 'cu-1', createdTime: '2026-04-24 11:20:25', title: 'Thara Customer', email: '', country: 'India', city: 'Thara',  state: '', zip: '', address: '', address2: '', phone: '', phoneCountry: '+91', description: '' },
+  { id: 'cu-2', createdTime: '2026-04-22 15:49:05', title: 'Customer C',     email: '', country: '',      city: '',       state: '', zip: '', address: '', address2: '', phone: '', phoneCountry: '+1',  description: '' },
+  { id: 'cu-3', createdTime: '2026-04-22 15:49:05', title: 'Customer B',     email: '', country: '',      city: '',       state: '', zip: '', address: '', address2: '', phone: '', phoneCountry: '+1',  description: '' },
+  { id: 'cu-4', createdTime: '2026-04-22 15:49:05', title: 'Customer A',     email: '', country: '',      city: '',       state: '', zip: '', address: '', address2: '', phone: '', phoneCountry: '+1',  description: '' }
+];
+
+function renderCustomersPage() {
+  const q = (document.getElementById('customerSearch') && document.getElementById('customerSearch').value || '').toLowerCase();
+  const list = q
+    ? CUSTOMERS.filter(c =>
+        (c.title || '').toLowerCase().includes(q) ||
+        (c.email || '').toLowerCase().includes(q) ||
+        (c.country || '').toLowerCase().includes(q) ||
+        (c.city || '').toLowerCase().includes(q))
+    : CUSTOMERS;
+  const countEl = document.getElementById('customersCount');
+  if (countEl) countEl.textContent = `(${list.length})`;
+  const meta = document.getElementById('customerListMeta');
+  if (meta) meta.textContent = `${list.length} of ${CUSTOMERS.length} customers`;
+
+  const tbody = document.getElementById('customerRows');
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
+      <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">No customers match</div>
+      <div style="font-size:13px;color:var(--text-muted)">Try adjusting your search or add a customer.</div>
+      <div style="margin-top:14px"><button class="btn btn-primary btn-sm" onclick="addCustomer()">+ Add customer</button></div>
+    </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(c => `
+    <tr class="row-clickable" onclick="editCustomer('${c.id}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" /></td>
+      <td>${c.createdTime}</td>
+      <td>${_kvEscape(c.title)}</td>
+      <td style="color:var(--text-muted)">${_kvEscape(c.email || '')}</td>
+      <td style="color:var(--text-muted)">${_kvEscape(c.country || '')}</td>
+      <td style="color:var(--text-muted)">${_kvEscape(c.city || '')}</td>
+      <td onclick="event.stopPropagation()">
+        <div class="row-actions">
+          <button class="icon-btn" title="Customer users" onclick="toast('Customer users — coming soon')">${li('user')}</button>
+          <button class="icon-btn" title="Customer industries" onclick="toast('Customer industries — coming soon')">${li('building-2')}</button>
+          <button class="icon-btn" title="Customer devices" onclick="toast('Customer devices — coming soon')">${li('cpu')}</button>
+          <button class="icon-btn" title="Customer dashboards" onclick="toast('Customer dashboards — coming soon')">${li('layout-grid')}</button>
+          <button class="icon-btn" title="Customer gateways" onclick="toast('Customer gateways — coming soon')">${li('share-2')}</button>
+          <button class="icon-btn" title="Delete" onclick="deleteCustomer('${c.id}')" style="color:var(--danger)">${li('trash-2')}</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function addCustomer(existing) {
+  closeCustomerDrawer();
+  const editing = !!existing;
+  state._customerDraft = {
+    id:           editing ? existing.id : null,
+    title:        existing && existing.title        || '',
+    description:  existing && existing.description  || '',
+    country:      existing && existing.country      || '',
+    city:         existing && existing.city         || '',
+    state:        existing && existing.state        || '',
+    zip:          existing && existing.zip          || '',
+    address:      existing && existing.address      || '',
+    address2:     existing && existing.address2     || '',
+    phone:        existing && existing.phone        || '',
+    phoneCountry: existing && existing.phoneCountry || '+1',
+    email:        existing && existing.email        || ''
+  };
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'drawer-backdrop';
+  backdrop.id = 'customerDrawerBackdrop';
+  backdrop.onclick = closeCustomerDrawer;
+
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+  drawer.id = 'customerDrawer';
+  drawer.style.width = '560px';
+  drawer.innerHTML = `
+    <style>
+      .cust-phone-row { display:flex;gap:8px;align-items:stretch }
+      .cust-phone-flag { width:96px;flex-shrink:0;padding:9px 28px 9px 10px;border:1px solid var(--border-strong);border-radius:5px;background:var(--surface);font-family:inherit;font-size:14px;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 8px center;outline:none }
+      .cust-phone-flag:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(31,78,158,0.15) }
+    </style>
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">${editing ? 'Edit' : 'Add'} customer</div>
+        <div class="drawer-sub">Customer profile and contact details.</div>
+      </div>
+      <button class="icon-btn" onclick="closeCustomerDrawer()" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="field">
+        <label class="label">Title <span class="req">*</span></label>
+        <input class="input" id="custTitle" placeholder="e.g. Acme Corp" value="${_kvEscape(state._customerDraft.title)}" oninput="state._customerDraft.title=this.value;validateCustomerForm()" />
+      </div>
+      <div class="field">
+        <label class="label">Description</label>
+        <textarea class="textarea" id="custDescription" placeholder="" oninput="state._customerDraft.description=this.value">${_kvEscape(state._customerDraft.description)}</textarea>
+      </div>
+      <div class="field">
+        <label class="label">Country</label>
+        <input class="input" placeholder="" value="${_kvEscape(state._customerDraft.country)}" oninput="state._customerDraft.country=this.value" />
+      </div>
+      <div class="field-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="field"><label class="label">City</label><input class="input" placeholder="" value="${_kvEscape(state._customerDraft.city)}" oninput="state._customerDraft.city=this.value" /></div>
+        <div class="field"><label class="label">State / Province</label><input class="input" placeholder="" value="${_kvEscape(state._customerDraft.state)}" oninput="state._customerDraft.state=this.value" /></div>
+        <div class="field"><label class="label">Zip / Postal Code</label><input class="input" placeholder="" value="${_kvEscape(state._customerDraft.zip)}" oninput="state._customerDraft.zip=this.value" /></div>
+      </div>
+      <div class="field">
+        <label class="label">Address</label>
+        <input class="input" placeholder="" value="${_kvEscape(state._customerDraft.address)}" oninput="state._customerDraft.address=this.value" />
+      </div>
+      <div class="field">
+        <label class="label">Address 2</label>
+        <input class="input" placeholder="" value="${_kvEscape(state._customerDraft.address2)}" oninput="state._customerDraft.address2=this.value" />
+      </div>
+      <div class="field">
+        <label class="label">Phone</label>
+        <div class="cust-phone-row">
+          <select class="cust-phone-flag" onchange="state._customerDraft.phoneCountry=this.value">
+            <option value="+1"   ${state._customerDraft.phoneCountry==='+1'  ?'selected':''}>🇺🇸 +1</option>
+            <option value="+91"  ${state._customerDraft.phoneCountry==='+91' ?'selected':''}>🇮🇳 +91</option>
+            <option value="+44"  ${state._customerDraft.phoneCountry==='+44' ?'selected':''}>🇬🇧 +44</option>
+            <option value="+86"  ${state._customerDraft.phoneCountry==='+86' ?'selected':''}>🇨🇳 +86</option>
+            <option value="+81"  ${state._customerDraft.phoneCountry==='+81' ?'selected':''}>🇯🇵 +81</option>
+            <option value="+49"  ${state._customerDraft.phoneCountry==='+49' ?'selected':''}>🇩🇪 +49</option>
+            <option value="+33"  ${state._customerDraft.phoneCountry==='+33' ?'selected':''}>🇫🇷 +33</option>
+            <option value="+61"  ${state._customerDraft.phoneCountry==='+61' ?'selected':''}>🇦🇺 +61</option>
+            <option value="+971" ${state._customerDraft.phoneCountry==='+971'?'selected':''}>🇦🇪 +971</option>
+          </select>
+          <input class="input" placeholder="Phone" value="${_kvEscape(state._customerDraft.phone)}" oninput="state._customerDraft.phone=this.value" />
+        </div>
+        <div class="hint">Phone number in E.164 format, ex. +12015550123</div>
+      </div>
+      <div class="field">
+        <label class="label">Email</label>
+        <input class="input" type="email" placeholder="" value="${_kvEscape(state._customerDraft.email)}" oninput="state._customerDraft.email=this.value" />
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn btn-ghost" onclick="closeCustomerDrawer()">Cancel</button>
+      <button class="btn btn-primary" id="custAddBtn" onclick="submitCustomer()" disabled>${editing ? 'Save changes' : 'Add'}</button>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+
+  requestAnimationFrame(() => {
+    backdrop.classList.add('open');
+    drawer.classList.add('open');
+  });
+
+  setTimeout(() => { const t = document.getElementById('custTitle'); if (t) t.focus(); }, 280);
+  validateCustomerForm();
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function closeCustomerDrawer() {
+  const backdrop = document.getElementById('customerDrawerBackdrop');
+  const drawer   = document.getElementById('customerDrawer');
+  if (!backdrop && !drawer) return;
+  if (backdrop) backdrop.classList.remove('open');
+  if (drawer)   drawer.classList.remove('open');
+  setTimeout(() => {
+    const b  = document.getElementById('customerDrawerBackdrop');
+    const dr = document.getElementById('customerDrawer');
+    if (b)  b.remove();
+    if (dr) dr.remove();
+  }, 260);
+}
+
+function validateCustomerForm() {
+  const draft = state._customerDraft;
+  const valid = !!(draft && draft.title && draft.title.trim());
+  const btn = document.getElementById('custAddBtn');
+  if (btn) btn.disabled = !valid;
+}
+
+function submitCustomer() {
+  const draft = state._customerDraft;
+  if (!draft || !draft.title.trim()) return;
+  const pad = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  if (draft.id) {
+    const existing = CUSTOMERS.find(c => c.id === draft.id);
+    if (existing) Object.assign(existing, draft);
+    toast('Customer updated', 'success');
+  } else {
+    const newId = 'cu-' + (state._customerSeq = (state._customerSeq || CUSTOMERS.length) + 1);
+    CUSTOMERS.unshift({ id: newId, createdTime: fmt, ...draft });
+    toast('Customer added', 'success');
+  }
+  closeCustomerDrawer();
+  renderCustomersPage();
+}
+
+function editCustomer(id) {
+  const c = CUSTOMERS.find(x => x.id === id);
+  if (c) addCustomer(c);
+}
+
+function deleteCustomer(id) {
+  const c = CUSTOMERS.find(x => x.id === id);
+  if (!c) return;
+  confirmDialog(`Delete customer "${c.title}"?`, 'This permanently removes the customer.', () => {
+    const idx = CUSTOMERS.findIndex(x => x.id === id);
+    if (idx >= 0) CUSTOMERS.splice(idx, 1);
+    renderCustomersPage();
+    toast('Customer deleted', 'danger');
+  });
+}
+
 function switchScreen(name) {
   if (state.dirtyChanges && countChanges() > 0) {
     if (!confirm('You have unsaved changes. Leave without saving?')) return;
@@ -5410,6 +5689,7 @@ function switchScreen(name) {
   if (name === 'roles') renderRoles();
   if (name === 'industries') renderIndustries();
   if (name === 'devices') renderDevicesPage();
+  if (name === 'customers') renderCustomersPage();
   window.scrollTo(0, 0);
 }
 
@@ -6567,11 +6847,13 @@ renderSidebar('users');
 renderSidebar('roles');
 renderSidebar('industries');
 renderSidebar('devices');
+renderSidebar('customers');
 renderTopbar();
 renderUsers();
 renderRoles();
 renderIndustries();
 renderDevicesPage();
+renderCustomersPage();
 if (window.lucide) window.lucide.createIcons();
 
 document.addEventListener('keydown', e => {
