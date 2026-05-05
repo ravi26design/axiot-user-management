@@ -5594,7 +5594,10 @@ function addCustomer(existing) {
       </div>
       <div class="field">
         <label class="label">Country</label>
-        <input class="input" placeholder="" value="${_kvEscape(state._customerDraft.country)}" oninput="state._customerDraft.country=this.value" />
+        <select class="select" onchange="state._customerDraft.country=this.value">
+          ${['', 'Australia', 'Brazil', 'Canada', 'China', 'France', 'Germany', 'India', 'Indonesia', 'Italy', 'Japan', 'Malaysia', 'Mexico', 'Netherlands', 'Philippines', 'Saudi Arabia', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Thailand', 'Türkiye', 'United Arab Emirates', 'United Kingdom', 'United States', 'Vietnam']
+            .map(c => `<option value="${c}" ${state._customerDraft.country===c?'selected':''}>${c || 'Select country…'}</option>`).join('')}
+        </select>
       </div>
       <div class="field-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="field"><label class="label">City</label><input class="input" placeholder="" value="${_kvEscape(state._customerDraft.city)}" oninput="state._customerDraft.city=this.value" /></div>
