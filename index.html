@@ -3667,7 +3667,7 @@ function renderDeviceAttributesTab(d) {
           ${ATTR_SCOPES.map(s => `<div class="de-chart-tab ${scope===s.id?'active':''}" onclick="setAttributesScope('${s.id}')">${s.label}</div>`).join('')}
         </div>
         <div class="tel-actions">
-          <button class="icon-btn" title="Add attribute" onclick="addAttribute()">${li('plus')}</button>
+          ${scope !== 'client' ? `<button class="icon-btn" title="Add attribute" onclick="addAttribute()">${li('plus')}</button>` : ''}
         </div>
       </div>
       <table class="tel-table">
