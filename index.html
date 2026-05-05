@@ -149,6 +149,24 @@
   }
   .nav-badge.alert { background: var(--danger-soft); color: var(--danger); }
 
+  /* Expandable nav group (e.g. Entities) */
+  .nav-group { display: flex; flex-direction: column; gap: 2px; }
+  .nav-group-head { cursor: pointer; }
+  .nav-group-head .nav-chevron {
+    margin-left: auto; color: var(--text-subtle);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform .15s;
+  }
+  .nav-group-head .nav-chevron [data-lucide] { width: 14px; height: 14px; }
+  .nav-group.expanded .nav-group-head .nav-chevron { transform: rotate(180deg); }
+  .nav-group-children { display: none; padding-top: 2px; }
+  .nav-group.expanded .nav-group-children { display: flex; flex-direction: column; gap: 2px; }
+  .nav-sub { padding-left: 32px; font-size: 13.5px; }
+  .nav-sub.active { padding-left: 31px; }
+  body.sidebar-collapsed .nav-group .nav-group-children { display: flex !important; flex-direction: column; }
+  body.sidebar-collapsed .nav-group .nav-sub { padding-left: 0; justify-content: center; }
+  body.sidebar-collapsed .nav-group-head .nav-chevron { display: none; }
+
   .main { display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
   .topbar {
     height: 54px; background: var(--surface);
@@ -2643,13 +2661,18 @@ const SVG = {
 
 const NAV = [
   { section: 'Administration' },
-  { key: 'users',       label: 'Users',                ico: SVG.users,        screen: 'users' },
-  { key: 'roles',       label: 'Roles & permissions',  ico: SVG.roles,        screen: 'roles' },
-  { key: 'industries',  label: 'Industries',           ico: SVG.industries,   screen: 'industries' },
-  { section: 'Entities' },
-  { key: 'devices',     label: 'Devices',              ico: SVG.devices,      screen: 'devices' },
-  { key: 'entityViews', label: 'Entity views',         ico: li('layout-grid'), comingSoon: true },
-  { key: 'gateways',    label: 'Gateways',             ico: li('router'),     comingSoon: true }
+  { key: 'users',       label: 'Users',                ico: SVG.users,      screen: 'users' },
+  { key: 'roles',       label: 'Roles & permissions',  ico: SVG.roles,      screen: 'roles' },
+  { key: 'industries',  label: 'Industries',           ico: SVG.industries, screen: 'industries' },
+  {
+    key: 'entities', label: 'Entities', ico: li('shapes'), group: true,
+    children: [
+      { key: 'devices',     label: 'Devices',      ico: SVG.devices,       screen: 'devices' },
+      { key: 'locations',   label: 'Locations',    ico: li('building-2'),  comingSoon: true },
+      { key: 'entityViews', label: 'Entity views', ico: li('layout-grid'), comingSoon: true },
+      { key: 'gateways',    label: 'Gateways',     ico: li('share-2'),     comingSoon: true }
+    ]
+  }
 ];
 
 const RESOURCES = [
@@ -2833,6 +2856,24 @@ function renderSidebar(activeScreen) {
     </div>
     ${NAV.map(item => {
       if (item.section) return `<div class="nav-section">${item.section}</div>`;
+      if (item.group) {
+        if (!state.navExpanded) state.navExpanded = {};
+        if (state.navExpanded[item.key] === undefined) state.navExpanded[item.key] = true;
+        const childActive = (item.children || []).some(c => c.screen === activeScreen);
+        if (childActive) state.navExpanded[item.key] = true;
+        const isExpanded = !!state.navExpanded[item.key];
+        const childrenHtml = (item.children || []).map(c => {
+          const cActive = c.screen === activeScreen;
+          const cClick = c.screen
+            ? `onclick="switchScreen('${c.screen}')"`
+            : (c.comingSoon ? `onclick="toast('${c.label} — coming soon')"` : '');
+          return `<a class="nav-item nav-sub ${cActive ? 'active' : ''}" ${cClick} title="${c.label}"><span class="ico">${c.ico}</span><span class="nav-label">${c.label}</span></a>`;
+        }).join('');
+        return `<div class="nav-group ${isExpanded ? 'expanded' : ''}">
+          <a class="nav-item nav-group-head" onclick="toggleNavGroup('${item.key}')" title="${item.label}"><span class="ico">${item.ico}</span><span class="nav-label">${item.label}</span><span class="nav-chevron">${li('chevron-down')}</span></a>
+          <div class="nav-group-children">${childrenHtml}</div>
+        </div>`;
+      }
       const isActive = item.screen === activeScreen;
       const clickable = item.screen
         ? `onclick="switchScreen('${item.screen}')"`
@@ -2846,6 +2887,17 @@ function renderSidebar(activeScreen) {
   document.querySelectorAll('[data-sidebar]').forEach(el => {
     if (el.closest('.screen').id === 'screen-' + activeScreen) el.innerHTML = html;
   });
+}
+
+function toggleNavGroup(key) {
+  if (!state.navExpanded) state.navExpanded = {};
+  state.navExpanded[key] = !state.navExpanded[key];
+  const activeScreenEl = document.querySelector('.screen.active');
+  if (!activeScreenEl) return;
+  const screenKey = activeScreenEl.id.replace('screen-', '');
+  const sidebarKey = screenKey === 'deviceDetails' ? 'devices' : screenKey;
+  renderSidebar(sidebarKey);
+  if (window.lucide) window.lucide.createIcons();
 }
 
 /* ==== Notifications data ==== */
