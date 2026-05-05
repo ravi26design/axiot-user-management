@@ -5571,6 +5571,31 @@ function viewClientUsers(clientName) {
   toast(`Showing users for ${clientName}`);
 }
 
+function _resolveClientTarget(clientName) {
+  if (typeof CLIENTS !== 'undefined' && Array.isArray(CLIENTS)) {
+    const exact = CLIENTS.find(cl => clientName === cl);
+    if (exact) return exact;
+    const sub = CLIENTS.find(cl => clientName.includes(cl) || cl.includes(clientName));
+    if (sub) return sub;
+  }
+  return clientName;
+}
+
+function viewClientIndustries(clientName) {
+  state.industryClientFilter = _resolveClientTarget(clientName);
+  switchScreen('industries');
+  if (typeof renderIndustries === 'function') renderIndustries();
+  toast(`Showing industries for ${clientName}`);
+}
+
+function viewClientDevices(clientName) {
+  state.deviceClientFilter   = _resolveClientTarget(clientName);
+  state.deviceIndustryFilter = 'all';
+  switchScreen('devices');
+  if (typeof renderDevicesPage === 'function') renderDevicesPage();
+  toast(`Showing devices for ${clientName}`);
+}
+
 function toggleClientCountryFilter(evt) {
   evt.stopPropagation();
   const existing = document.getElementById('clientCountryPop');
@@ -5698,8 +5723,8 @@ function renderCustomersPage() {
       <td onclick="event.stopPropagation()">
         <div class="row-actions">
           <button class="icon-btn" title="Client users" onclick="viewClientUsers('${(c.title || '').replace(/'/g, "\\'")}')">${li('user')}</button>
-          <button class="icon-btn" title="Client industries" onclick="toast('Client industries â coming soon')">${li('building-2')}</button>
-          <button class="icon-btn" title="Client devices" onclick="toast('Client devices â coming soon')">${li('cpu')}</button>
+          <button class="icon-btn" title="Client industries" onclick="viewClientIndustries('${(c.title || '').replace(/'/g, "\\'")}')">${li('building-2')}</button>
+          <button class="icon-btn" title="Client devices" onclick="viewClientDevices('${(c.title || '').replace(/'/g, "\\'")}')">${li('cpu')}</button>
           <button class="icon-btn" title="Client dashboards" onclick="toast('Client dashboards â coming soon')">${li('layout-grid')}</button>
           <button class="icon-btn" title="Client gateways" onclick="toast('Client gateways â coming soon')">${li('share-2')}</button>
           <button class="icon-btn" title="Delete" onclick="deleteCustomer('${c.id}')" style="color:var(--danger)">${li('trash-2')}</button>
