@@ -5486,10 +5486,14 @@ function toggleIndustryClientFilter(evt) {
    Customers
    ============================================================ */
 const CUSTOMERS = [
-  { id: 'cu-1', createdTime: '2026-04-24 11:20:25', title: 'Thara Customer', email: '', country: 'India', city: 'Thara',  state: '', zip: '', address: '', address2: '', phone: '', phoneCountry: '+91', description: '' },
-  { id: 'cu-2', createdTime: '2026-04-22 15:49:05', title: 'Customer C',     email: '', country: '',      city: '',       state: '', zip: '', address: '', address2: '', phone: '', phoneCountry: '+1',  description: '' },
-  { id: 'cu-3', createdTime: '2026-04-22 15:49:05', title: 'Customer B',     email: '', country: '',      city: '',       state: '', zip: '', address: '', address2: '', phone: '', phoneCountry: '+1',  description: '' },
-  { id: 'cu-4', createdTime: '2026-04-22 15:49:05', title: 'Customer A',     email: '', country: '',      city: '',       state: '', zip: '', address: '', address2: '', phone: '', phoneCountry: '+1',  description: '' }
+  { id: 'cu-1', createdTime: '2026-04-24 11:20:25', title: 'Thara Customer', email: 'ops@thara.in',           country: 'India',          city: 'Thara',     state: 'Gujarat',     zip: '385565',   address: '12 Industrial Area',         address2: '',         phone: '9876543210', phoneCountry: '+91',  description: 'Textile manufacturing customer in north Gujarat.' },
+  { id: 'cu-2', createdTime: '2026-04-22 15:49:05', title: 'Customer C',     email: 'support@customer-c.com', country: 'United Kingdom', city: 'London',    state: 'England',     zip: 'EC1A 1BB', address: '24 Tabernacle Street',       address2: '',         phone: '2079460000', phoneCountry: '+44',  description: '' },
+  { id: 'cu-3', createdTime: '2026-04-22 15:49:05', title: 'Customer B',     email: 'hello@customer-b.io',    country: 'Germany',        city: 'Berlin',    state: 'Berlin',      zip: '10115',    address: 'Friedrichstraße 88',         address2: '',         phone: '3025550143', phoneCountry: '+49',  description: '' },
+  { id: 'cu-4', createdTime: '2026-04-22 15:49:05', title: 'Customer A',     email: 'info@customer-a.com',    country: 'United States',  city: 'Austin',    state: 'TX',          zip: '78701',    address: '500 W 2nd St',               address2: 'Suite 1900', phone: '5125550101', phoneCountry: '+1', description: '' },
+  { id: 'cu-5', createdTime: '2026-04-20 09:14:11', title: 'Arvind Mills',   email: 'iot@arvind.com',         country: 'India',          city: 'Ahmedabad', state: 'Gujarat',     zip: '380025',   address: 'Naroda Road',                address2: '',         phone: '7926827000', phoneCountry: '+91',  description: 'Strategic textiles partner.' },
+  { id: 'cu-6', createdTime: '2026-04-18 14:02:48', title: 'Dynamic Looms',  email: 'priya@dynamiclooms.com', country: 'India',          city: 'Pune',      state: 'Maharashtra', zip: '411001',   address: 'Hadapsar Industrial Estate', address2: '',         phone: '2026123456', phoneCountry: '+91',  description: 'Enterprise host workspace.' },
+  { id: 'cu-7', createdTime: '2026-04-15 17:38:22', title: 'NovaWeave KK',   email: 'contact@novaweave.jp',   country: 'Japan',          city: 'Osaka',     state: 'Osaka',       zip: '530-0001', address: '1-1 Umeda',                  address2: '',         phone: '662222222',  phoneCountry: '+81',  description: '' },
+  { id: 'cu-8', createdTime: '2026-04-12 10:55:09', title: 'Helio Energies', email: 'plants@helio-energy.ae', country: 'United Arab Emirates', city: 'Dubai', state: 'Dubai',     zip: '00000',    address: 'Sheikh Zayed Rd',            address2: 'Tower B',  phone: '43330000',   phoneCountry: '+971', description: '' }
 ];
 
 function renderCustomersPage() {
