@@ -2811,11 +2811,17 @@ const initialRoles = [
 ];
 
 const initialIndustries = [
-  { id: 'i-1', name: 'Mumbai HQ',           client: 'Dynamic Looms', type: 'Textiles & Apparel', address: 'Nariman Point', city: 'Mumbai',     country: 'India', active: true,  users: 1, devices: 2 },
-  { id: 'i-2', name: 'Pune Plant — Line A', client: 'Arvind',        type: 'Textiles & Apparel', address: 'MIDC Hinjewadi', city: 'Pune',      country: 'India', active: true,  users: 1, devices: 6 },
-  { id: 'i-3', name: 'Pune Plant — Line B', client: 'Arvind',        type: 'Textiles & Apparel', address: 'MIDC Hinjewadi', city: 'Pune',      country: 'India', active: true,  users: 0, devices: 4 },
-  { id: 'i-4', name: 'Chennai Plant',       client: 'Arvind',        type: 'Manufacturing',      address: 'Sriperumbudur',  city: 'Chennai',   country: 'India', active: true,  users: 0, devices: 4 },
-  { id: 'i-5', name: 'Ahmedabad HQ',        client: 'Arvind',        type: 'Textiles & Apparel', address: 'Naroda',         city: 'Ahmedabad', country: 'India', active: false, users: 0, devices: 2 }
+  { id: 'i-1',  name: 'Mumbai HQ',           client: 'Dynamic Looms',  type: 'Textiles & Apparel',     address: 'Nariman Point',         city: 'Mumbai',     country: 'India',                    active: true,  users: 2, devices: 2 },
+  { id: 'i-2',  name: 'Pune Plant — Line A', client: 'Arvind',         type: 'Textiles & Apparel',     address: 'MIDC Hinjewadi',        city: 'Pune',       country: 'India',                    active: true,  users: 1, devices: 6 },
+  { id: 'i-3',  name: 'Pune Plant — Line B', client: 'Arvind',         type: 'Textiles & Apparel',     address: 'MIDC Hinjewadi',        city: 'Pune',       country: 'India',                    active: true,  users: 0, devices: 4 },
+  { id: 'i-4',  name: 'Chennai Plant',       client: 'Arvind',         type: 'Manufacturing',          address: 'Sriperumbudur',         city: 'Chennai',    country: 'India',                    active: true,  users: 0, devices: 4 },
+  { id: 'i-5',  name: 'Ahmedabad HQ',        client: 'Arvind',         type: 'Textiles & Apparel',     address: 'Naroda',                city: 'Ahmedabad',  country: 'India',                    active: false, users: 1, devices: 2 },
+  { id: 'i-6',  name: 'Thara',               client: 'Thara Client',   type: 'Textiles & Apparel',     address: '12 Industrial Area',    city: 'Thara',      country: 'India',                    active: true,  users: 2, devices: 3 },
+  { id: 'i-7',  name: 'Austin',              client: 'Client A',       type: 'Manufacturing',          address: '500 W 2nd St',          city: 'Austin',     country: 'United States',            active: true,  users: 2, devices: 4 },
+  { id: 'i-8',  name: 'Berlin',              client: 'Client B',       type: 'Electronics',            address: 'Friedrichstraße 88',    city: 'Berlin',     country: 'Germany',                  active: true,  users: 1, devices: 3 },
+  { id: 'i-9',  name: 'London',              client: 'Client C',       type: 'Logistics & Warehousing', address: '24 Tabernacle Street', city: 'London',     country: 'United Kingdom',           active: true,  users: 2, devices: 3 },
+  { id: 'i-10', name: 'Osaka',               client: 'NovaWeave KK',   type: 'Textiles & Apparel',     address: '1-1 Umeda',             city: 'Osaka',      country: 'Japan',                    active: true,  users: 1, devices: 2 },
+  { id: 'i-11', name: 'Dubai',               client: 'Helio Energies', type: 'Energy & Utilities',     address: 'Sheikh Zayed Rd',       city: 'Dubai',      country: 'United Arab Emirates',     active: true,  users: 2, devices: 4 }
 ];
 
 const state = {
@@ -2836,10 +2842,16 @@ const state = {
 /* ============================================================
    Devices + role-based defaults
    ============================================================ */
-const CLIENTS = ['Dynamic Looms', 'Arvind'];
+const CLIENTS = ['Dynamic Looms', 'Arvind', 'Thara Client', 'Client A', 'Client B', 'Client C', 'NovaWeave KK', 'Helio Energies'];
 const LOCATIONS_BY_CLIENT = {
-  'Dynamic Looms': ['Mumbai HQ'],
-  'Arvind':        ['Pune Plant — Line A', 'Pune Plant — Line B', 'Chennai Plant', 'Ahmedabad HQ']
+  'Dynamic Looms':  ['Mumbai HQ'],
+  'Arvind':         ['Pune Plant — Line A', 'Pune Plant — Line B', 'Chennai Plant', 'Ahmedabad HQ'],
+  'Thara Client':   ['Thara'],
+  'Client A':       ['Austin'],
+  'Client B':       ['Berlin'],
+  'Client C':       ['London'],
+  'NovaWeave KK':   ['Osaka'],
+  'Helio Energies': ['Dubai']
 };
 // NOTE: In our product, this field is called "Location" (surfaced as Location in the UI).
 // Kept as INDUSTRIES in code for future flexibility. Values below represent
@@ -2859,8 +2871,14 @@ const INDUSTRIES = [
   'Logistics & Warehousing'
 ];
 const INDUSTRY_BY_CLIENT = {
-  'Dynamic Looms': 'Textiles & Apparel',
-  'Arvind':        'Textiles & Apparel'
+  'Dynamic Looms':  'Textiles & Apparel',
+  'Arvind':         'Textiles & Apparel',
+  'Thara Client':   'Textiles & Apparel',
+  'Client A':       'Manufacturing',
+  'Client B':       'Electronics',
+  'Client C':       'Logistics & Warehousing',
+  'NovaWeave KK':   'Textiles & Apparel',
+  'Helio Energies': 'Energy & Utilities'
 };
 
 const DEVICES = [
@@ -2890,7 +2908,38 @@ const DEVICES = [
 
   // Arvind — Ahmedabad HQ
   { id: 'd-040', name: 'HQ Gateway GW-AHM01',       type: 'Gateway',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Ahmedabad HQ' },
-  { id: 'd-041', name: 'Network Switch NSW-12',     type: 'Network',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Ahmedabad HQ' }
+  { id: 'd-041', name: 'Network Switch NSW-12',     type: 'Network',   client: 'Arvind', industry: 'Textiles & Apparel', location: 'Ahmedabad HQ' },
+
+  // Thara Client — Thara
+  { id: 'd-050', name: 'Loom Sensor LS-T01',        type: 'Sensor',    client: 'Thara Client', industry: 'Textiles & Apparel', location: 'Thara' },
+  { id: 'd-051', name: 'Compressor C-T1',           type: 'Compressor', client: 'Thara Client', industry: 'Textiles & Apparel', location: 'Thara' },
+  { id: 'd-052', name: 'Site Gateway GW-THR01',     type: 'Gateway',   client: 'Thara Client', industry: 'Textiles & Apparel', location: 'Thara' },
+
+  // Client A — Austin
+  { id: 'd-060', name: 'Press Line PR-A1',          type: 'Press',     client: 'Client A', industry: 'Manufacturing', location: 'Austin' },
+  { id: 'd-061', name: 'Robotic Arm RA-A2',         type: 'Robot',     client: 'Client A', industry: 'Manufacturing', location: 'Austin' },
+  { id: 'd-062', name: 'Welder Station WS-A3',      type: 'Welder',    client: 'Client A', industry: 'Manufacturing', location: 'Austin' },
+  { id: 'd-063', name: 'Floor Gateway GW-ATX01',    type: 'Gateway',   client: 'Client A', industry: 'Manufacturing', location: 'Austin' },
+
+  // Client B — Berlin
+  { id: 'd-070', name: 'Inspection Camera IC-B1',   type: 'Camera',    client: 'Client B', industry: 'Electronics', location: 'Berlin' },
+  { id: 'd-071', name: 'Reflow Oven Sensor TS-B2',  type: 'Sensor',    client: 'Client B', industry: 'Electronics', location: 'Berlin' },
+  { id: 'd-072', name: 'Lab Gateway GW-BER01',      type: 'Gateway',   client: 'Client B', industry: 'Electronics', location: 'Berlin' },
+
+  // Client C — London
+  { id: 'd-080', name: 'Forklift Telemetry FL-C1',  type: 'Sensor',    client: 'Client C', industry: 'Logistics & Warehousing', location: 'London' },
+  { id: 'd-081', name: 'Bay Door Access AC-C2',     type: 'Access Control', client: 'Client C', industry: 'Logistics & Warehousing', location: 'London' },
+  { id: 'd-082', name: 'Warehouse Gateway GW-LDN01', type: 'Gateway',  client: 'Client C', industry: 'Logistics & Warehousing', location: 'London' },
+
+  // NovaWeave KK — Osaka
+  { id: 'd-090', name: 'Loom Motor M-NV1',          type: 'Motor',     client: 'NovaWeave KK', industry: 'Textiles & Apparel', location: 'Osaka' },
+  { id: 'd-091', name: 'Plant Gateway GW-OSK01',    type: 'Gateway',   client: 'NovaWeave KK', industry: 'Textiles & Apparel', location: 'Osaka' },
+
+  // Helio Energies — Dubai
+  { id: 'd-100', name: 'Solar Inverter SI-H1',      type: 'Sensor',    client: 'Helio Energies', industry: 'Energy & Utilities', location: 'Dubai' },
+  { id: 'd-101', name: 'Substation Flow Meter FM-H2', type: 'Flow meter', client: 'Helio Energies', industry: 'Energy & Utilities', location: 'Dubai' },
+  { id: 'd-102', name: 'Cooling Tower CT-H3',       type: 'Cooling',   client: 'Helio Energies', industry: 'Energy & Utilities', location: 'Dubai' },
+  { id: 'd-103', name: 'Site Gateway GW-DXB01',     type: 'Gateway',   client: 'Helio Energies', industry: 'Energy & Utilities', location: 'Dubai' }
 ];
 
 // Augment DEVICES with status + lastSeen for the management UI
@@ -2929,8 +2978,20 @@ function isOverridden(user, device, action) {
 }
 
 const users = [
-  { name: 'Priya Sharma', email: 'priya@dynamiclooms.com', role: 'Super Admin', client: 'Dynamic Looms', industry: 'Textiles & Apparel', location: 'Mumbai HQ',           status: 'active', last: '2 min ago',  init: 'PS' },
-  { name: 'Marcus Chen',  email: 'marcus.chen@arvind.com', role: 'Super Admin', client: 'Arvind',        industry: 'Textiles & Apparel', location: 'Pune Plant — Line A', status: 'active', last: '28 min ago', init: 'MC' }
+  { name: 'Priya Sharma',       email: 'priya@dynamiclooms.com',  role: 'Super Admin', client: 'Dynamic Looms',  industry: 'Textiles & Apparel',     location: 'Mumbai HQ',           status: 'active',   last: '2 min ago',   init: 'PS' },
+  { name: 'Aarav Patel',        email: 'aarav@dynamiclooms.com',  role: 'Admin',       client: 'Dynamic Looms',  industry: 'Textiles & Apparel',     location: 'Mumbai HQ',           status: 'active',   last: '1 hr ago',    init: 'AP' },
+  { name: 'Marcus Chen',        email: 'marcus.chen@arvind.com',  role: 'Super Admin', client: 'Arvind',         industry: 'Textiles & Apparel',     location: 'Pune Plant — Line A', status: 'active',   last: '28 min ago',  init: 'MC' },
+  { name: 'Neha Kapoor',        email: 'neha.kapoor@arvind.com',  role: 'Admin',       client: 'Arvind',         industry: 'Textiles & Apparel',     location: 'Ahmedabad HQ',        status: 'active',   last: '4 hr ago',    init: 'NK' },
+  { name: 'Ravi Mehta',         email: 'ravi@thara.in',           role: 'Super Admin', client: 'Thara Client',   industry: 'Textiles & Apparel',     location: 'Thara',               status: 'active',   last: 'Yesterday',   init: 'RM' },
+  { name: 'Vidya Joshi',        email: 'vidya@thara.in',          role: 'Operator',    client: 'Thara Client',   industry: 'Textiles & Apparel',     location: 'Thara',               status: 'active',   last: '6 hr ago',    init: 'VJ' },
+  { name: 'Megan Hayes',        email: 'megan@customer-a.com',    role: 'Super Admin', client: 'Client A',       industry: 'Manufacturing',          location: 'Austin',              status: 'active',   last: '3 hr ago',    init: 'MH' },
+  { name: 'Tom Wilson',         email: 'tom@customer-a.com',      role: 'Operator',    client: 'Client A',       industry: 'Manufacturing',          location: 'Austin',              status: 'pending',  last: 'Yesterday',   init: 'TW' },
+  { name: 'Hans Müller',        email: 'hans@customer-b.io',      role: 'Super Admin', client: 'Client B',       industry: 'Electronics',            location: 'Berlin',              status: 'active',   last: '15 min ago',  init: 'HM' },
+  { name: 'Olivia Knight',      email: 'olivia@customer-c.com',   role: 'Super Admin', client: 'Client C',       industry: 'Logistics & Warehousing', location: 'London',              status: 'active',   last: '5 min ago',   init: 'OK' },
+  { name: 'James Carter',       email: 'james@customer-c.com',    role: 'Read-Only',   client: 'Client C',       industry: 'Logistics & Warehousing', location: 'London',              status: 'inactive', last: '3 days ago',  init: 'JC' },
+  { name: 'Hiroshi Tanaka',     email: 'tanaka@novaweave.jp',     role: 'Super Admin', client: 'NovaWeave KK',   industry: 'Textiles & Apparel',     location: 'Osaka',               status: 'active',   last: '2 hr ago',    init: 'HT' },
+  { name: 'Aisha Al-Mansoori',  email: 'aisha@helio-energy.ae',   role: 'Super Admin', client: 'Helio Energies', industry: 'Energy & Utilities',     location: 'Dubai',               status: 'active',   last: '12 min ago',  init: 'AM' },
+  { name: 'Khalid Rashid',      email: 'khalid@helio-energy.ae',  role: 'Operator',    client: 'Helio Energies', industry: 'Energy & Utilities',     location: 'Dubai',               status: 'active',   last: '1 day ago',   init: 'KR' }
 ];
 
 /* ============================================================
