@@ -5570,8 +5570,16 @@ function addCustomer(existing) {
   drawer.style.width = '560px';
   drawer.innerHTML = `
     <style>
+      /* Auto-layout fields: stack with consistent vertical rhythm and 16px L/R padding */
+      #customerDrawer .drawer-body { padding-left: 16px; padding-right: 16px; }
+      #customerDrawer .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+      #customerDrawer .field-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+      #customerDrawer .field-row .field { margin-bottom: 0; }
+      #customerDrawer .input,
+      #customerDrawer .select,
+      #customerDrawer .textarea { padding-left: 16px; padding-right: 16px; }
       .cust-phone-row { display:flex;gap:8px;align-items:stretch }
-      .cust-phone-flag { width:96px;flex-shrink:0;padding:9px 28px 9px 10px;border:1px solid var(--border-strong);border-radius:5px;background:var(--surface);font-family:inherit;font-size:14px;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 8px center;outline:none }
+      .cust-phone-flag { width:96px;flex-shrink:0;padding:9px 28px 9px 16px;border:1px solid var(--border-strong);border-radius:5px;background:var(--surface);font-family:inherit;font-size:14px;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 8px center;outline:none }
       .cust-phone-flag:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(31,78,158,0.15) }
     </style>
     <div class="drawer-head">
