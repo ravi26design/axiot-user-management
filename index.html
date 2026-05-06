@@ -2395,6 +2395,72 @@
   </div>
 </div>
 
+<!-- DEVICE PROFILES SCREEN -->
+<div class="screen" id="screen-deviceProfiles">
+  <div class="app">
+    <aside class="sidebar" data-sidebar></aside>
+    <div class="main">
+      <header class="topbar" data-topbar></header>
+      <div class="content">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Device profiles <span id="deviceProfilesCount" style="color:var(--text-muted);font-weight:500;font-size:18px"></span></div>
+            <div class="page-sub">Reusable device templates that define transport, rules, alarms, and provisioning.</div>
+          </div>
+          <button class="btn btn-primary" onclick="addDeviceProfile()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Add device profile
+          </button>
+        </div>
+
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search-box">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+              <input id="deviceProfileSearch" placeholder="Search device profiles…" oninput="renderDeviceProfilesPage()" />
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:40px"><input type="checkbox" /></th>
+                  <th>Created time</th>
+                  <th>Name</th>
+                  <th>Profile type</th>
+                  <th>Transport type</th>
+                  <th>Description</th>
+                  <th style="width:80px">Default</th>
+                  <th style="width:140px"></th>
+                </tr>
+              </thead>
+              <tbody id="deviceProfileRows"></tbody>
+            </table>
+          </div>
+          <div class="tbl-footer">
+            <div id="deviceProfileListMeta">—</div>
+            <div class="pager">
+              <button disabled style="opacity:.4;cursor:default">‹</button><button class="active">1</button><button disabled style="opacity:.4;cursor:default">›</button>
+            </div>
+            <div><select class="select-sm"><option>10 per page</option><option>25 per page</option><option>50 per page</option></select></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEVICE PROFILE DETAILS SCREEN -->
+<div class="screen" id="screen-deviceProfileDetails">
+  <div class="app">
+    <aside class="sidebar" data-sidebar></aside>
+    <div class="main">
+      <header class="topbar" data-topbar></header>
+      <div class="content" id="deviceProfileDetailsContent"></div>
+    </div>
+  </div>
+</div>
+
 <!-- USER DETAILS SCREEN -->
 <div class="screen" id="screen-userDetails">
   <div class="app">
@@ -2758,9 +2824,10 @@ const NAV = [
   {
     key: 'entities', label: 'Entities', ico: li('shapes'), group: true,
     children: [
-      { key: 'devices',     label: 'Devices',      ico: SVG.devices,       screen: 'devices' },
-      { key: 'entityViews', label: 'Entity views', ico: li('layout-grid'), comingSoon: true },
-      { key: 'gateways',    label: 'Gateways',     ico: li('share-2'),     comingSoon: true }
+      { key: 'devices',        label: 'Devices',         ico: SVG.devices,        screen: 'devices' },
+      { key: 'deviceProfiles', label: 'Device profiles', ico: li('layers'),       screen: 'deviceProfiles' },
+      { key: 'entityViews',    label: 'Entity views',    ico: li('layout-grid'),  comingSoon: true },
+      { key: 'gateways',       label: 'Gateways',        ico: li('share-2'),      comingSoon: true }
     ]
   }
 ];
@@ -5908,6 +5975,174 @@ function deleteCustomer(id) {
   });
 }
 
+/* ============================================================
+   Device profiles
+   ============================================================ */
+const DEVICE_PROFILES = [
+  { id: 'dp-1', name: 'test',       createdTime: '2026-05-06 15:21:18', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: '',               imageSize: '',     imageDim: '' },
+  { id: 'dp-2', name: 'Flow-Meter', createdTime: '2026-04-29 15:49:13', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: '',               imageSize: '',     imageDim: '' },
+  { id: 'dp-3', name: 'Tanks-GSR',  createdTime: '2026-04-29 14:06:29', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: '',               imageSize: '',     imageDim: '' },
+  { id: 'dp-4', name: 'Tanks-ESR',  createdTime: '2026-04-23 19:06:23', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: '',               imageSize: '',     imageDim: '' },
+  { id: 'dp-5', name: 'Pump',       createdTime: '2026-04-23 18:34:59', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: 'water-pump.jpg', imageSize: '25.3 KB', imageDim: '980×980' },
+  { id: 'dp-6', name: 'thermostat', createdTime: '2026-04-22 15:49:06', profileType: 'Default', transportType: 'Default', description: 'Thermostat device profile', isDefault: false, image: '',               imageSize: '',     imageDim: '' },
+  { id: 'dp-7', name: 'default',    createdTime: '2026-04-22 15:49:04', profileType: 'Default', transportType: 'Default', description: 'Default device profile',    isDefault: true,  image: '',               imageSize: '',     imageDim: '' }
+];
+
+state.detailsDeviceProfileId = null;
+
+function renderDeviceProfilesPage() {
+  const q = (document.getElementById('deviceProfileSearch') && document.getElementById('deviceProfileSearch').value || '').toLowerCase();
+  const list = q ? DEVICE_PROFILES.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    (p.description || '').toLowerCase().includes(q)) : DEVICE_PROFILES;
+  const cnt = document.getElementById('deviceProfilesCount');
+  if (cnt) cnt.textContent = `(${list.length})`;
+  const meta = document.getElementById('deviceProfileListMeta');
+  if (meta) meta.textContent = `${list.length} of ${DEVICE_PROFILES.length} profiles`;
+
+  const tbody = document.getElementById('deviceProfileRows');
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">
+      <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">No device profiles match</div>
+      <div style="font-size:13px;color:var(--text-muted)">Try adjusting your search or add a profile.</div>
+      <div style="margin-top:14px"><button class="btn btn-primary btn-sm" onclick="addDeviceProfile()">+ Add device profile</button></div>
+    </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(p => `
+    <tr class="row-clickable" onclick="openDeviceProfileDetails('${p.id}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" /></td>
+      <td>${p.createdTime}</td>
+      <td>${_kvEscape(p.name)}</td>
+      <td style="color:var(--text-muted)">${p.profileType}</td>
+      <td style="color:var(--text-muted)">${p.transportType}</td>
+      <td style="color:var(--text-muted)">${_kvEscape(p.description || '')}</td>
+      <td onclick="event.stopPropagation()"><input type="checkbox" ${p.isDefault ? 'checked' : ''} disabled style="accent-color:var(--primary)" /></td>
+      <td onclick="event.stopPropagation()">
+        <div class="row-actions">
+          <button class="icon-btn" title="Export profile" onclick="exportDeviceProfile('${p.id}')">${li('download')}</button>
+          <button class="icon-btn" title="Make default" onclick="makeProfileDefault('${p.id}')" ${p.isDefault ? 'disabled style="opacity:.4;cursor:default"' : ''}>${li('flag')}</button>
+          <button class="icon-btn" title="Delete" onclick="deleteDeviceProfile('${p.id}')" style="color:var(--danger)" ${p.isDefault ? 'disabled style="opacity:.4;cursor:default"' : ''}>${li('trash-2')}</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function openDeviceProfileDetails(id) {
+  state.detailsDeviceProfileId = id;
+  switchScreen('deviceProfileDetails');
+  renderDeviceProfileDetails();
+  const aside = document.querySelector('#screen-deviceProfileDetails [data-sidebar]');
+  const src = document.querySelector('#screen-deviceProfiles [data-sidebar]');
+  if (aside && src) aside.innerHTML = src.innerHTML;
+}
+
+function renderDeviceProfileDetails() {
+  const p = DEVICE_PROFILES.find(x => x.id === state.detailsDeviceProfileId);
+  if (!p) { switchScreen('deviceProfiles'); return; }
+  const c = document.getElementById('deviceProfileDetailsContent');
+  if (!c) return;
+  c.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+      <button class="icon-btn" onclick="switchScreen('deviceProfiles')" title="Back to device profiles" style="width:32px;height:32px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div style="flex:1">
+        <div class="page-title" style="margin-bottom:2px">${_kvEscape(p.name)}</div>
+        <div class="page-sub">Device profile details</div>
+      </div>
+      ${p.isDefault ? '<span class="chip chip-active"><span class="dot"></span>Default</span>' : ''}
+    </div>
+
+    <div class="dd-tabs-wrap">
+      <div class="dd-tabs">
+        <div class="dd-tab active">Details</div>
+        <div class="dd-tab" onclick="toast('Transport configuration — coming soon')">Transport configuration</div>
+        <div class="dd-tab" onclick="toast('Calculated fields — coming soon')">Calculated fields</div>
+        <div class="dd-tab" onclick="toast('Alarm rules — coming soon')">Alarm rules</div>
+        <div class="dd-tab" onclick="toast('Device provisioning — coming soon')">Device provisioning</div>
+        <div class="dd-tab" onclick="toast('Audit logs — coming soon')">Audit logs</div>
+        <div class="dd-tab" onclick="toast('Version control — coming soon')">Version control</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="exportDeviceProfile('${p.id}')">${li('download')} Export device profile</button>
+      <button class="btn btn-primary btn-sm" onclick="makeProfileDefault('${p.id}')" ${p.isDefault ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>${li('flag')} Make device profile default</button>
+      <button class="btn btn-primary btn-sm" onclick="deleteDeviceProfile('${p.id}')" ${p.isDefault ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>${li('trash-2')} Delete device profile</button>
+      <button class="btn btn-secondary btn-sm" onclick="copyProfileId('${p.id}')">${li('clipboard')} Copy device profile Id</button>
+    </div>
+
+    <div class="panel" style="padding:24px">
+      <div class="field"><label class="label">Name <span class="req">*</span></label><input class="input" value="${_kvEscape(p.name)}" readonly /></div>
+      <div class="field"><label class="label">Default rule chain</label><input class="input" placeholder="—" readonly /></div>
+      <div class="field"><label class="label">Mobile dashboard</label><input class="input" placeholder="—" readonly /><div class="hint">Used by mobile application as a device details dashboard</div></div>
+      <div class="field"><label class="label">Queue</label><input class="input" placeholder="Main" readonly /></div>
+      <div class="field"><label class="label">Default edge rule chain</label><input class="input" placeholder="—" readonly /><div class="hint">Used on edge as rule chain to process incoming data for devices of this device profile</div></div>
+      <div class="field"><label class="label">Assigned firmware</label><input class="input" placeholder="—" readonly /></div>
+      <div class="field"><label class="label">Assigned software</label><input class="input" placeholder="—" readonly /></div>
+      ${p.image ? `
+        <div class="field">
+          <label class="label">Device profile image</label>
+          <div style="display:flex;align-items:center;gap:14px;padding:10px 12px;border:1px solid var(--border);border-radius:8px">
+            <div style="width:54px;height:54px;border-radius:8px;background:#E0F0FF;display:grid;place-items:center;font-size:24px;flex-shrink:0">⚙️</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:500;color:var(--text)">${_kvEscape(p.image)}</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:3px">${p.imageDim}<span style="margin:0 8px;color:var(--border-strong)">|</span>${p.imageSize}</div>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+      <div class="field"><label class="label">Description</label><textarea class="textarea" readonly rows="3">${_kvEscape(p.description || '')}</textarea></div>
+    </div>
+  `;
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function exportDeviceProfile(id) {
+  const p = DEVICE_PROFILES.find(x => x.id === id);
+  if (p) toast(`Exported "${p.name}" (demo)`);
+}
+
+function makeProfileDefault(id) {
+  const p = DEVICE_PROFILES.find(x => x.id === id);
+  if (!p || p.isDefault) return;
+  DEVICE_PROFILES.forEach(x => x.isDefault = false);
+  p.isDefault = true;
+  renderDeviceProfilesPage();
+  if (state.detailsDeviceProfileId === id) renderDeviceProfileDetails();
+  toast(`"${p.name}" is now the default device profile`, 'success');
+}
+
+function deleteDeviceProfile(id) {
+  const p = DEVICE_PROFILES.find(x => x.id === id);
+  if (!p) return;
+  if (p.isDefault) { toast('Cannot delete the default device profile', 'danger'); return; }
+  confirmDialog(`Delete device profile "${p.name}"?`, 'This permanently removes the device profile.', () => {
+    const idx = DEVICE_PROFILES.findIndex(x => x.id === id);
+    if (idx >= 0) DEVICE_PROFILES.splice(idx, 1);
+    if (state.detailsDeviceProfileId === id) switchScreen('deviceProfiles');
+    renderDeviceProfilesPage();
+    toast('Device profile deleted', 'danger');
+  });
+}
+
+function copyProfileId(id) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(id).then(() => toast(`Copied profile id: ${id}`));
+  } else {
+    toast(id);
+  }
+}
+
+function addDeviceProfile() {
+  toast('Add device profile — drawer coming soon');
+}
+
 function switchScreen(name) {
   if (state.dirtyChanges && countChanges() > 0) {
     if (!confirm('You have unsaved changes. Leave without saving?')) return;
@@ -5917,14 +6152,16 @@ function switchScreen(name) {
   document.getElementById('screen-' + name).classList.add('active');
   // Keep parent module highlighted on detail screens
   let activeForSidebar = name;
-  if (name === 'userDetails') activeForSidebar = 'users';
-  if (name === 'deviceDetails') activeForSidebar = 'devices';
+  if (name === 'userDetails')          activeForSidebar = 'users';
+  if (name === 'deviceDetails')        activeForSidebar = 'devices';
+  if (name === 'deviceProfileDetails') activeForSidebar = 'deviceProfiles';
   renderSidebar(activeForSidebar);
   renderTopbar();
-  if (name === 'roles') renderRoles();
-  if (name === 'industries') renderIndustries();
-  if (name === 'devices') renderDevicesPage();
-  if (name === 'customers') renderCustomersPage();
+  if (name === 'roles')          renderRoles();
+  if (name === 'industries')     renderIndustries();
+  if (name === 'devices')        renderDevicesPage();
+  if (name === 'customers')      renderCustomersPage();
+  if (name === 'deviceProfiles') renderDeviceProfilesPage();
   window.scrollTo(0, 0);
 }
 
@@ -7083,12 +7320,14 @@ renderSidebar('roles');
 renderSidebar('industries');
 renderSidebar('devices');
 renderSidebar('customers');
+renderSidebar('deviceProfiles');
 renderTopbar();
 renderUsers();
 renderRoles();
 renderIndustries();
 renderDevicesPage();
 renderCustomersPage();
+renderDeviceProfilesPage();
 if (window.lucide) window.lucide.createIcons();
 
 /* Hover tooltip activation: convert titleâdata-tip on icon-only controls
