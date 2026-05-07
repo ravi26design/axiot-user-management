@@ -7876,6 +7876,25 @@ renderDeviceProfilesPage();
 renderGatewaysPage();
 if (window.lucide) window.lucide.createIcons();
 
+/* Lucide CDN may load late on previewers (e.g. htmlpreview.github.io).
+   Poll briefly, then re-run createIcons + renders so nav/page icons appear. */
+(function ensureLucide() {
+  let tries = 0;
+  const tick = () => {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      try { window.lucide.createIcons(); } catch (e) {}
+      try { renderSidebar(state.currentScreen); renderTopbar(); } catch (e) {}
+      try { window.lucide.createIcons(); } catch (e) {}
+      return;
+    }
+    if (++tries < 40) setTimeout(tick, 100);
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tick);
+  } else { tick(); }
+  window.addEventListener('load', tick);
+})();
+
 /* Hover tooltip activation: convert titleâdata-tip on icon-only controls
    so the custom CSS tooltip shows instead of the slow native browser tip.
    Nav items keep their title attribute so sidebar-collapsed mode works. */
