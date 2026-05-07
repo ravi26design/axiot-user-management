@@ -5179,11 +5179,8 @@ function renderDeviceCredsView(d) {
     </div>`;
   } else if (c.type === 'x509') {
     const cert = c.cert || '';
-    const lines = cert.split('
-');
-    const preview = cert ? lines.slice(0, 4).join('
-') + (lines.length > 4 ? '
-…' : '') : '';
+    const lines = cert.split('\n');
+    const preview = cert ? lines.slice(0, 4).join('\n') + (lines.length > 4 ? '\n…' : '') : '';
     body = `<div class="info-row-cell">
       <div class="info-row-label">Certificate (PEM)</div>
       <div class="info-row-value">
