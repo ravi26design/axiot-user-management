@@ -2645,72 +2645,12 @@
         <label class="label">Device name <span class="req">*</span></label>
         <input class="input" id="deviceName" placeholder="e.g. Compressor #4" />
       </div>
-      <div class="field-row">
-        <div class="field">
-          <label class="label">Type <span class="req">*</span></label>
-          <select class="select" id="deviceType">
-            <option>Compressor</option><option>Valve</option><option>Motor</option><option>Sensor</option>
-            <option>Pump</option><option>Boiler</option><option>Press</option><option>Robot</option>
-            <option>Welder</option><option>Gateway</option><option>Server</option><option>Network</option>
-            <option>Camera</option><option>Access Control</option><option>Cooling</option><option>Exchanger</option>
-            <option>Flow meter</option><option>Gauge</option><option>Other</option>
-          </select>
-        </div>
-        <div class="field">
-          <label class="label">Serial number</label>
-          <input class="input" id="deviceSerial" placeholder="SN-XXXXX" />
-        </div>
-      </div>
-      <div class="field">
-        <label class="label">Firmware version</label>
-        <input class="input" id="deviceFirmware" placeholder="e.g. 2.4.1" />
-      </div>
       <div class="field">
         <label class="label">Device profile <span class="req">*</span></label>
         <select class="select" id="deviceProfile">
           <option value="">Select a device profile…</option>
         </select>
         <div class="hint">Defines transport, rule chain and provisioning for this device.</div>
-      </div>
-    </div>
-    <div class="form-section">
-      <div class="form-section-title">Device image</div>
-      <div class="field">
-        <input type="file" id="deviceImageInput" accept="image/png,image/jpeg,image/jpg,image/webp" style="display:none" onchange="handleDeviceImageSelect(event)" />
-        <div style="display:flex;gap:14px;align-items:flex-start">
-          <div id="deviceImageFrame"
-               style="width:160px;height:160px;border-radius:10px;flex-shrink:0;cursor:pointer;position:relative;overflow:hidden;border:2px dashed #B8C0CC;background:#F5F7FA;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px;transition:border-color .12s, background .12s"
-               onclick="document.getElementById('deviceImageInput').click()"
-               ondragover="event.preventDefault();event.stopPropagation();this.style.borderColor='#1F4E9E';this.style.background='#E8EEF8'"
-               ondragleave="this.style.borderColor='#B8C0CC';this.style.background='#F5F7FA'"
-               ondrop="handleDeviceImageDrop(event)">
-            <div id="deviceImagePlaceholder" style="display:flex;flex-direction:column;align-items:center">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F4E9E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
-              <div style="font-size:12px;font-weight:500;color:#0B1220;margin-top:8px">Click or drag</div>
-              <div style="font-size:11px;color:rgba(11,18,32,0.52);margin-top:2px">PNG Â· JPG Â· WEBP</div>
-            </div>
-            <img id="deviceImagePreviewImg" alt="Device" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
-          </div>
-          <div style="flex:1;min-width:0;padding-top:4px">
-            <div style="font-size:13px;font-weight:500;color:#0B1220">Square preview (1:1)</div>
-            <div style="font-size:12px;color:rgba(11,18,32,0.7);margin-top:4px;line-height:1.5">
-              The image is displayed as a square. Non-square uploads are center-cropped to fit.
-            </div>
-            <div id="deviceImageMeta" style="display:none;margin-top:10px;font-size:12px">
-              <div id="deviceImageName" style="font-weight:500;color:#0B1220;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">image.png</div>
-              <div id="deviceImageSize" style="color:rgba(11,18,32,0.6);margin-top:2px">0 KB</div>
-              <div style="margin-top:8px;display:flex;gap:14px">
-                <button type="button" style="font-size:12px;font-weight:500;color:#1F4E9E;background:none;border:none;padding:0;cursor:pointer" onclick="event.stopPropagation();document.getElementById('deviceImageInput').click()">Replace</button>
-                <button type="button" style="font-size:12px;font-weight:500;color:#9F1A0F;background:none;border:none;padding:0;cursor:pointer" onclick="event.stopPropagation();removeDeviceImage()">Remove</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="hint" style="margin-top:10px">Optional. Up to 5 MB.</div>
       </div>
     </div>
     <div class="form-section">
@@ -5332,9 +5272,6 @@ function openDeviceDrawer(id) {
   document.getElementById('deviceDrawerTitle').textContent = id ? 'Edit device' : 'Add device';
   document.getElementById('deviceSubmitBtn').textContent = id ? 'Save changes' : 'Create device';
   document.getElementById('deviceName').value = d ? d.name : '';
-  document.getElementById('deviceType').value = d ? d.type : 'Compressor';
-  document.getElementById('deviceSerial').value = d ? (d.serial || '') : '';
-  document.getElementById('deviceFirmware').value = d ? (d.firmware || '') : '';
   const dp = document.getElementById('deviceProfile');
   if (dp) {
     const profiles = (typeof DEVICE_PROFILES !== 'undefined') ? DEVICE_PROFILES : [];
@@ -5351,13 +5288,9 @@ function openDeviceDrawer(id) {
   if (d) document.getElementById('deviceIndustry').value = d.location;
   const sw = document.getElementById('deviceActive');
   sw.classList.toggle('on', d ? d.active !== false : true);
-  if (d && d.image) {
-    state._pendingDeviceImage = { dataUrl: d.image, name: d.imageName || 'Device image', size: d.imageSize || 0 };
-    setDeviceImagePreview(d.image, d.imageName || 'Device image', d.imageSize || 0);
-  } else {
-    state._pendingDeviceImage = null;
-    clearDeviceImagePreview();
-  }
+  state._pendingDeviceImage = d && d.image
+    ? { dataUrl: d.image, name: d.imageName || 'Device image', size: d.imageSize || 0 }
+    : null;
   document.getElementById('deviceDrawer').classList.add('open');
   document.getElementById('deviceDrawerBackdrop').classList.add('open');
   setTimeout(() => document.getElementById('deviceName').focus(), 250);
@@ -5387,9 +5320,6 @@ function submitDevice() {
   if (!industry) { toast('Please select an industry', 'danger'); return; }
   const data = {
     name, client, deviceProfile,
-    type:     document.getElementById('deviceType').value,
-    serial:   document.getElementById('deviceSerial').value.trim(),
-    firmware: document.getElementById('deviceFirmware').value.trim(),
     location: industry,
     industry: 'Textiles & Apparel',  // legacy field for back-compat
     active:   document.getElementById('deviceActive').classList.contains('on'),
