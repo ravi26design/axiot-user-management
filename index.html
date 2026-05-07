@@ -6199,7 +6199,14 @@ function addDeviceProfile() {
 /* ============================================================
    Gateways
    ============================================================ */
-const GATEWAYS = [];
+const GATEWAYS = [
+  { id: 'gw-1', name: 'Plant Gateway 01',     deviceProfile: 'default',    status: 'Active',   connectors: 4, version: '3.6.2', createdTime: '2026-04-30 11:51:42' },
+  { id: 'gw-2', name: 'Substation GW-DXB01',  deviceProfile: 'default',    status: 'Active',   connectors: 3, version: '3.6.2', createdTime: '2026-04-28 16:22:18' },
+  { id: 'gw-3', name: 'Loom Hall Gateway',    deviceProfile: 'thermostat', status: 'Active',   connectors: 2, version: '3.5.1', createdTime: '2026-04-25 09:10:33' },
+  { id: 'gw-4', name: 'Warehouse Edge GW',    deviceProfile: 'default',    status: 'Inactive', connectors: 0, version: '3.4.0', createdTime: '2026-04-20 14:05:09' },
+  { id: 'gw-5', name: 'Inspection Lab GW',    deviceProfile: 'Flow-Meter', status: 'Active',   connectors: 5, version: '3.6.2', createdTime: '2026-04-18 08:44:51' },
+  { id: 'gw-6', name: 'Site Gateway GW-OSK01', deviceProfile: 'default',   status: 'Active',   connectors: 2, version: '3.5.1', createdTime: '2026-04-12 19:33:27' }
+];
 
 function renderGatewaysPage() {
   const q = (document.getElementById('gatewaySearch') && document.getElementById('gatewaySearch').value || '').toLowerCase();
