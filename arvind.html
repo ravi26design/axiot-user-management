@@ -2450,6 +2450,59 @@
   </div>
 </div>
 
+<!-- GATEWAYS SCREEN -->
+<div class="screen" id="screen-gateways">
+  <div class="app">
+    <aside class="sidebar" data-sidebar></aside>
+    <div class="main">
+      <header class="topbar" data-topbar></header>
+      <div class="content">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Gateway list <span id="gatewaysCount" style="color:var(--text-muted);font-weight:500;font-size:18px"></span></div>
+            <div class="page-sub">IoT gateways that aggregate connector traffic into AXIoT.</div>
+          </div>
+          <button class="btn btn-primary" onclick="addGateway()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Add gateway
+          </button>
+        </div>
+
+        <div class="panel">
+          <div class="toolbar">
+            <div class="search-box">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+              <input id="gatewaySearch" placeholder="Search gateways…" oninput="renderGatewaysPage()" />
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Created time</th>
+                  <th>Gateway name</th>
+                  <th>Status</th>
+                  <th>Enabled Connectors</th>
+                  <th>Version</th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+              <tbody id="gatewayRows"></tbody>
+            </table>
+          </div>
+          <div class="tbl-footer">
+            <div id="gatewayListMeta">—</div>
+            <div class="pager">
+              <button disabled style="opacity:.4;cursor:default">‹</button><button class="active">1</button><button disabled style="opacity:.4;cursor:default">›</button>
+            </div>
+            <div><select class="select-sm"><option>10 per page</option><option>25 per page</option><option>50 per page</option></select></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- DEVICE PROFILE DETAILS SCREEN -->
 <div class="screen" id="screen-deviceProfileDetails">
   <div class="app">
@@ -2827,7 +2880,7 @@ const NAV = [
       { key: 'devices',        label: 'Devices',         ico: SVG.devices,        screen: 'devices' },
       { key: 'deviceProfiles', label: 'Device profiles', ico: li('layers'),       screen: 'deviceProfiles' },
       { key: 'entityViews',    label: 'Entity views',    ico: li('layout-grid'),  comingSoon: true },
-      { key: 'gateways',       label: 'Gateways',        ico: li('share-2'),      comingSoon: true }
+      { key: 'gateways',       label: 'Gateways',        ico: li('share-2'),      screen: 'gateways' }
     ]
   }
 ];
@@ -6145,6 +6198,171 @@ function addDeviceProfile() {
   toast('Add device profile — drawer coming soon');
 }
 
+/* ============================================================
+   Gateways
+   ============================================================ */
+const GATEWAYS = [];
+
+function renderGatewaysPage() {
+  const q = (document.getElementById('gatewaySearch') && document.getElementById('gatewaySearch').value || '').toLowerCase();
+  const list = q ? GATEWAYS.filter(g =>
+    (g.name || '').toLowerCase().includes(q) ||
+    (g.deviceProfile || '').toLowerCase().includes(q)) : GATEWAYS;
+  const cnt = document.getElementById('gatewaysCount');
+  if (cnt) cnt.textContent = `(${list.length})`;
+  const meta = document.getElementById('gatewayListMeta');
+  if (meta) meta.textContent = `${list.length} of ${GATEWAYS.length} gateways`;
+
+  const tbody = document.getElementById('gatewayRows');
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:60px 22px;text-align:center;color:var(--text-muted)">No entities found</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(g => `
+    <tr class="row-clickable" onclick="editGateway('${g.id}')">
+      <td>${g.createdTime}</td>
+      <td>${_kvEscape(g.name)}</td>
+      <td>${g.status === 'Active'
+        ? '<span class="chip chip-active"><span class="dot"></span>Active</span>'
+        : '<span class="chip chip-inactive"><span class="dot"></span>Inactive</span>'}</td>
+      <td style="color:var(--text-muted)">${g.connectors || 0}</td>
+      <td style="color:var(--text-muted)">${_kvEscape(g.version || '—')}</td>
+      <td onclick="event.stopPropagation()">
+        <div class="row-actions">
+          <button class="icon-btn" title="Delete" onclick="deleteGateway('${g.id}')" style="color:var(--danger)">${li('trash-2')}</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function addGateway(existing) {
+  closeGatewayDrawer();
+  const editing = !!existing;
+  state._gatewayDraft = {
+    id:            editing ? existing.id : null,
+    name:          existing && existing.name          || '',
+    deviceProfile: existing && existing.deviceProfile || ''
+  };
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'drawer-backdrop';
+  backdrop.id = 'gatewayDrawerBackdrop';
+  backdrop.onclick = closeGatewayDrawer;
+
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+  drawer.id = 'gatewayDrawer';
+  drawer.style.width = '480px';
+
+  const profileNames = (typeof DEVICE_PROFILES !== 'undefined') ? DEVICE_PROFILES.map(p => p.name) : ['default'];
+
+  drawer.innerHTML = `
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">${editing ? 'Edit' : 'Add'} gateway</div>
+        <div class="drawer-sub">IoT gateway aggregating telemetry from connectors.</div>
+      </div>
+      <button class="icon-btn" title="Close" onclick="closeGatewayDrawer()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="field">
+        <label class="label">Name <span class="req">*</span></label>
+        <input class="input" id="gwName" placeholder="e.g. Plant Gateway 01" value="${_kvEscape(state._gatewayDraft.name)}" oninput="state._gatewayDraft.name=this.value;validateGatewayForm()" />
+      </div>
+      <div class="field">
+        <label class="label">Device profile <span class="req">*</span></label>
+        <select class="select" id="gwDeviceProfile" onchange="state._gatewayDraft.deviceProfile=this.value;validateGatewayForm()">
+          <option value="">Select device profile…</option>
+          ${profileNames.map(name => `<option value="${name}" ${state._gatewayDraft.deviceProfile===name?'selected':''}>${_kvEscape(name)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="drawer-foot">
+      <button class="btn btn-ghost" onclick="closeGatewayDrawer()">Cancel</button>
+      <button class="btn btn-primary" id="gwSubmitBtn" onclick="submitGateway()" disabled>${editing ? 'Save changes' : 'Create'}</button>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+  requestAnimationFrame(() => {
+    backdrop.classList.add('open');
+    drawer.classList.add('open');
+  });
+  setTimeout(() => { const n = document.getElementById('gwName'); if (n) n.focus(); }, 280);
+  validateGatewayForm();
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function closeGatewayDrawer() {
+  const backdrop = document.getElementById('gatewayDrawerBackdrop');
+  const drawer   = document.getElementById('gatewayDrawer');
+  if (!backdrop && !drawer) return;
+  if (backdrop) backdrop.classList.remove('open');
+  if (drawer)   drawer.classList.remove('open');
+  setTimeout(() => {
+    const b  = document.getElementById('gatewayDrawerBackdrop');
+    const dr = document.getElementById('gatewayDrawer');
+    if (b)  b.remove();
+    if (dr) dr.remove();
+  }, 260);
+}
+
+function validateGatewayForm() {
+  const d = state._gatewayDraft;
+  const valid = !!(d && d.name && d.name.trim() && d.deviceProfile && d.deviceProfile.trim());
+  const btn = document.getElementById('gwSubmitBtn');
+  if (btn) btn.disabled = !valid;
+}
+
+function submitGateway() {
+  const d = state._gatewayDraft;
+  if (!d || !d.name.trim() || !d.deviceProfile.trim()) return;
+  const pad = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  if (d.id) {
+    const ex = GATEWAYS.find(g => g.id === d.id);
+    if (ex) Object.assign(ex, d);
+    toast('Gateway updated', 'success');
+  } else {
+    const newId = 'gw-' + (state._gwSeq = (state._gwSeq || GATEWAYS.length) + 1);
+    GATEWAYS.unshift({
+      id: newId,
+      name: d.name,
+      deviceProfile: d.deviceProfile,
+      status: 'Inactive',
+      connectors: 0,
+      version: '—',
+      createdTime: fmt
+    });
+    toast('Gateway created', 'success');
+  }
+  closeGatewayDrawer();
+  renderGatewaysPage();
+}
+
+function editGateway(id) {
+  const g = GATEWAYS.find(x => x.id === id);
+  if (g) addGateway(g);
+}
+
+function deleteGateway(id) {
+  const g = GATEWAYS.find(x => x.id === id);
+  if (!g) return;
+  confirmDialog(`Delete gateway "${g.name}"?`, 'This permanently removes the gateway.', () => {
+    const idx = GATEWAYS.findIndex(x => x.id === id);
+    if (idx >= 0) GATEWAYS.splice(idx, 1);
+    renderGatewaysPage();
+    toast('Gateway deleted', 'danger');
+  });
+}
+
 function switchScreen(name) {
   if (state.dirtyChanges && countChanges() > 0) {
     if (!confirm('You have unsaved changes. Leave without saving?')) return;
@@ -6164,6 +6382,7 @@ function switchScreen(name) {
   if (name === 'devices')        renderDevicesPage();
   if (name === 'customers')      renderCustomersPage();
   if (name === 'deviceProfiles') renderDeviceProfilesPage();
+  if (name === 'gateways')       renderGatewaysPage();
   window.scrollTo(0, 0);
 }
 
@@ -7323,6 +7542,7 @@ renderSidebar('industries');
 renderSidebar('devices');
 renderSidebar('customers');
 renderSidebar('deviceProfiles');
+renderSidebar('gateways');
 renderTopbar();
 renderUsers();
 renderRoles();
@@ -7330,6 +7550,7 @@ renderIndustries();
 renderDevicesPage();
 renderCustomersPage();
 renderDeviceProfilesPage();
+renderGatewaysPage();
 if (window.lucide) window.lucide.createIcons();
 
 /* Hover tooltip activation: convert titleâdata-tip on icon-only controls
