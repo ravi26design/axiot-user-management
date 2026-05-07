@@ -6281,67 +6281,357 @@ function openDeviceProfileDetails(id) {
   if (aside && src) aside.innerHTML = src.innerHTML;
 }
 
+state.detailsProfileTab = state.detailsProfileTab || 'details';
+
+function switchProfileTab(tab) { state.detailsProfileTab = tab; renderDeviceProfileDetails(); }
+
+function _profileDeviceCount(p) {
+  try { return DEVICES.filter(d => d.deviceProfile === p.name).length; }
+  catch (e) { return 0; }
+}
+
 function renderDeviceProfileDetails() {
   const p = DEVICE_PROFILES.find(x => x.id === state.detailsDeviceProfileId);
   if (!p) { switchScreen('deviceProfiles'); return; }
   const c = document.getElementById('deviceProfileDetailsContent');
   if (!c) return;
+  const tab = state.detailsProfileTab || 'details';
+  const deviceCount = _profileDeviceCount(p);
+  const transport = p.transportType || 'Default';
+  const provision = p.provisionStrategy || 'Disabled';
+  const tabBtn = (key, label) =>
+    `<div class="dd-tab ${tab === key ? 'active' : ''}" onclick="switchProfileTab('${key}')">${label}</div>`;
+
   c.innerHTML = `
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
-      <button class="icon-btn" onclick="switchScreen('deviceProfiles')" title="Back to device profiles" style="width:32px;height:32px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      </button>
-      <div style="flex:1">
-        <div class="page-title" style="margin-bottom:2px">${_kvEscape(p.name)}</div>
-        <div class="page-sub">Device profile details</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button class="icon-btn" onclick="switchScreen('deviceProfiles')" title="Back to device profiles" style="width:32px;height:32px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div>
+          <div class="page-title">Device profile details</div>
+          <div class="page-sub">Configuration shared by every device assigned to this profile.</div>
+        </div>
       </div>
-      ${p.isDefault ? '<span class="chip chip-active"><span class="dot"></span>Default</span>' : ''}
-    </div>
-
-    <div class="dd-tabs-wrap">
-      <div class="dd-tabs">
-        <div class="dd-tab active">Details</div>
-        <div class="dd-tab" onclick="toast('Transport configuration — coming soon')">Transport configuration</div>
-        <div class="dd-tab" onclick="toast('Calculated fields — coming soon')">Calculated fields</div>
-        <div class="dd-tab" onclick="toast('Alarm rules — coming soon')">Alarm rules</div>
-        <div class="dd-tab" onclick="toast('Device provisioning — coming soon')">Device provisioning</div>
-        <div class="dd-tab" onclick="toast('Audit logs — coming soon')">Audit logs</div>
-        <div class="dd-tab" onclick="toast('Version control — coming soon')">Version control</div>
+      <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="addDeviceProfile(DEVICE_PROFILES.find(x=>x.id==='${p.id}'))">${li('pencil')} Edit</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportDeviceProfile('${p.id}')">${li('download')} Export</button>
+        <button class="btn btn-secondary btn-sm" onclick="makeProfileDefault('${p.id}')" ${p.isDefault ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>${li('flag')} Make default</button>
+        <button class="btn btn-danger-ghost btn-sm" onclick="deleteDeviceProfile('${p.id}')" ${p.isDefault ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>${li('trash-2')} Delete</button>
       </div>
     </div>
 
-    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
-      <button class="btn btn-primary btn-sm" onclick="exportDeviceProfile('${p.id}')">${li('download')} Export device profile</button>
-      <button class="btn btn-primary btn-sm" onclick="makeProfileDefault('${p.id}')" ${p.isDefault ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>${li('flag')} Make device profile default</button>
-      <button class="btn btn-primary btn-sm" onclick="deleteDeviceProfile('${p.id}')" ${p.isDefault ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>${li('trash-2')} Delete device profile</button>
-      <button class="btn btn-secondary btn-sm" onclick="copyProfileId('${p.id}')">${li('clipboard')} Copy device profile Id</button>
-    </div>
-
-    <div class="panel" style="padding:24px">
-      <div class="field"><label class="label">Name <span class="req">*</span></label><input class="input" value="${_kvEscape(p.name)}" readonly /></div>
-      <div class="field"><label class="label">Default rule chain</label><input class="input" placeholder="—" readonly /></div>
-      <div class="field"><label class="label">Mobile dashboard</label><input class="input" placeholder="—" readonly /><div class="hint">Used by mobile application as a device details dashboard</div></div>
-      <div class="field"><label class="label">Queue</label><input class="input" placeholder="Main" readonly /></div>
-      <div class="field"><label class="label">Default edge rule chain</label><input class="input" placeholder="—" readonly /><div class="hint">Used on edge as rule chain to process incoming data for devices of this device profile</div></div>
-      <div class="field"><label class="label">Assigned firmware</label><input class="input" placeholder="—" readonly /></div>
-      <div class="field"><label class="label">Assigned software</label><input class="input" placeholder="—" readonly /></div>
-      ${p.image ? `
-        <div class="field">
-          <label class="label">Device profile image</label>
-          <div style="display:flex;align-items:center;gap:14px;padding:10px 12px;border:1px solid var(--border);border-radius:8px">
-            <div style="width:54px;height:54px;border-radius:8px;background:#E0F0FF;display:grid;place-items:center;font-size:24px;flex-shrink:0">⚙️</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:14px;font-weight:500;color:var(--text)">${_kvEscape(p.image)}</div>
-              <div style="font-size:12px;color:var(--text-muted);margin-top:3px">${p.imageDim}<span style="margin:0 8px;color:var(--border-strong)">|</span>${p.imageSize}</div>
-            </div>
+    <!-- HEADER CARD -->
+    <div class="dd-header">
+      <div class="dd-head-top">
+        <div class="dd-icon">${li('layers')}</div>
+        <div class="dd-head-main">
+          <div class="dd-name">${_kvEscape(p.name)}</div>
+          <div class="dd-type">${(p.profileType || 'Default').toUpperCase()} PROFILE</div>
+        </div>
+        <div class="dd-head-status">
+          <div class="dd-status-block">
+            ${p.isDefault
+              ? '<span class="chip chip-active"><span class="dot"></span>Default</span>'
+              : '<span class="chip chip-inactive"><span class="dot"></span>Custom</span>'}
+            <div class="meta">${p.isDefault ? 'Used as fallback' : 'Custom profile'}</div>
+          </div>
+          <div class="dd-status-block">
+            <span class="chip" style="background:var(--primary-soft);color:var(--primary)"><span class="dot" style="background:var(--primary)"></span>${deviceCount} ${deviceCount === 1 ? 'device' : 'devices'}</span>
+            <div class="meta">Currently using this profile</div>
           </div>
         </div>
-      ` : ''}
-      <div class="field"><label class="label">Description</label><textarea class="textarea" readonly rows="3">${_kvEscape(p.description || '')}</textarea></div>
+      </div>
+
+      <div class="dd-meta-grid">
+        <div class="dd-meta-cell">
+          <div class="lbl">${li('hash')} Profile ID</div>
+          <div class="val mono">${p.id}</div>
+        </div>
+        <div class="dd-meta-cell">
+          <div class="lbl">${li('calendar')} Created</div>
+          <div class="val">${p.createdTime || '—'}</div>
+        </div>
+        <div class="dd-meta-cell">
+          <div class="lbl">${li('radio-tower')} Transport</div>
+          <div class="val">${_kvEscape(transport)}<span class="sub">${_transportDesc(transport)}</span></div>
+        </div>
+        <div class="dd-meta-cell">
+          <div class="lbl">${li('shield-check')} Provisioning</div>
+          <div class="val">${_kvEscape(provision)}</div>
+        </div>
+      </div>
     </div>
+
+    <!-- TABS -->
+    <div class="dd-tabs-wrap">
+      <div class="dd-tabs">
+        ${tabBtn('details',     'Details')}
+        ${tabBtn('transport',   'Transport configuration')}
+        ${tabBtn('calculated',  'Calculated fields')}
+        ${tabBtn('alarms',      'Alarm rules')}
+        ${tabBtn('provision',   'Device provisioning')}
+        ${tabBtn('audit',       'Audit logs')}
+        ${tabBtn('version',     'Version control')}
+      </div>
+    </div>
+
+    ${
+      tab === 'details'    ? _renderProfileDetailsTab(p)
+      : tab === 'transport'  ? _renderProfileTransportTab(p)
+      : tab === 'calculated' ? _renderProfileCalculatedTab(p)
+      : tab === 'alarms'     ? _renderProfileAlarmsTab(p)
+      : tab === 'provision'  ? _renderProfileProvisionTab(p)
+      : tab === 'audit'      ? _renderProfileAuditTab(p)
+      : tab === 'version'    ? _renderProfileVersionTab(p)
+      : ''
+    }
   `;
   if (window.lucide) window.lucide.createIcons();
 }
+
+function _transportDesc(t) {
+  switch (t) {
+    case 'Default': return 'Basic MQTT, HTTP, CoAP';
+    case 'MQTT':    return 'MQTT protocol';
+    case 'CoAP':    return 'CoAP protocol';
+    case 'LWM2M':   return 'Lightweight M2M';
+    case 'SNMP':    return 'SNMP protocol';
+    default:        return '';
+  }
+}
+
+function _renderProfileDetailsTab(p) {
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('layers')}</div>
+        <div>
+          <div class="info-section-title">Identification</div>
+          <div class="info-section-sub">Name and description</div>
+        </div>
+      </div>
+      <div class="info-rows">
+        <div class="info-row-cell"><div class="info-row-label">Name</div><div class="info-row-value">${_kvEscape(p.name)}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Profile type</div><div class="info-row-value">${_kvEscape(p.profileType || 'Default')}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Description</div><div class="info-row-value ${p.description ? '' : 'muted'}">${p.description ? _kvEscape(p.description) : 'No description added'}</div></div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('share-2')}</div>
+        <div>
+          <div class="info-section-title">Routing &amp; processing</div>
+          <div class="info-section-sub">Rule chains, dashboard and queue</div>
+        </div>
+      </div>
+      <div class="info-rows">
+        <div class="info-row-cell"><div class="info-row-label">Default rule chain</div><div class="info-row-value ${p.defaultRuleChain ? '' : 'muted'}">${p.defaultRuleChain ? _kvEscape(p.defaultRuleChain) : '—'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Default edge rule chain</div><div class="info-row-value ${p.edgeRuleChain ? '' : 'muted'}">${p.edgeRuleChain ? _kvEscape(p.edgeRuleChain) : '—'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Mobile dashboard</div><div class="info-row-value ${p.mobileDashboard ? '' : 'muted'}">${p.mobileDashboard ? _kvEscape(p.mobileDashboard) : '—'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Queue</div><div class="info-row-value ${p.queue ? '' : 'muted'}">${p.queue ? _kvEscape(p.queue) : 'Main'}</div></div>
+      </div>
+    </div>
+
+    ${p.image ? `
+      <div class="info-section">
+        <div class="info-section-head">
+          <div class="ico-box">${li('upload')}</div>
+          <div>
+            <div class="info-section-title">Profile image</div>
+            <div class="info-section-sub">Used in device cards</div>
+          </div>
+        </div>
+        <div class="info-rows">
+          <div class="info-row-cell" style="grid-column:1 / -1">
+            <div class="info-row-label">File</div>
+            <div class="info-row-value">
+              <div style="display:flex;align-items:center;gap:14px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+                <div style="width:54px;height:54px;border-radius:8px;background:#E0F0FF;display:grid;place-items:center;font-size:24px;flex-shrink:0">⚙️</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:14px;font-weight:500;color:var(--text)">${_kvEscape(p.image)}</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-top:3px">${p.imageDim || ''}${p.imageDim && p.imageSize ? '<span style=\"margin:0 8px;color:var(--border-strong)\">|</span>' : ''}${p.imageSize || ''}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+function _renderProfileTransportTab(p) {
+  const t = p.transportType || 'Default';
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('radio-tower')}</div>
+        <div>
+          <div class="info-section-title">Transport configuration</div>
+          <div class="info-section-sub">How devices send data to the platform</div>
+        </div>
+      </div>
+      <div class="info-rows">
+        <div class="info-row-cell"><div class="info-row-label">Transport type</div><div class="info-row-value">${_kvEscape(t)}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Protocol</div><div class="info-row-value">${_kvEscape(_transportDesc(t) || '—')}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">QoS / retries</div><div class="info-row-value muted">Default</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Max payload size</div><div class="info-row-value muted">256 KB</div></div>
+      </div>
+    </div>
+  `;
+}
+
+function _renderProfileCalculatedTab(p) {
+  const rows = [
+    { time: '2026-05-06 11:42', name: 'Power factor',       type: 'Aggregated' },
+    { time: '2026-05-04 09:18', name: 'Energy delta (kWh)', type: 'Aggregated' },
+    { time: '2026-05-01 14:55', name: 'Pressure threshold', type: 'Simple' }
+  ];
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('activity')}</div>
+        <div>
+          <div class="info-section-title">Calculated fields</div>
+          <div class="info-section-sub">Derived values applied to every device of this profile</div>
+        </div>
+      </div>
+      <table class="tel-table" style="width:100%;border-collapse:collapse;margin-top:6px">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Created time</th>
+            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Name</th>
+            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `<tr><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px">${r.time}</td><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px">${_kvEscape(r.name)}</td><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-muted)">${_kvEscape(r.type)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function _renderProfileAlarmsTab(p) {
+  const rules = [
+    { name: 'High temperature',   severity: 'Critical', condition: 'temperature > 80 for 5m',  enabled: true },
+    { name: 'Battery low',        severity: 'Warning',  condition: 'battery < 15',             enabled: true },
+    { name: 'Connectivity loss',  severity: 'Major',    condition: 'lastSeen older than 10m',  enabled: false }
+  ];
+  const sevColor = (s) => s === 'Critical' ? 'var(--danger)' : s === 'Major' ? '#C2410C' : 'var(--warn)';
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('triangle-alert')}</div>
+        <div>
+          <div class="info-section-title">Alarm rules</div>
+          <div class="info-section-sub">Triggers that produce alarms for any device using this profile</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+        ${rules.map(r => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface)">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0">
+              <span class="chip" style="background:${sevColor(r.severity)}1a;color:${sevColor(r.severity)};border:1px solid ${sevColor(r.severity)}40"><span class="dot" style="background:${sevColor(r.severity)}"></span>${r.severity}</span>
+              <div style="min-width:0">
+                <div style="font-size:14px;font-weight:500;color:var(--text)">${_kvEscape(r.name)}</div>
+                <div style="font-size:12.5px;color:var(--text-muted);font-family:ui-monospace,Menlo,monospace;margin-top:2px">${_kvEscape(r.condition)}</div>
+              </div>
+            </div>
+            <span class="chip ${r.enabled ? 'chip-active' : 'chip-inactive'}"><span class="dot"></span>${r.enabled ? 'Enabled' : 'Disabled'}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function _renderProfileProvisionTab(p) {
+  const strat = p.provisionStrategy || 'Disabled';
+  const enabled = strat !== 'Disabled';
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('shield-check')}</div>
+        <div>
+          <div class="info-section-title">Device provisioning</div>
+          <div class="info-section-sub">How new devices register against this profile</div>
+        </div>
+      </div>
+      <div class="info-rows">
+        <div class="info-row-cell"><div class="info-row-label">Strategy</div><div class="info-row-value">${_kvEscape(strat)}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">State</div><div class="info-row-value">${enabled ? '<span class="chip chip-active"><span class="dot"></span>Active</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Inactive</span>'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Provision device key</div><div class="info-row-value ${enabled ? 'mono' : 'muted'}">${enabled ? 'PRV-' + (p.id || '').toUpperCase() + '-KEY' : '—'}</div></div>
+        <div class="info-row-cell"><div class="info-row-label">Provision device secret</div><div class="info-row-value ${enabled ? 'mono' : 'muted'}">${enabled ? '••••••••••••' : '—'}</div></div>
+      </div>
+    </div>
+  `;
+}
+
+function _renderProfileAuditTab(p) {
+  const events = [
+    { time: '2026-05-06 15:21', actor: 'priya.sharma',    action: 'Updated description' },
+    { time: '2026-05-04 09:18', actor: 'rahul.verma',     action: 'Changed transport type to Default' },
+    { time: '2026-04-29 14:06', actor: 'priya.sharma',    action: 'Created profile' }
+  ];
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('history')}</div>
+        <div>
+          <div class="info-section-title">Audit logs</div>
+          <div class="info-section-sub">Recent changes to this profile</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        ${events.map((e, i) => `
+          <div style="display:flex;gap:14px;padding:14px 0;${i < events.length - 1 ? 'border-bottom:1px solid var(--border)' : ''}">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;flex-shrink:0">${li('clock')}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;color:var(--text)"><strong>${_kvEscape(e.actor)}</strong> &middot; ${_kvEscape(e.action)}</div>
+              <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">${e.time}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function _renderProfileVersionTab(p) {
+  const versions = [
+    { tag: 'v1.3', time: '2026-05-06 15:21', author: 'priya.sharma', note: 'Tightened alarm thresholds' },
+    { tag: 'v1.2', time: '2026-04-29 14:06', author: 'rahul.verma',  note: 'Added pressure rule chain' },
+    { tag: 'v1.1', time: '2026-04-22 15:49', author: 'priya.sharma', note: 'Initial baseline' }
+  ];
+  return `
+    <div class="info-section">
+      <div class="info-section-head">
+        <div class="ico-box">${li('file-text')}</div>
+        <div>
+          <div class="info-section-title">Version control</div>
+          <div class="info-section-sub">Tracked snapshots of this profile</div>
+        </div>
+      </div>
+      <table class="tel-table" style="width:100%;border-collapse:collapse;margin-top:6px">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Version</th>
+            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Saved on</th>
+            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Author</th>
+            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${versions.map(v => `<tr><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px;font-family:ui-monospace,Menlo,monospace">${v.tag}</td><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px">${v.time}</td><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px">${_kvEscape(v.author)}</td><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-muted)">${_kvEscape(v.note)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 
 function exportDeviceProfile(id) {
   const p = DEVICE_PROFILES.find(x => x.id === id);
