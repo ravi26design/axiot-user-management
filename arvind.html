@@ -3693,6 +3693,12 @@ function renderDeviceTelemetryTab(d) {
       .tel-pager .pg-icon:disabled { opacity:.4;cursor:default }
       .tel-pager .pg-icon [data-lucide] { width:18px;height:18px }
     </style>
+    <div class="dd-tab-section-head" style="margin-top:18px;margin-bottom:6px">
+      <div style="font-size:18px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px">
+        <span style="display:inline-flex;color:var(--primary)">${li('line-chart')}</span>Latest telemetry
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Most recent values reported by this device per key.</div>
+    </div>
     <div class="tel-card">
       <div class="tel-head">
         <div class="tel-actions" style="margin-left:auto">
@@ -4224,7 +4230,13 @@ function renderDeviceCalculatedTab(d) {
   state.calculatedPage    = state.calculatedPage    || 1;
   state.calculatedPerPage = state.calculatedPerPage || 10;
   if (!state._calcCache) state._calcCache = {};
-  if (!state._calcCache[d.id]) state._calcCache[d.id] = [];
+  if (!state._calcCache[d.id]) state._calcCache[d.id] = [
+    { id: 'cf-' + d.id + '-1', createdTime: '2026-05-06 10:42:18', title: 'Temperature (°C)',     type: 'simple',     expression: '(temperature - 32) / 1.8',          outputType: 'timeseries', outputKey: 'temperature_c' },
+    { id: 'cf-' + d.id + '-2', createdTime: '2026-05-05 14:11:02', title: 'Power factor',         type: 'aggregated', expression: 'kW / kVA',                          outputType: 'timeseries', outputKey: 'power_factor' },
+    { id: 'cf-' + d.id + '-3', createdTime: '2026-05-04 09:27:55', title: 'Energy delta (kWh)',   type: 'aggregated', expression: 'kWh - prev(kWh)',                   outputType: 'timeseries', outputKey: 'kwh_delta' },
+    { id: 'cf-' + d.id + '-4', createdTime: '2026-05-02 17:03:40', title: 'Pressure threshold',   type: 'simple',     expression: 'pressure > 4.5',                    outputType: 'attribute',  outputKey: 'pressure_alert' },
+    { id: 'cf-' + d.id + '-5', createdTime: '2026-04-30 08:55:12', title: 'Average flow (L/min)', type: 'aggregated', expression: 'avg(flow_in, 5m)',                  outputType: 'timeseries', outputKey: 'flow_avg_5m' }
+  ];
 
   const all = state._calcCache[d.id];
   const total = all.length;
@@ -4255,6 +4267,12 @@ function renderDeviceCalculatedTab(d) {
       .row-edit:hover { background:var(--bg);color:var(--primary) }
       .row-edit [data-lucide] { width:16px;height:16px }
     </style>
+    <div class="dd-tab-section-head" style="margin-top:18px;margin-bottom:6px">
+      <div style="font-size:18px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px">
+        <span style="display:inline-flex;color:var(--primary)">${li('activity')}</span>Calculated fields
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Derived values computed from this device\'s telemetry and attributes.</div>
+    </div>
     <div class="tel-card">
       <div class="tel-head">
         <div class="tel-actions" style="margin-left:auto">
