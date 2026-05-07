@@ -6473,6 +6473,7 @@ function _renderProfileDetailsTab(p) {
 
 function _renderProfileTransportTab(p) {
   const t = p.transportType || 'Default';
+  const isMqtt = t === 'MQTT';
   return `
     <div class="info-section">
       <div class="info-section-head">
@@ -6485,10 +6486,31 @@ function _renderProfileTransportTab(p) {
       <div class="info-rows">
         <div class="info-row-cell"><div class="info-row-label">Transport type</div><div class="info-row-value">${_kvEscape(t)}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Protocol</div><div class="info-row-value">${_kvEscape(_transportDesc(t) || '—')}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">QoS / retries</div><div class="info-row-value muted">Default</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Max payload size</div><div class="info-row-value muted">256 KB</div></div>
+        ${!isMqtt ? `
+          <div class="info-row-cell"><div class="info-row-label">QoS / retries</div><div class="info-row-value muted">Default</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Max payload size</div><div class="info-row-value muted">256 KB</div></div>
+        ` : ''}
       </div>
     </div>
+    ${isMqtt ? `
+      <div class="info-section">
+        <div class="info-section-head">
+          <div class="ico-box">${li('radio')}</div>
+          <div>
+            <div class="info-section-title">Advanced MQTT settings</div>
+            <div class="info-section-sub">Topic filters, payload format, validation behaviour</div>
+          </div>
+        </div>
+        <div class="info-rows">
+          <div class="info-row-cell"><div class="info-row-label">Sparkplug B (EoN node)</div><div class="info-row-value">${p.mqttSparkplugEoN ? '<span class="chip chip-active"><span class="dot"></span>Enabled</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Disabled</span>'}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Payload format</div><div class="info-row-value">${_kvEscape(p.mqttPayload || 'JSON')}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">PUBACK on validation failure</div><div class="info-row-value">${p.mqttPubackOnFailure ? '<span class="chip chip-active"><span class="dot"></span>Send PUBACK</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Close session</span>'}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Telemetry topic filter</div><div class="info-row-value mono">${_kvEscape(p.mqttTelemetryTopic || 'v1/devices/me/telemetry')}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Attributes publish topic filter</div><div class="info-row-value mono">${_kvEscape(p.mqttAttrsPubTopic || 'v1/devices/me/attributes')}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Attributes subscribe topic filter</div><div class="info-row-value mono">${_kvEscape(p.mqttAttrsSubTopic || 'v1/devices/me/attributes')}</div></div>
+        </div>
+      </div>
+    ` : ''}
   `;
 }
 
@@ -6709,7 +6731,13 @@ function addDeviceProfile(existing) {
     image:             existing && existing.image             || '',
     description:       existing && existing.description       || '',
     transportType:     existing && existing.transportType     || 'Default',
-    provisionStrategy: existing && existing.provisionStrategy || 'Disabled'
+    provisionStrategy: existing && existing.provisionStrategy || 'Disabled',
+    mqttSparkplugEoN:  existing && existing.mqttSparkplugEoN  || false,
+    mqttTelemetryTopic:(existing && existing.mqttTelemetryTopic) || 'v1/devices/me/telemetry',
+    mqttAttrsPubTopic: (existing && existing.mqttAttrsPubTopic)  || 'v1/devices/me/attributes',
+    mqttAttrsSubTopic: (existing && existing.mqttAttrsSubTopic)  || 'v1/devices/me/attributes',
+    mqttPayload:       (existing && existing.mqttPayload)        || 'JSON',
+    mqttPubackOnFailure: existing && existing.mqttPubackOnFailure || false
   };
   state._dpStep = 1;
 
@@ -6848,26 +6876,69 @@ function renderDeviceProfileStep() {
       </div>
     `;
   } else if (step === 2) {
+    const isMqtt = d.transportType === 'MQTT';
+    const hint = isMqtt ? 'Enables advanced MQTT transport settings'
+      : ((TRANSPORT_TYPES.find(t => t.value === d.transportType) || TRANSPORT_TYPES[0]).desc);
     body.innerHTML = `
       <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
         <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('radio-tower')}</span>Transport configuration</div>
         <div class="field">
-          <label class="label">Transport type</label>
+          <label class="label">Transport type <span class="req">*</span></label>
           <select class="select" id="dpTransportType" onchange="state._dpDraft.transportType=this.value;renderDeviceProfileStep()">
             ${TRANSPORT_TYPES.map(t => `<option value="${t.value}" ${d.transportType===t.value?'selected':''}>${t.value}</option>`).join('')}
           </select>
-          <div class="hint">${(TRANSPORT_TYPES.find(t => t.value === d.transportType) || TRANSPORT_TYPES[0]).desc}</div>
+          <div class="hint">${hint}</div>
         </div>
-        <div style="margin-top:8px;padding:14px;border-radius:6px;background:var(--bg);border:1px solid var(--border)">
-          <div style="display:flex;gap:10px;align-items:flex-start">
-            <div style="color:var(--primary);flex-shrink:0;margin-top:1px">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        ${isMqtt ? `
+          <div class="field" style="margin-top:14px">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
+              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer" ${d.mqttSparkplugEoN ? 'checked' : ''} onchange="state._dpDraft.mqttSparkplugEoN=this.checked" />
+              <span>MQTT Sparkplug B Edge of Network (EoN) node.</span>
+            </label>
+          </div>
+
+          <fieldset style="border:1px solid var(--border);border-radius:6px;padding:14px 14px 4px;margin-top:14px">
+            <legend style="font-size:12px;color:var(--text-muted);padding:0 6px;font-weight:500">MQTT device topic filters</legend>
+            <div class="field-row" style="grid-template-columns:1fr 1fr 1fr">
+              <div class="field"><label class="label">Telemetry topic filter <span class="req">*</span></label><input class="input" value="${_kvEscape(d.mqttTelemetryTopic)}" oninput="state._dpDraft.mqttTelemetryTopic=this.value;validateDeviceProfileForm()" /></div>
+              <div class="field"><label class="label">Attributes publish topic filter <span class="req">*</span></label><input class="input" value="${_kvEscape(d.mqttAttrsPubTopic)}" oninput="state._dpDraft.mqttAttrsPubTopic=this.value;validateDeviceProfileForm()" /></div>
+              <div class="field"><label class="label">Attributes subscribe topic filter <span class="req">*</span></label><input class="input" value="${_kvEscape(d.mqttAttrsSubTopic)}" oninput="state._dpDraft.mqttAttrsSubTopic=this.value;validateDeviceProfileForm()" /></div>
             </div>
-            <div style="font-size:12.5px;color:var(--text-muted);line-height:1.55">
-              The transport type controls which protocol devices of this profile use to talk to the platform. Leave at <strong>Default</strong> if devices use the standard MQTT, HTTP or CoAP endpoints.
+            <div class="hint" style="margin-top:8px;line-height:1.55">
+              Single <code style="background:var(--bg);padding:1px 5px;border-radius:3px">[+]</code> and multi-level <code style="background:var(--bg);padding:1px 5px;border-radius:3px">[#]</code> wildcards supported.<br/>
+              <code style="background:var(--bg);padding:1px 5px;border-radius:3px">[+]</code> is suitable for any topic filter level. Ex.: <strong>v1/devices/+/telemetry</strong> or <strong>+/devices/+/attributes</strong>.<br/>
+              <code style="background:var(--bg);padding:1px 5px;border-radius:3px">[#]</code> can replace the topic filter itself and must be the last symbol of the topic. Ex.: <strong>#</strong> or <strong>v1/devices/me/#</strong>.
+            </div>
+          </fieldset>
+
+          <fieldset style="border:1px solid var(--border);border-radius:6px;padding:14px 14px 4px;margin-top:14px">
+            <legend style="font-size:12px;color:var(--text-muted);padding:0 6px;font-weight:500">MQTT device payload</legend>
+            <div class="field">
+              <select class="select" onchange="state._dpDraft.mqttPayload=this.value">
+                ${['JSON','Protobuf'].map(v => `<option value="${v}" ${d.mqttPayload===v?'selected':''}>${v}</option>`).join('')}
+              </select>
+            </div>
+          </fieldset>
+
+          <div class="field" style="margin-top:14px">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:14px">
+              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;margin-top:2px;flex-shrink:0" ${d.mqttPubackOnFailure ? 'checked' : ''} onchange="state._dpDraft.mqttPubackOnFailure=this.checked" />
+              <span>Send PUBACK on PUBLISH message validation failure</span>
+            </label>
+            <div class="hint" style="margin-top:6px;margin-left:26px">By default, the platform will close the MQTT session on message validation failure. When enabled, the platform will send publish acknowledgment instead of closing the session.</div>
+          </div>
+        ` : `
+          <div style="margin-top:8px;padding:14px;border-radius:6px;background:var(--bg);border:1px solid var(--border)">
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="color:var(--primary);flex-shrink:0;margin-top:1px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              </div>
+              <div style="font-size:12.5px;color:var(--text-muted);line-height:1.55">
+                The transport type controls which protocol devices of this profile use to talk to the platform. Leave at <strong>Default</strong> if devices use the standard MQTT, HTTP or CoAP endpoints.
+              </div>
             </div>
           </div>
-        </div>
+        `}
       </div>
     `;
   } else if (step === 3) {
@@ -6958,7 +7029,13 @@ function submitDeviceProfile() {
       edgeRuleChain: d.edgeRuleChain,
       image: d.image,
       transportType: d.transportType,
-      provisionStrategy: d.provisionStrategy
+      provisionStrategy: d.provisionStrategy,
+      mqttSparkplugEoN: d.mqttSparkplugEoN,
+      mqttTelemetryTopic: d.mqttTelemetryTopic,
+      mqttAttrsPubTopic: d.mqttAttrsPubTopic,
+      mqttAttrsSubTopic: d.mqttAttrsSubTopic,
+      mqttPayload: d.mqttPayload,
+      mqttPubackOnFailure: d.mqttPubackOnFailure
     });
     toast('Device profile updated', 'success');
   } else {
@@ -6978,7 +7055,13 @@ function submitDeviceProfile() {
       mobileDashboard: d.mobileDashboard || '',
       queue: d.queue || '',
       edgeRuleChain: d.edgeRuleChain || '',
-      provisionStrategy: d.provisionStrategy || 'Disabled'
+      provisionStrategy: d.provisionStrategy || 'Disabled',
+      mqttSparkplugEoN: !!d.mqttSparkplugEoN,
+      mqttTelemetryTopic: d.mqttTelemetryTopic || 'v1/devices/me/telemetry',
+      mqttAttrsPubTopic: d.mqttAttrsPubTopic || 'v1/devices/me/attributes',
+      mqttAttrsSubTopic: d.mqttAttrsSubTopic || 'v1/devices/me/attributes',
+      mqttPayload: d.mqttPayload || 'JSON',
+      mqttPubackOnFailure: !!d.mqttPubackOnFailure
     });
     toast(`Device profile "${d.name.trim()}" created`, 'success');
   }
