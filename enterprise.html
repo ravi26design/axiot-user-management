@@ -6220,13 +6220,20 @@ function deleteCustomer(id) {
    Device profiles
    ============================================================ */
 const DEVICE_PROFILES = [
-  { id: 'dp-1', name: 'test',       createdTime: '2026-05-06 15:21:18', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: '',               imageSize: '',     imageDim: '' },
-  { id: 'dp-2', name: 'Flow-Meter', createdTime: '2026-04-29 15:49:13', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: '',               imageSize: '',     imageDim: '' },
-  { id: 'dp-3', name: 'Tanks-GSR',  createdTime: '2026-04-29 14:06:29', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: '',               imageSize: '',     imageDim: '' },
-  { id: 'dp-4', name: 'Tanks-ESR',  createdTime: '2026-04-23 19:06:23', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: '',               imageSize: '',     imageDim: '' },
-  { id: 'dp-5', name: 'Pump',       createdTime: '2026-04-23 18:34:59', profileType: 'Default', transportType: 'Default', description: '',                          isDefault: false, image: 'water-pump.jpg', imageSize: '25.3 KB', imageDim: '980×980' },
-  { id: 'dp-6', name: 'thermostat', createdTime: '2026-04-22 15:49:06', profileType: 'Default', transportType: 'Default', description: 'Thermostat device profile', isDefault: false, image: '',               imageSize: '',     imageDim: '' },
-  { id: 'dp-7', name: 'default',    createdTime: '2026-04-22 15:49:04', profileType: 'Default', transportType: 'Default', description: 'Default device profile',    isDefault: true,  image: '',               imageSize: '',     imageDim: '' }
+  { id: 'dp-1', name: 'test',       createdTime: '2026-05-06 15:21:18', profileType: 'Default', transportType: 'Default', description: 'Sandbox profile for QA experiments',                                       isDefault: false, image: '',               imageSize: '',     imageDim: '',
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'Main',                       provisionStrategy: 'Disabled' },
+  { id: 'dp-2', name: 'Flow-Meter', createdTime: '2026-04-29 15:49:13', profileType: 'Default', transportType: 'MQTT',    description: 'Industrial flow meter telemetry profile',                                  isDefault: false, image: '',               imageSize: '',     imageDim: '',
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'HighPriority',               provisionStrategy: 'Allow to create new devices' },
+  { id: 'dp-3', name: 'Tanks-GSR',  createdTime: '2026-04-29 14:06:29', profileType: 'Default', transportType: 'Default', description: 'Ground service reservoir tank monitoring',                                 isDefault: false, image: '',               imageSize: '',     imageDim: '',
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'Main',                       provisionStrategy: 'Disabled' },
+  { id: 'dp-4', name: 'Tanks-ESR',  createdTime: '2026-04-23 19:06:23', profileType: 'Default', transportType: 'Default', description: 'Elevated service reservoir tank monitoring',                               isDefault: false, image: '',               imageSize: '',     imageDim: '',
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'Main',                       provisionStrategy: 'Disabled' },
+  { id: 'dp-5', name: 'Pump',       createdTime: '2026-04-23 18:34:59', profileType: 'Default', transportType: 'MQTT',    description: 'Pump units with high-frequency telemetry',                                 isDefault: false, image: 'water-pump.jpg', imageSize: '25.3 KB', imageDim: '980×980',
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'SequentialByOriginator',     provisionStrategy: 'Check for pre-provisioned devices' },
+  { id: 'dp-6', name: 'thermostat', createdTime: '2026-04-22 15:49:06', profileType: 'Default', transportType: 'CoAP',    description: 'Thermostat device profile',                                                isDefault: false, image: '',               imageSize: '',     imageDim: '',
+    defaultRuleChain: 'Thermostat Rule Chain',   edgeRuleChain: 'Thermostat Edge Rule Chain',   mobileDashboard: 'Thermostat Mobile Dashboard',  queue: 'Main',                       provisionStrategy: 'Allow to create new devices' },
+  { id: 'dp-7', name: 'default',    createdTime: '2026-04-22 15:49:04', profileType: 'Default', transportType: 'Default', description: 'Default device profile',                                                   isDefault: true,  image: '',               imageSize: '',     imageDim: '',
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'Main',                       provisionStrategy: 'Disabled' }
 ];
 
 state.detailsDeviceProfileId = null;
