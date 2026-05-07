@@ -676,6 +676,27 @@
   }
   .switch.on { background: var(--primary); }
   .switch.on::after { left: 16px; }
+  .seg-tabs {
+    display: flex; padding: 4px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 999px; gap: 0;
+  }
+  .seg-tab {
+    flex: 1; text-align: center; padding: 8px 14px; border-radius: 999px;
+    font-size: 13.5px; font-weight: 500; color: var(--text-muted);
+    cursor: pointer; transition: all .15s; background: transparent; border: none;
+  }
+  .seg-tab.active { background: var(--primary); color: #fff; }
+  .seg-tab:hover:not(.active) { color: var(--text); background: var(--bg-hover); }
+  .creds-input-wrap { position: relative; }
+  .creds-input-wrap .input { padding-right: 40px; }
+  .creds-input-wrap .input.has-2btn { padding-right: 72px; }
+  .creds-input-wrap .creds-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 28px; height: 28px; display: grid; place-items: center;
+    background: transparent; border: none; cursor: pointer;
+    color: var(--text-muted); border-radius: 4px;
+  }
+  .creds-input-wrap .creds-btn:hover { background: var(--bg-hover); color: var(--text); }
 
   /* Roles */
   .two-col { display: grid; grid-template-columns: 300px 1fr; gap: 16px; align-items: flex-start; }
@@ -2652,6 +2673,14 @@
         </select>
         <div class="hint">Defines transport, rule chain and provisioning for this device.</div>
       </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Credentials</div>
+      <div class="field">
+        <label class="label" style="margin-bottom:8px">Credentials type</label>
+        <div class="seg-tabs" id="deviceCredsTabs"></div>
+      </div>
+      <div id="deviceCredsBody"></div>
     </div>
     <div class="form-section">
       <div class="form-section-title">Assignment</div>
@@ -5291,6 +5320,11 @@ function openDeviceDrawer(id) {
   state._pendingDeviceImage = d && d.image
     ? { dataUrl: d.image, name: d.imageName || 'Device image', size: d.imageSize || 0 }
     : null;
+  state._deviceCreds = (d && d.credentials)
+    ? Object.assign({}, d.credentials)
+    : { type: 'access', token: _genAccessToken() };
+  renderDeviceCredsTabs();
+  renderDeviceCredsBody();
   document.getElementById('deviceDrawer').classList.add('open');
   document.getElementById('deviceDrawerBackdrop').classList.add('open');
   setTimeout(() => document.getElementById('deviceName').focus(), 250);
@@ -5318,8 +5352,17 @@ function submitDevice() {
   if (!deviceProfile) { toast('Please select a device profile', 'danger'); return; }
   if (!client) { toast('Please select a client', 'danger'); return; }
   if (!industry) { toast('Please select an industry', 'danger'); return; }
+  const creds = state._deviceCreds || { type: 'access', token: '' };
+  if (creds.type === 'access' && !(creds.token || '').trim()) { toast('Access token is required', 'danger'); return; }
+  if (creds.type === 'x509'   && !(creds.cert  || '').trim()) { toast('Certificate is required', 'danger'); return; }
+  if (creds.type === 'mqtt'   && !(creds.clientId || '').trim() && !(creds.user || '').trim()) {
+    toast('Client ID and/or User Name are necessary', 'danger'); return;
+  }
+  const credentials = creds.type === 'access' ? { type: 'access', token: creds.token }
+    : creds.type === 'x509' ? { type: 'x509', cert: creds.cert }
+    : { type: 'mqtt', clientId: creds.clientId || '', user: creds.user || '', password: creds.password || '' };
   const data = {
-    name, client, deviceProfile,
+    name, client, deviceProfile, credentials,
     location: industry,
     industry: 'Textiles & Apparel',  // legacy field for back-compat
     active:   document.getElementById('deviceActive').classList.contains('on'),
@@ -5337,6 +5380,89 @@ function submitDevice() {
   closeDeviceDrawer();
   renderDevicesPage();
 }
+function _genAccessToken(len) {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let s = '';
+  const n = len || 20;
+  for (let i = 0; i < n; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
+function setDeviceCredsType(type) {
+  state._deviceCreds = state._deviceCreds || {};
+  state._deviceCreds.type = type;
+  if (type === 'access' && !state._deviceCreds.token) state._deviceCreds.token = _genAccessToken();
+  renderDeviceCredsTabs();
+  renderDeviceCredsBody();
+}
+function renderDeviceCredsTabs() {
+  const wrap = document.getElementById('deviceCredsTabs');
+  if (!wrap) return;
+  const types = [
+    { key: 'access', label: 'Access token' },
+    { key: 'x509',   label: 'X.509' },
+    { key: 'mqtt',   label: 'MQTT Basic' }
+  ];
+  const active = (state._deviceCreds || {}).type || 'access';
+  wrap.innerHTML = types.map(t =>
+    `<button type="button" class="seg-tab ${t.key === active ? 'active' : ''}" onclick="setDeviceCredsType('${t.key}')">${t.label}</button>`
+  ).join('');
+}
+const _EYE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>';
+const _EYE_OFF_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>';
+function copyDeviceCredToken() {
+  const t = (state._deviceCreds || {}).token || '';
+  if (!t) return;
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => toast('Token copied'));
+  else toast(t);
+}
+function renderDeviceCredsBody() {
+  const c = document.getElementById('deviceCredsBody');
+  if (!c) return;
+  const creds = state._deviceCreds = state._deviceCreds || { type: 'access', token: _genAccessToken() };
+  if (creds.type === 'access') {
+    c.innerHTML = `
+      <div class="field">
+        <label class="label">Access token <span class="req">*</span></label>
+        <div class="creds-input-wrap">
+          <input class="input" id="deviceCredsToken" value="${_kvEscape(creds.token || '')}" oninput="state._deviceCreds.token=this.value" />
+          <button type="button" class="creds-btn" title="Copy token" style="right:6px" onclick="copyDeviceCredToken()">${li('copy')}</button>
+        </div>
+      </div>`;
+  } else if (creds.type === 'x509') {
+    c.innerHTML = `
+      <div class="field">
+        <label class="label">Certificate in PEM format <span class="req">*</span></label>
+        <textarea class="textarea" rows="6" id="deviceCredsCert" placeholder="-----BEGIN CERTIFICATE-----..." oninput="state._deviceCreds.cert=this.value">${_kvEscape(creds.cert || '')}</textarea>
+      </div>`;
+  } else if (creds.type === 'mqtt') {
+    const pwdType = creds._pwdShown ? 'text' : 'password';
+    c.innerHTML = `
+      <div class="field">
+        <label class="label">Client ID</label>
+        <div class="creds-input-wrap">
+          <input class="input" id="deviceCredsClientId" value="${_kvEscape(creds.clientId || '')}" oninput="state._deviceCreds.clientId=this.value" />
+          <button type="button" class="creds-btn" title="Regenerate" style="right:6px" onclick="state._deviceCreds.clientId=_genAccessToken();renderDeviceCredsBody()">${li('rotate-cw')}</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">User Name</label>
+        <div class="creds-input-wrap">
+          <input class="input" id="deviceCredsUser" value="${_kvEscape(creds.user || '')}" oninput="state._deviceCreds.user=this.value" />
+          <button type="button" class="creds-btn" title="Regenerate" style="right:6px" onclick="state._deviceCreds.user=_genAccessToken();renderDeviceCredsBody()">${li('rotate-cw')}</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Password</label>
+        <div class="creds-input-wrap">
+          <input class="input has-2btn" id="deviceCredsPwd" type="${pwdType}" value="${_kvEscape(creds.password || '')}" oninput="state._deviceCreds.password=this.value" />
+          <button type="button" class="creds-btn" title="${creds._pwdShown ? 'Hide' : 'Show'}" style="right:36px" onclick="state._deviceCreds._pwdShown=!state._deviceCreds._pwdShown;renderDeviceCredsBody()">${creds._pwdShown ? _EYE_OFF_ICON : _EYE_ICON}</button>
+          <button type="button" class="creds-btn" title="Regenerate" style="right:6px" onclick="state._deviceCreds.password=_genAccessToken(16);renderDeviceCredsBody()">${li('rotate-cw')}</button>
+        </div>
+      </div>`;
+  }
+  if (window.lucide) window.lucide.createIcons();
+}
+
 function deleteDevice(id) {
   const d = DEVICES.find(x => x.id === id);
   if (!d) return;
