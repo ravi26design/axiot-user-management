@@ -6298,7 +6298,7 @@ function renderDeviceProfileStep() {
   if (step === 1) {
     body.innerHTML = `
       <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
-        <div class="form-section-title">Device profile details</div>
+        <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('layers')}</span>Device profile details</div>
         <div class="field">
           <label class="label">Name <span class="req">*</span></label>
           <input class="input" id="dpName" placeholder="e.g. Pump" value="${_kvEscape(d.name)}" oninput="state._dpDraft.name=this.value;validateDeviceProfileForm()" />
@@ -6364,7 +6364,7 @@ function renderDeviceProfileStep() {
   } else if (step === 2) {
     body.innerHTML = `
       <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
-        <div class="form-section-title">Transport configuration</div>
+        <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('radio-tower')}</span>Transport configuration</div>
         <div class="field">
           <label class="label">Transport type</label>
           <select class="select" id="dpTransportType" onchange="state._dpDraft.transportType=this.value;renderDeviceProfileStep()">
@@ -6387,7 +6387,7 @@ function renderDeviceProfileStep() {
   } else if (step === 3) {
     body.innerHTML = `
       <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
-        <div class="form-section-title">Device provisioning</div>
+        <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('shield-check')}</span>Device provisioning</div>
         <div class="field">
           <label class="label">Provision strategy</label>
           <select class="select" onchange="state._dpDraft.provisionStrategy=this.value;renderDeviceProfileStep()">
