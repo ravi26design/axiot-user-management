@@ -6771,10 +6771,10 @@ const TRANSPORT_TYPES     = [
   { value: 'SNMP',        desc: 'Specify SNMP transport configuration' }
 ];
 const PROVISION_STRATEGIES = [
-  { value: 'Disabled',                 desc: 'Provisioning is disabled for devices of this profile' },
-  { value: 'Allow to create new devices', desc: 'New devices will be created on first message with provision key/secret' },
-  { value: 'Check for pre-provisioned devices', desc: 'Only existing devices with matching provision key/secret are accepted' },
-  { value: 'X.509 Certificates Chain', desc: 'X.509 certificates strategy is used to provision devices by client certificates in two-way TLS communication.' }
+  { value: 'Disabled',                          desc: 'No automatic provisioning. Devices must be created manually before they can connect.' },
+  { value: 'Allow to create new devices',       desc: 'A new device is created automatically the first time a request arrives with a matching provision key and secret.' },
+  { value: 'Check for pre-provisioned devices', desc: 'Only devices that already exist on the platform are accepted, and only when the request matches the provision key and secret.' },
+  { value: 'X.509 Certificates Chain',          desc: 'Two-way TLS where the device authenticates with a client certificate. New devices are created using the certificate as their credentials.' }
 ];
 
 const PROTO_DEFAULTS = {
@@ -7174,43 +7174,55 @@ function renderDeviceProfileStep() {
     `;
   } else if (step === 3) {
     const ps = d.provisionStrategy;
+    const stratDesc = (PROVISION_STRATEGIES.find(s => s.value === ps) || PROVISION_STRATEGIES[0]).desc;
+    const banner = (text, tone) => `
+      <div style="margin-top:14px;padding:12px 14px;border-radius:8px;background:${tone === 'warn' ? 'var(--warn-soft, #FEF3C7)' : 'var(--primary-soft)'};border:1px solid ${tone === 'warn' ? 'var(--warn, #B45309)' : 'var(--primary)'}33;display:flex;gap:10px;align-items:flex-start">
+        <div style="color:${tone === 'warn' ? 'var(--warn, #B45309)' : 'var(--primary)'};flex-shrink:0;margin-top:1px">${li('info')}</div>
+        <div style="font-size:12.5px;color:var(--text);line-height:1.55">${text}</div>
+      </div>`;
     const keySecretBlock = `
-      <div class="field">
-        <label class="label">Provision device key</label>
-        <input class="input" value="${_kvEscape(d.provisionDeviceKey || '')}" oninput="state._dpDraft.provisionDeviceKey=this.value" />
-      </div>
-      <div class="field">
-        <label class="label">Provision device secret</label>
-        <input class="input" value="${_kvEscape(d.provisionDeviceSecret || '')}" oninput="state._dpDraft.provisionDeviceSecret=this.value" />
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
+        <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Provisioning credentials</div>
+        <div class="field">
+          <label class="label">Provision device key <span class="req">*</span></label>
+          <input class="input" value="${_kvEscape(d.provisionDeviceKey || '')}" oninput="state._dpDraft.provisionDeviceKey=this.value" />
+          <div class="hint">Devices include this key in their first connection request to identify the profile.</div>
+        </div>
+        <div class="field">
+          <label class="label">Provision device secret <span class="req">*</span></label>
+          <input class="input" value="${_kvEscape(d.provisionDeviceSecret || '')}" oninput="state._dpDraft.provisionDeviceSecret=this.value" />
+          <div class="hint">Shared secret paired with the key above. Treat it like a password — anyone who has both values can claim a device.</div>
+        </div>
       </div>`;
     body.innerHTML = `
       <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
         <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('shield-check')}</span>Device provisioning</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.55;margin:-6px 0 14px 0">Choose how new devices register against this profile and what credentials they need to present.</div>
         <div class="field">
-          <label class="label">Provision strategy</label>
+          <label class="label">Provision strategy <span class="req">*</span></label>
           <select class="select" onchange="state._dpDraft.provisionStrategy=this.value;renderDeviceProfileStep()">
             ${PROVISION_STRATEGIES.map(s => `<option value="${s.value}" ${ps===s.value?'selected':''}>${s.value}</option>`).join('')}
           </select>
-          <div class="hint">${(PROVISION_STRATEGIES.find(s => s.value === ps) || PROVISION_STRATEGIES[0]).desc}</div>
+          <div class="hint">${stratDesc}</div>
         </div>
+        ${ps === 'Disabled' ? banner('<strong>Provisioning is disabled.</strong> Devices for this profile must be added manually from the Devices screen before they can connect to the platform.', 'warn') : ''}
+        ${ps === 'Allow to create new devices' ? banner('Any device that presents the matching key and secret will be created automatically on its first message.', 'info') : ''}
+        ${ps === 'Check for pre-provisioned devices' ? banner('Only devices already present on the platform will be accepted, and only when the request matches the key and secret below.', 'info') : ''}
+        ${ps === 'X.509 Certificates Chain' ? banner('Devices authenticate using a client certificate in two-way TLS. The certificate becomes the device credential.', 'info') : ''}
         ${ps === 'Allow to create new devices' || ps === 'Check for pre-provisioned devices' ? keySecretBlock : ''}
         ${ps === 'X.509 Certificates Chain' ? `
-          <div style="margin-top:8px;padding:14px;border-radius:6px;background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--text-muted);line-height:1.55">
-            If selected new devices will be created and client certificate will be used as device credentials.
-          </div>
-          <div class="field" style="margin-top:14px">
-            <label class="label">Certificate in PEM format <span class="req">*</span></label>
-            <textarea class="textarea" rows="6" style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px" placeholder="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----" oninput="state._dpDraft.provisionX509Cert=this.value">${_kvEscape(d.provisionX509Cert || '')}</textarea>
-          </div>
-          <div class="field">
-            <label class="label">CN Regular Expression variable</label>
-            <input class="input" value="${_kvEscape(d.provisionX509CnRegex || '(.*)')}" oninput="state._dpDraft.provisionX509CnRegex=this.value" />
-            <div class="hint">Required to fetch device name from device's X509 certificate's common name.</div>
-          </div>
-        ` : ''}
-        ${ps === 'Disabled' ? `
-          <div style="margin-top:8px;padding:14px;border-radius:6px;background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--text-muted);line-height:1.55">
-            Provisioning is currently <strong>disabled</strong>. Devices for this profile must be created manually before they can connect.
+          <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Certificate &amp; identity</div>
+            <div class="field">
+              <label class="label">Certificate in PEM format <span class="req">*</span></label>
+              <textarea class="textarea" rows="6" style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px" placeholder="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----" oninput="state._dpDraft.provisionX509Cert=this.value">${_kvEscape(d.provisionX509Cert || '')}</textarea>
+              <div class="hint">Paste the trusted root or intermediate certificate that signs your devices' client certificates.</div>
+            </div>
+            <div class="field">
+              <label class="label">CN regular expression <span class="req">*</span></label>
+              <input class="input" value="${_kvEscape(d.provisionX509CnRegex || '(.*)')}" oninput="state._dpDraft.provisionX509CnRegex=this.value" />
+              <div class="hint">Used to extract the device name from the certificate's Common Name (CN). The first capture group becomes the device name. Default <code style="background:var(--bg);padding:1px 5px;border-radius:3px">(.*)</code> uses the whole CN as the name.</div>
+            </div>
           </div>
         ` : ''}
       </div>
