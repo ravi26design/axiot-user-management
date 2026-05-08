@@ -6557,7 +6557,14 @@ function _renderProfileTransportTab(p) {
 
 function _renderProfileCalculatedTab(p) {
   if (!state._profileCalcFields) state._profileCalcFields = {};
-  if (!state._profileCalcFields[p.id]) state._profileCalcFields[p.id] = [];
+  if (!state._profileCalcFields[p.id]) state._profileCalcFields[p.id] = [
+    { time: '2026-05-06 11:42:18', name: 'Power factor (avg over 5m)',         type: 'Aggregated' },
+    { time: '2026-05-04 09:18:02', name: 'Energy delta (kWh)',                 type: 'Aggregated' },
+    { time: '2026-05-01 14:55:33', name: 'Pressure threshold breach',          type: 'Simple' },
+    { time: '2026-04-28 10:11:47', name: 'Temperature in degrees Celsius',     type: 'Simple' },
+    { time: '2026-04-22 17:03:21', name: 'Average flow per minute (L/min)',    type: 'Aggregated' },
+    { time: '2026-04-18 08:27:14', name: 'Vibration RMS (last sample)',        type: 'Simple' }
+  ];
   const rows = state._profileCalcFields[p.id];
   return `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
@@ -6573,9 +6580,9 @@ function _renderProfileCalculatedTab(p) {
         <thead>
           <tr>
             <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);width:48px"><input type="checkbox" style="accent-color:var(--primary);width:16px;height:16px;cursor:pointer;vertical-align:middle" /></th>
-            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Created time <span style="color:var(--text);margin-left:4px">↓</span></th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);width:200px;white-space:nowrap">Created time <span style="color:var(--text);margin-left:4px">↓</span></th>
             <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Name</th>
-            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Type</th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);width:140px">Type</th>
           </tr>
         </thead>
         <tbody>
