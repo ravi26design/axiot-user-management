@@ -6710,9 +6710,11 @@ function renderCalcFieldBody() {
                     <td style="${td};color:var(--text-muted)">${_kvEscape(a.argType || '—')}</td>
                     <td style="${td};color:var(--text-muted);font-family:ui-monospace,Menlo,monospace">${_kvEscape(a.tsKey || '—')}</td>
                     <td style="${td};color:var(--text-muted)">${a.defaultValue ? _kvEscape(a.defaultValue) : '—'}</td>
-                    <td style="padding:6px 10px;text-align:right;border-bottom:${last?'none':'1px solid var(--border)'}">
-                      <button class="icon-btn" title="Edit" onclick="openCalcArgDialog(${i})" style="width:28px;height:28px">${li('pencil')}</button>
-                      <button class="icon-btn" title="Remove" style="width:28px;height:28px;color:var(--danger)" onclick="removeCalcArg(${i})">${li('trash-2')}</button>
+                    <td style="padding:6px 10px;border-bottom:${last?'none':'1px solid var(--border)'};white-space:nowrap">
+                      <div style="display:inline-flex;align-items:center;gap:2px;justify-content:flex-end">
+                        <button class="icon-btn" title="Edit" onclick="openCalcArgDialog(${i})" style="width:28px;height:28px;flex-shrink:0">${li('pencil')}</button>
+                        <button class="icon-btn" title="Remove" style="width:28px;height:28px;flex-shrink:0;color:var(--danger)" onclick="removeCalcArg(${i})">${li('trash-2')}</button>
+                      </div>
                     </td>
                   </tr>
                 `;
