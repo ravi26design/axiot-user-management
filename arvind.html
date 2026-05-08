@@ -6505,7 +6505,7 @@ function _renderProfileTransportTab(p) {
         <div class="info-rows">
           <div class="info-row-cell"><div class="info-row-label">CoAP device type</div><div class="info-row-value">${_kvEscape(p.coapDeviceType || 'Default')}</div></div>
           <div class="info-row-cell"><div class="info-row-label">Payload format</div><div class="info-row-value">${_kvEscape(p.coapPayload || 'JSON')}</div></div>
-          <div class="info-row-cell"><div class="info-row-label">Power saving mode</div><div class="info-row-value">${_kvEscape(p.coapPsm || 'Disabled')}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Power saving mode</div><div class="info-row-value">${_kvEscape(p.coapPsm || 'Power Saving Mode (PSM)')}</div></div>
         </div>
       </div>`;
   } else if (t === 'LWM2M') {
@@ -6775,7 +6775,7 @@ function addDeviceProfile(existing) {
     mqttPubackOnFailure: existing && existing.mqttPubackOnFailure || false,
     coapDeviceType:    (existing && existing.coapDeviceType)    || 'Default',
     coapPayload:       (existing && existing.coapPayload)       || 'JSON',
-    coapPsm:           (existing && existing.coapPsm)           || 'Disabled',
+    coapPsm:           (existing && existing.coapPsm)           || 'Power Saving Mode (PSM)',
     lwm2mTab:          (existing && existing.lwm2mTab)          || 'model',
     lwm2mObjectList:   (existing && existing.lwm2mObjectList)   || '',
     lwm2mObserveInit:  (existing && existing.lwm2mObserveInit)  || false,
@@ -6981,7 +6981,7 @@ function renderDeviceProfileStep() {
             <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">CoAP device payload</div>
             <div class="field">
               <select class="select" onchange="state._dpDraft.coapPayload=this.value">
-                ${['JSON','Protobuf','CBOR'].map(v => `<option value="${v}" ${d.coapPayload===v?'selected':''}>${v}</option>`).join('')}
+                ${['JSON','Protobuf'].map(v => `<option value="${v}" ${d.coapPayload===v?'selected':''}>${v}</option>`).join('')}
               </select>
             </div>
           </div>
@@ -6989,9 +6989,9 @@ function renderDeviceProfileStep() {
             <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Power saving mode</div>
             <div class="field">
               <select class="select" onchange="state._dpDraft.coapPsm=this.value">
-                ${['Disabled','PSM','eDRX','PSM and eDRX'].map(v => `<option value="${v}" ${d.coapPsm===v?'selected':''}>${v}</option>`).join('')}
+                ${['Power Saving Mode (PSM)','Discontinuous Reception (DRX)','Extended Discontinuous Reception (eDRX)'].map(v => `<option value="${v}" ${d.coapPsm===v?'selected':''}>${v}</option>`).join('')}
               </select>
-              <div class="hint">Network-side power saving for NB-IoT / LTE-M devices. Leave <strong>Disabled</strong> for always-connected devices.</div>
+              <div class="hint">Network-side power saving strategy advertised to the device. Choose the mode supported by your NB-IoT or LTE-M operator.</div>
             </div>
           </div>
         ` : tt === 'LWM2M' ? (() => {
@@ -7215,7 +7215,7 @@ function submitDeviceProfile() {
       mqttPubackOnFailure: !!d.mqttPubackOnFailure,
       coapDeviceType: d.coapDeviceType || 'Default',
       coapPayload: d.coapPayload || 'JSON',
-      coapPsm: d.coapPsm || 'Disabled',
+      coapPsm: d.coapPsm || 'Power Saving Mode (PSM)',
       lwm2mObjectList: d.lwm2mObjectList || '',
       lwm2mObserveInit: !!d.lwm2mObserveInit,
       lwm2mObserveStrategy: d.lwm2mObserveStrategy || 'Single',
