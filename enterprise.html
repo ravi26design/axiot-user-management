@@ -6238,19 +6238,19 @@ function deleteCustomer(id) {
    ============================================================ */
 const DEVICE_PROFILES = [
   { id: 'dp-1', name: 'test',       createdTime: '2026-05-06 15:21:18', profileType: 'Default', transportType: 'Default', description: 'Sandbox profile for QA experiments',                                       isDefault: false, image: '',               imageSize: '',     imageDim: '',
-    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'Main',                       provisionStrategy: 'Disabled' },
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         queue: 'Main',                       provisionStrategy: 'Disabled' },
   { id: 'dp-2', name: 'Flow-Meter', createdTime: '2026-04-29 15:49:13', profileType: 'Default', transportType: 'MQTT',    description: 'Industrial flow meter telemetry profile',                                  isDefault: false, image: '',               imageSize: '',     imageDim: '',
-    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'HighPriority',               provisionStrategy: 'Allow to create new devices' },
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         queue: 'HighPriority',               provisionStrategy: 'Allow to create new devices' },
   { id: 'dp-3', name: 'Tanks-GSR',  createdTime: '2026-04-29 14:06:29', profileType: 'Default', transportType: 'Default', description: 'Ground service reservoir tank monitoring',                                 isDefault: false, image: '',               imageSize: '',     imageDim: '',
-    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'Main',                       provisionStrategy: 'Disabled' },
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         queue: 'Main',                       provisionStrategy: 'Disabled' },
   { id: 'dp-4', name: 'Tanks-ESR',  createdTime: '2026-04-23 19:06:23', profileType: 'Default', transportType: 'Default', description: 'Elevated service reservoir tank monitoring',                               isDefault: false, image: '',               imageSize: '',     imageDim: '',
-    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'Main',                       provisionStrategy: 'Disabled' },
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         queue: 'Main',                       provisionStrategy: 'Disabled' },
   { id: 'dp-5', name: 'Pump',       createdTime: '2026-04-23 18:34:59', profileType: 'Default', transportType: 'MQTT',    description: 'Pump units with high-frequency telemetry',                                 isDefault: false, image: 'water-pump.jpg', imageSize: '25.3 KB', imageDim: '980×980',
-    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'SequentialByOriginator',     provisionStrategy: 'Check for pre-provisioned devices' },
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         queue: 'SequentialByOriginator',     provisionStrategy: 'Check for pre-provisioned devices' },
   { id: 'dp-6', name: 'thermostat', createdTime: '2026-04-22 15:49:06', profileType: 'Default', transportType: 'CoAP',    description: 'Thermostat device profile',                                                isDefault: false, image: '',               imageSize: '',     imageDim: '',
-    defaultRuleChain: 'Thermostat Rule Chain',   edgeRuleChain: 'Thermostat Edge Rule Chain',   mobileDashboard: 'Thermostat Mobile Dashboard',  queue: 'Main',                       provisionStrategy: 'Allow to create new devices' },
+    defaultRuleChain: 'Thermostat Rule Chain',   edgeRuleChain: 'Thermostat Edge Rule Chain',   queue: 'Main',                       provisionStrategy: 'Allow to create new devices' },
   { id: 'dp-7', name: 'default',    createdTime: '2026-04-22 15:49:04', profileType: 'Default', transportType: 'Default', description: 'Default device profile',                                                   isDefault: true,  image: '',               imageSize: '',     imageDim: '',
-    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         mobileDashboard: 'Default Mobile Dashboard',     queue: 'Main',                       provisionStrategy: 'Disabled' }
+    defaultRuleChain: 'Root Rule Chain',         edgeRuleChain: 'Edge Root Rule Chain',         queue: 'Main',                       provisionStrategy: 'Disabled' }
 ];
 
 state.detailsDeviceProfileId = null;
@@ -6449,7 +6449,6 @@ function _renderProfileDetailsTab(p) {
       <div class="info-rows">
         <div class="info-row-cell"><div class="info-row-label">Default rule chain</div><div class="info-row-value ${p.defaultRuleChain ? '' : 'muted'}">${p.defaultRuleChain ? _kvEscape(p.defaultRuleChain) : '—'}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Default edge rule chain</div><div class="info-row-value ${p.edgeRuleChain ? '' : 'muted'}">${p.edgeRuleChain ? _kvEscape(p.edgeRuleChain) : '—'}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Mobile dashboard</div><div class="info-row-value ${p.mobileDashboard ? '' : 'muted'}">${p.mobileDashboard ? _kvEscape(p.mobileDashboard) : '—'}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Queue</div><div class="info-row-value ${p.queue ? '' : 'muted'}">${p.queue ? _kvEscape(p.queue) : 'Main'}</div></div>
       </div>
     </div>
@@ -6713,7 +6712,6 @@ function copyProfileId(id) {
 
 /* ----- Add device profile wizard ----- */
 const RULE_CHAINS         = ['Root Rule Chain', 'Thermostat Rule Chain', 'Edge Root Rule Chain'];
-const MOBILE_DASHBOARDS   = ['Default Mobile Dashboard', 'Thermostat Mobile Dashboard'];
 const QUEUES              = ['Main', 'HighPriority', 'SequentialByOriginator'];
 const EDGE_RULE_CHAINS    = ['Edge Root Rule Chain', 'Thermostat Edge Rule Chain'];
 const TRANSPORT_TYPES     = [
@@ -6736,7 +6734,6 @@ function addDeviceProfile(existing) {
     id:                editing ? existing.id : null,
     name:              existing && existing.name              || '',
     defaultRuleChain:  existing && existing.defaultRuleChain  || '',
-    mobileDashboard:   existing && existing.mobileDashboard   || '',
     queue:             existing && existing.queue             || '',
     edgeRuleChain:     existing && existing.edgeRuleChain     || '',
     image:             existing && existing.image             || '',
@@ -6834,14 +6831,6 @@ function renderDeviceProfileStep() {
             <option value="">Select rule chain…</option>
             ${RULE_CHAINS.map(rc => `<option value="${_kvEscape(rc)}" ${d.defaultRuleChain===rc?'selected':''}>${_kvEscape(rc)}</option>`).join('')}
           </select>
-        </div>
-        <div class="field">
-          <label class="label">Mobile dashboard</label>
-          <select class="select" onchange="state._dpDraft.mobileDashboard=this.value">
-            <option value="">Select dashboard…</option>
-            ${MOBILE_DASHBOARDS.map(m => `<option value="${_kvEscape(m)}" ${d.mobileDashboard===m?'selected':''}>${_kvEscape(m)}</option>`).join('')}
-          </select>
-          <div class="hint">Used by mobile application as a device details dashboard</div>
         </div>
         <div class="field">
           <label class="label">Queue</label>
@@ -7035,7 +7024,6 @@ function submitDeviceProfile() {
       name: d.name.trim(),
       description: d.description,
       defaultRuleChain: d.defaultRuleChain,
-      mobileDashboard: d.mobileDashboard,
       queue: d.queue,
       edgeRuleChain: d.edgeRuleChain,
       image: d.image,
@@ -7063,7 +7051,6 @@ function submitDeviceProfile() {
       imageSize: '',
       imageDim: '',
       defaultRuleChain: d.defaultRuleChain || '',
-      mobileDashboard: d.mobileDashboard || '',
       queue: d.queue || '',
       edgeRuleChain: d.edgeRuleChain || '',
       provisionStrategy: d.provisionStrategy || 'Disabled',
