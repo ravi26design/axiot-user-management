@@ -6896,8 +6896,8 @@ function renderDeviceProfileStep() {
             </label>
           </div>
 
-          <fieldset style="border:1px solid var(--border);border-radius:6px;padding:14px 14px 4px;margin-top:14px">
-            <legend style="font-size:12px;color:var(--text-muted);padding:0 6px;font-weight:500">MQTT device topic filters</legend>
+          <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">MQTT device topic filters</div>
             <div class="field-row" style="grid-template-columns:1fr 1fr;row-gap:12px">
               <div class="field"><label class="label">Telemetry topic filter <span class="req">*</span></label><input class="input" value="${_kvEscape(d.mqttTelemetryTopic)}" oninput="state._dpDraft.mqttTelemetryTopic=this.value;validateDeviceProfileForm()" /></div>
               <div class="field"><label class="label">Attributes publish topic filter <span class="req">*</span></label><input class="input" value="${_kvEscape(d.mqttAttrsPubTopic)}" oninput="state._dpDraft.mqttAttrsPubTopic=this.value;validateDeviceProfileForm()" /></div>
@@ -6908,16 +6908,16 @@ function renderDeviceProfileStep() {
               <code style="background:var(--bg);padding:1px 5px;border-radius:3px">[+]</code> is suitable for any topic filter level. Ex.: <strong>v1/devices/+/telemetry</strong> or <strong>+/devices/+/attributes</strong>.<br/>
               <code style="background:var(--bg);padding:1px 5px;border-radius:3px">[#]</code> can replace the topic filter itself and must be the last symbol of the topic. Ex.: <strong>#</strong> or <strong>v1/devices/me/#</strong>.
             </div>
-          </fieldset>
+          </div>
 
-          <fieldset style="border:1px solid var(--border);border-radius:6px;padding:14px 14px 4px;margin-top:14px">
-            <legend style="font-size:12px;color:var(--text-muted);padding:0 6px;font-weight:500">MQTT device payload</legend>
+          <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">MQTT device payload</div>
             <div class="field">
               <select class="select" onchange="state._dpDraft.mqttPayload=this.value">
                 ${['JSON','Protobuf'].map(v => `<option value="${v}" ${d.mqttPayload===v?'selected':''}>${v}</option>`).join('')}
               </select>
             </div>
-          </fieldset>
+          </div>
 
           <div class="field" style="margin-top:14px">
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:14px">
