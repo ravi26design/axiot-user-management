@@ -6754,6 +6754,33 @@ const PROVISION_STRATEGIES = [
   { value: 'Check for pre-provisioned devices', desc: 'Only existing devices with matching provision key/secret are accepted' }
 ];
 
+const PROTO_DEFAULTS = {
+  telemetry: 'syntax ="proto3";\npackage telemetry;\n\nmessage SensorDataReading {\n\n  optional double temperature = 1;\n  optional double humidity = 2;\n  InnerObject innerObject = 3;\n\n  message InnerObject {\n    optional string key1 = 1;\n    optional bool key2 = 2;\n    optional double key3 = 3;\n    optional int32 key4 = 4;\n    optional string key5 = 5;\n  }\n}',
+  attributes: 'syntax ="proto3";\npackage attributes;\n\nmessage SensorConfiguration {\n  optional string firmwareVersion = 1;\n  optional string serialNumber = 2;\n}',
+  rpcRequest: 'syntax ="proto3";\npackage rpc;\n\nmessage RpcRequestMsg {\n  optional string method = 1;\n  optional int32 requestId = 2;\n  optional string params = 3;\n}',
+  rpcResponse: 'syntax ="proto3";\npackage rpc;\n\nmessage RpcResponseMsg {\n  optional string payload = 1;\n}'
+};
+
+function _renderProtoSchemas(d) {
+  const fields = [
+    { key: 'telemetryProtoSchema',   label: 'Telemetry proto schema' },
+    { key: 'attributesProtoSchema',  label: 'Attributes proto schema' },
+    { key: 'rpcRequestProtoSchema',  label: 'RPC request proto schema' },
+    { key: 'rpcResponseProtoSchema', label: 'RPC response proto schema' }
+  ];
+  return `
+    <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
+      <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Protobuf schemas</div>
+      ${fields.map(f => `
+        <div class="field">
+          <label class="label">${f.label} <span class="req">*</span></label>
+          <textarea class="textarea" rows="6" style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px" oninput="state._dpDraft.${f.key}=this.value">${_kvEscape(d[f.key] || '')}</textarea>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
 function addDeviceProfile(existing) {
   closeDeviceProfileDrawer();
   const editing = !!existing;
@@ -6776,6 +6803,10 @@ function addDeviceProfile(existing) {
     coapDeviceType:    (existing && existing.coapDeviceType)    || 'Default',
     coapPayload:       (existing && existing.coapPayload)       || 'JSON',
     coapPsm:           (existing && existing.coapPsm)           || 'Power Saving Mode (PSM)',
+    telemetryProtoSchema:   (existing && existing.telemetryProtoSchema)   || PROTO_DEFAULTS.telemetry,
+    attributesProtoSchema:  (existing && existing.attributesProtoSchema)  || PROTO_DEFAULTS.attributes,
+    rpcRequestProtoSchema:  (existing && existing.rpcRequestProtoSchema)  || PROTO_DEFAULTS.rpcRequest,
+    rpcResponseProtoSchema: (existing && existing.rpcResponseProtoSchema) || PROTO_DEFAULTS.rpcResponse,
     lwm2mTab:          (existing && existing.lwm2mTab)          || 'model',
     lwm2mObjectList:   (existing && existing.lwm2mObjectList)   || '',
     lwm2mObserveInit:  (existing && existing.lwm2mObserveInit)  || false,
@@ -6955,11 +6986,12 @@ function renderDeviceProfileStep() {
           <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
             <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">MQTT device payload</div>
             <div class="field">
-              <select class="select" onchange="state._dpDraft.mqttPayload=this.value">
+              <select class="select" onchange="state._dpDraft.mqttPayload=this.value;renderDeviceProfileStep()">
                 ${['JSON','Protobuf'].map(v => `<option value="${v}" ${d.mqttPayload===v?'selected':''}>${v}</option>`).join('')}
               </select>
             </div>
           </div>
+          ${d.mqttPayload === 'Protobuf' ? _renderProtoSchemas(d) : ''}
 
           <div class="field" style="margin-top:14px">
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:14px">
@@ -6981,11 +7013,12 @@ function renderDeviceProfileStep() {
           <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
             <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">CoAP device payload</div>
             <div class="field">
-              <select class="select" onchange="state._dpDraft.coapPayload=this.value">
+              <select class="select" onchange="state._dpDraft.coapPayload=this.value;renderDeviceProfileStep()">
                 ${['JSON','Protobuf'].map(v => `<option value="${v}" ${d.coapPayload===v?'selected':''}>${v}</option>`).join('')}
               </select>
             </div>
           </div>
+          ${d.coapPayload === 'Protobuf' ? _renderProtoSchemas(d) : ''}
           ` : ''}
           <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
             <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Power saving mode</div>
@@ -7180,6 +7213,10 @@ function submitDeviceProfile() {
       coapDeviceType: d.coapDeviceType,
       coapPayload: d.coapPayload,
       coapPsm: d.coapPsm,
+      telemetryProtoSchema: d.telemetryProtoSchema,
+      attributesProtoSchema: d.attributesProtoSchema,
+      rpcRequestProtoSchema: d.rpcRequestProtoSchema,
+      rpcResponseProtoSchema: d.rpcResponseProtoSchema,
       lwm2mObjectList: d.lwm2mObjectList,
       lwm2mObserveInit: d.lwm2mObserveInit,
       lwm2mObserveStrategy: d.lwm2mObserveStrategy,
@@ -7218,6 +7255,10 @@ function submitDeviceProfile() {
       coapDeviceType: d.coapDeviceType || 'Default',
       coapPayload: d.coapPayload || 'JSON',
       coapPsm: d.coapPsm || 'Power Saving Mode (PSM)',
+      telemetryProtoSchema: d.telemetryProtoSchema || PROTO_DEFAULTS.telemetry,
+      attributesProtoSchema: d.attributesProtoSchema || PROTO_DEFAULTS.attributes,
+      rpcRequestProtoSchema: d.rpcRequestProtoSchema || PROTO_DEFAULTS.rpcRequest,
+      rpcResponseProtoSchema: d.rpcResponseProtoSchema || PROTO_DEFAULTS.rpcResponse,
       lwm2mObjectList: d.lwm2mObjectList || '',
       lwm2mObserveInit: !!d.lwm2mObserveInit,
       lwm2mObserveStrategy: d.lwm2mObserveStrategy || 'Single',
