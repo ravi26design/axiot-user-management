@@ -7138,7 +7138,7 @@ function renderDeviceProfileStep() {
                 <div class="field">
                   <label class="label">Scope</label>
                   <select class="select" onchange="state._dpDraft.snmpComms[${ci}].scope=this.value">
-                    ${['Client attributes (SNMP GET)','Shared attributes (SNMP SET)','Telemetry (SNMP GET)','Telemetry (TRAP)'].map(v => `<option value="${v}" ${cc.scope===v?'selected':''}>${v}</option>`).join('')}
+                    ${['Telemetry (SNMP GET)','Client attributes (SNMP GET)','Shared attributes (SNMP SET)','To-device RPC request (SNMP GET/SET)','From-device RPC request (SNMP TRAP)'].map(v => `<option value="${v}" ${cc.scope===v?'selected':''}>${v}</option>`).join('')}
                   </select>
                 </div>
                 <div class="field">
