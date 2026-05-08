@@ -6557,30 +6557,39 @@ function _renderProfileTransportTab(p) {
 
 
 function _renderProfileCalculatedTab(p) {
-  const rows = [
-    { time: '2026-05-06 11:42', name: 'Power factor',       type: 'Aggregated' },
-    { time: '2026-05-04 09:18', name: 'Energy delta (kWh)', type: 'Aggregated' },
-    { time: '2026-05-01 14:55', name: 'Pressure threshold', type: 'Simple' }
-  ];
+  if (!state._profileCalcFields) state._profileCalcFields = {};
+  if (!state._profileCalcFields[p.id]) state._profileCalcFields[p.id] = [];
+  const rows = state._profileCalcFields[p.id];
   return `
-    <div class="info-section">
-      <div class="info-section-head">
-        <div class="ico-box">${li('activity')}</div>
-        <div>
-          <div class="info-section-title">Calculated fields</div>
-          <div class="info-section-sub">Derived values applied to every device of this profile</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border)">
+        <div style="font-size:18px;font-weight:600;color:var(--text)">Calculated fields</div>
+        <div style="display:flex;gap:2px">
+          <button class="icon-btn" title="Add calculated field" onclick="toast('Add calculated field — coming soon')" style="width:34px;height:34px">${li('plus')}</button>
+          <button class="icon-btn" title="Refresh" onclick="renderDeviceProfileDetails()" style="width:34px;height:34px">${li('rotate-cw')}</button>
+          <button class="icon-btn" title="Search" onclick="toast('Search — coming soon')" style="width:34px;height:34px">${li('search')}</button>
         </div>
       </div>
-      <table class="tel-table" style="width:100%;border-collapse:collapse;margin-top:6px">
+      <table style="width:100%;border-collapse:collapse">
         <thead>
           <tr>
-            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Created time</th>
-            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Name</th>
-            <th style="text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Type</th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);width:48px"><input type="checkbox" style="accent-color:var(--primary);width:16px;height:16px;cursor:pointer;vertical-align:middle" /></th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Created time <span style="color:var(--text);margin-left:4px">↓</span></th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Name</th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Type</th>
           </tr>
         </thead>
         <tbody>
-          ${rows.map(r => `<tr><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px">${r.time}</td><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px">${_kvEscape(r.name)}</td><td style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-muted)">${_kvEscape(r.type)}</td></tr>`).join('')}
+          ${rows.length ? rows.map(r => `
+            <tr>
+              <td style="padding:14px 22px;border-bottom:1px solid var(--border);font-size:14px"><input type="checkbox" style="accent-color:var(--primary);width:16px;height:16px;cursor:pointer;vertical-align:middle" /></td>
+              <td style="padding:14px 22px;border-bottom:1px solid var(--border);font-size:14px">${r.time}</td>
+              <td style="padding:14px 22px;border-bottom:1px solid var(--border);font-size:14px">${_kvEscape(r.name)}</td>
+              <td style="padding:14px 22px;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-muted)">${_kvEscape(r.type)}</td>
+            </tr>
+          `).join('') : `
+            <tr><td colspan="4" style="padding:80px 22px;text-align:center;color:var(--text-muted);font-size:14px">No calculated fields found</td></tr>
+          `}
         </tbody>
       </table>
     </div>
