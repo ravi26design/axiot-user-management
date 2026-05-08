@@ -6666,39 +6666,63 @@ function renderCalcFieldBody() {
   const body = document.getElementById('calcFieldBody');
   if (!body) return;
   const d = state._calcFieldDraft;
-  const argsValid = d.args && d.args.length > 0;
+  const titleErr = !((d.title||'').trim());
+  const argsErr = !((d.args||[]).length);
+  const exprErr = !((d.expression||'').trim());
+  const keyErr  = !((d.outputKey||'').trim());
+  const argNames = (d.args || []).map(a => a.name).filter(Boolean);
+  const num = (n) => `<span style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;font-weight:600;flex-shrink:0">${n}</span>`;
+  const sectionHead = (n, title, sub) => `
+    <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px">
+      ${num(n)}
+      <div style="min-width:0">
+        <div style="font-size:15px;font-weight:600;color:var(--text);line-height:1.3">${title}</div>
+        <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px;line-height:1.5">${sub}</div>
+      </div>
+    </div>`;
+  const card = 'border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;background:var(--surface)';
+
   body.innerHTML = `
-    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;background:var(--surface)">
-      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:14px">General</div>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.55;margin-bottom:14px">
+      A calculated field derives a new value from other telemetry or attributes on every device using this profile. Fill in each step below — the form will let you save once everything is set.
+    </div>
+
+    <div style="${card}">
+      ${sectionHead(1, 'Basics', 'Give this field a name and choose how often it should run.')}
       <div style="display:flex;gap:10px;align-items:flex-start">
         <div class="field" style="flex:1;margin-bottom:0">
-          <input class="input" id="calcTitle" placeholder="Title *" value="${_kvEscape(d.title || '')}" oninput="state._calcFieldDraft.title=this.value;_calcValidate()" />
+          <label class="label">Title <span class="req">*</span></label>
+          <input class="input" id="calcTitle" placeholder="e.g. Temperature in &#176;C" value="${_kvEscape(d.title || '')}" oninput="state._calcFieldDraft.title=this.value;_calcValidate()" />
+          ${titleErr ? '<div class="hint" style="color:var(--danger);margin-top:6px">A short, descriptive name shown in the table.</div>' : '<div class="hint">Shown in the Calculated fields table and on dashboards.</div>'}
         </div>
-        <button type="button" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:500;border:1px solid var(--primary);border-radius:999px;background:#fff;color:var(--primary);cursor:pointer;white-space:nowrap" title="Set debug duration" onclick="toast('Debug — 15 minutes default')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>
-          15 min
-        </button>
+        <div class="field" style="margin-bottom:0">
+          <label class="label">Debug window</label>
+          <button type="button" style="display:inline-flex;align-items:center;gap:6px;padding:9px 14px;font-size:13px;font-weight:500;border:1px solid var(--primary);border-radius:999px;background:#fff;color:var(--primary);cursor:pointer;white-space:nowrap;height:38px" title="Capture debug logs for the next 15 minutes" onclick="toast('Debug window set to 15 minutes')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3 3 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/></svg>
+            15 min
+          </button>
+        </div>
       </div>
       <div class="field" style="margin-top:12px;margin-bottom:0">
         <label class="label">Type</label>
         <select class="select" onchange="state._calcFieldDraft.type=this.value">
-          ${['Simple','Aggregated'].map(v => `<option value="${v}" ${d.type===v?'selected':''}>${v}</option>`).join('')}
+          ${[
+            ['Simple', 'Simple — recomputes on every new sample'],
+            ['Aggregated', 'Aggregated — recomputes over a time window']
+          ].map(([v, lbl]) => `<option value="${v}" ${d.type===v?'selected':''}>${lbl}</option>`).join('')}
         </select>
       </div>
     </div>
 
-    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;background:var(--surface)">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-        <div style="font-size:16px;font-weight:600;color:var(--text)">Arguments <span style="color:var(--danger)">*</span></div>
-        <span title="Define the inputs your expression will reference. Each argument can be a current-entity attribute or telemetry value." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
-      </div>
+    <div style="${card}">
+      ${sectionHead(2, 'Inputs', 'Pick the device telemetry or attributes the formula will use. You can add as many as you need.')}
       ${(d.args || []).length ? `
         <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px">
           <table style="width:100%;border-collapse:collapse">
             <thead>
               <tr>
                 <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Name</th>
-                <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Argument type</th>
+                <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Source</th>
                 <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Key</th>
                 <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Default</th>
                 <th style="text-align:right;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border);width:84px">Actions</th>
@@ -6707,10 +6731,10 @@ function renderCalcFieldBody() {
             <tbody>
               ${d.args.map((a, i) => `
                 <tr>
-                  <td style="padding:12px 14px;font-size:13.5px;color:var(--text);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'};font-weight:500">${_kvEscape(a.name || '(unnamed)')}</td>
+                  <td style="padding:12px 14px;font-size:13.5px;color:var(--text);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'};font-weight:500;font-family:ui-monospace,Menlo,monospace"><span style="background:var(--primary-soft);color:var(--primary);padding:2px 8px;border-radius:5px">${_kvEscape(a.name || '(unnamed)')}</span></td>
                   <td style="padding:12px 14px;font-size:13px;color:var(--text-muted);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'}">${_kvEscape(a.argType || '—')}</td>
                   <td style="padding:12px 14px;font-size:13px;color:var(--text-muted);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'};font-family:ui-monospace,Menlo,monospace">${_kvEscape(a.tsKey || '—')}</td>
-                  <td style="padding:12px 14px;font-size:13px;color:var(--text-muted);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'}">${a.defaultValue ? _kvEscape(a.defaultValue) : '<span style="color:var(--text-subtle)">—</span>'}</td>
+                  <td style="padding:12px 14px;font-size:13px;color:var(--text-muted);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'}">${a.defaultValue ? _kvEscape(a.defaultValue) : '<span style=\"color:var(--text-subtle)\">—</span>'}</td>
                   <td style="padding:8px 12px;text-align:right;border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'}">
                     <button class="icon-btn" title="Edit" onclick="openCalcArgDialog(${i})" style="width:30px;height:30px">${li('pencil')}</button>
                     <button class="icon-btn" title="Remove" style="width:30px;height:30px;color:var(--danger)" onclick="removeCalcArg(${i})">${li('trash-2')}</button>
@@ -6721,56 +6745,74 @@ function renderCalcFieldBody() {
           </table>
         </div>
       ` : `
-        <div style="text-align:center;color:var(--danger);font-size:13px;padding:14px 0;border:1px dashed var(--border);border-radius:8px;margin-bottom:12px">At least one argument is required.</div>
+        <div style="text-align:center;padding:22px 14px;border:1px dashed var(--border-strong);border-radius:8px;margin-bottom:12px;background:var(--bg)">
+          <div style="font-size:13.5px;color:var(--text);font-weight:500;margin-bottom:4px">No inputs yet</div>
+          <div style="font-size:12.5px;color:var(--text-muted)">Add at least one input the formula can reference. For example: a telemetry key like <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-family:ui-monospace,Menlo,monospace">temperature</code>.</div>
+        </div>
       `}
-      <button class="btn btn-secondary btn-sm" onclick="openCalcArgDialog()">${li('plus')} Add argument</button>
+      <button class="btn btn-primary btn-sm" onclick="openCalcArgDialog()">${li('plus')} Add input</button>
     </div>
 
-    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;background:var(--surface)">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-        <div style="font-size:16px;font-weight:600;color:var(--text)">Expression <span style="color:var(--danger)">*</span></div>
-        <span title="JavaScript-style expression that references your arguments by name." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
-      </div>
+    <div style="${card}">
+      ${sectionHead(3, 'Formula', 'Write the expression that produces the new value. Reference inputs by their name.')}
+      ${argNames.length ? `
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--text-muted);align-self:center;margin-right:4px">Available:</span>
+          ${argNames.map(n => `<button type="button" style="font-size:12.5px;font-family:ui-monospace,Menlo,monospace;padding:3px 9px;border-radius:5px;background:var(--primary-soft);color:var(--primary);border:1px solid var(--primary)33;cursor:pointer" title="Insert &quot;${_kvEscape(n)}&quot;" onclick="(function(){var t=document.getElementById('calcExpr');t.focus();var s=t.selectionStart||t.value.length;t.value=t.value.slice(0,s)+'${_kvEscape(n)}'+t.value.slice(s);t.dispatchEvent(new Event('input'));})()">${_kvEscape(n)}</button>`).join('')}
+        </div>
+      ` : ''}
       <div class="field" style="margin-bottom:6px;position:relative">
-        <input class="input" style="font-family:ui-monospace,Menlo,monospace;padding-right:38px" placeholder="(temperature - 32) / 1.8" value="${_kvEscape(d.expression || '')}" oninput="state._calcFieldDraft.expression=this.value;_calcValidate()" />
-        <span title="Use argument names directly. Operators + - * / and parentheses are supported." style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--primary);display:inline-flex">${li('circle-help')}</span>
+        <input class="input" id="calcExpr" style="font-family:ui-monospace,Menlo,monospace;padding-right:38px" placeholder="(temperature - 32) / 1.8" value="${_kvEscape(d.expression || '')}" oninput="state._calcFieldDraft.expression=this.value;_calcValidate()" />
+        <span title="Use input names as variables. Operators + - * / and parentheses are supported." style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--primary);display:inline-flex;cursor:help">${li('circle-help')}</span>
       </div>
-      <div class="hint">Default expression demonstrates how to transform a temperature from Fahrenheit to Celsius.</div>
+      <div class="hint">Default expression converts Fahrenheit to Celsius. Tap a chip above to insert that input name into the formula.</div>
     </div>
 
-    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;background:var(--surface)">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-        <div style="font-size:16px;font-weight:600;color:var(--text)">Output</div>
-        <span title="Where the calculated value will be written on each device." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
-      </div>
-      <div class="field">
-        <label class="label">Output type</label>
-        <select class="select" onchange="state._calcFieldDraft.outputType=this.value">
-          ${['Time series','Attribute'].map(v => `<option value="${v}" ${d.outputType===v?'selected':''}>${v}</option>`).join('')}
-        </select>
-      </div>
+    <div style="${card}">
+      ${sectionHead(4, 'Save output as', 'Choose where the calculated value will live on each device.')}
       <div class="field-row" style="grid-template-columns:1fr 1fr">
-        <div class="field"><input class="input" placeholder="Time series key *" value="${_kvEscape(d.outputKey || '')}" oninput="state._calcFieldDraft.outputKey=this.value;_calcValidate()" /></div>
-        <div class="field"><input class="input" placeholder="Decimals by default" value="${_kvEscape(d.decimals || '')}" oninput="state._calcFieldDraft.decimals=this.value" /></div>
+        <div class="field" style="margin-bottom:0">
+          <label class="label">Output type</label>
+          <select class="select" onchange="state._calcFieldDraft.outputType=this.value;renderCalcFieldBody()">
+            ${[
+              ['Time series','Time series — keeps history'],
+              ['Attribute','Attribute — last value only']
+            ].map(([v,lbl]) => `<option value="${v}" ${d.outputType===v?'selected':''}>${lbl}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label class="label">${d.outputType === 'Attribute' ? 'Attribute key' : 'Time series key'} <span class="req">*</span></label>
+          <input class="input" placeholder="e.g. temperature_c" value="${_kvEscape(d.outputKey || '')}" oninput="state._calcFieldDraft.outputKey=this.value;_calcValidate()" />
+        </div>
       </div>
-      <div class="field" style="margin-bottom:0">
-        <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px">
-          <span class="switch ${d.useLatestTimestamp ? 'on' : ''}" onclick="event.preventDefault();state._calcFieldDraft.useLatestTimestamp=!state._calcFieldDraft.useLatestTimestamp;renderCalcFieldBody()" style="flex-shrink:0"></span>
-          <span>Use latest timestamp</span>
-          <span title="When enabled, the output value carries the timestamp of the most recent argument value rather than the evaluation time." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
-        </label>
+      <div class="field-row" style="grid-template-columns:1fr 1fr;margin-top:12px">
+        <div class="field" style="margin-bottom:0">
+          <label class="label">Decimal places</label>
+          <input class="input" placeholder="Auto" value="${_kvEscape(d.decimals || '')}" oninput="state._calcFieldDraft.decimals=this.value" />
+          <div class="hint">Leave empty to keep the full precision.</div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label class="label">Timestamp</label>
+          <label style="display:flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid var(--border-strong);border-radius:5px;cursor:pointer;font-size:14px;background:var(--surface);height:38px;box-sizing:border-box">
+            <span class="switch ${d.useLatestTimestamp ? 'on' : ''}" onclick="event.preventDefault();state._calcFieldDraft.useLatestTimestamp=!state._calcFieldDraft.useLatestTimestamp;renderCalcFieldBody()" style="flex-shrink:0"></span>
+            <span style="flex:1">Use latest input timestamp</span>
+          </label>
+        </div>
       </div>
     </div>
 
-    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;background:var(--surface)">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px">
-        <div style="display:flex;align-items:center;gap:6px">
-          <div style="font-size:16px;font-weight:600;color:var(--text)">Strategy</div>
-          <span title="Choose whether the platform writes the calculated value directly or routes it through rule chains." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
-        </div>
-        <div style="display:inline-flex;padding:4px;background:var(--bg);border:1px solid var(--border);border-radius:999px">
-          ${['Process right away','Process via Rule Chains'].map(v => `<button type="button" style="padding:6px 14px;border-radius:999px;border:none;background:${d.strategy===v?'var(--primary)':'transparent'};color:${d.strategy===v?'#fff':'var(--text-muted)'};font-size:13px;font-weight:500;cursor:pointer" onclick="state._calcFieldDraft.strategy='${v}';renderCalcFieldBody()">${v}</button>`).join('')}
-        </div>
+    <div style="${card}">
+      ${sectionHead(5, 'When to compute', 'Decide whether the platform writes the value directly or sends it through rule chains first.')}
+      <div style="display:inline-flex;padding:4px;background:var(--bg);border:1px solid var(--border);border-radius:999px">
+        ${['Process right away','Process via Rule Chains'].map(v => `<button type="button" style="padding:6px 14px;border-radius:999px;border:none;background:${d.strategy===v?'var(--primary)':'transparent'};color:${d.strategy===v?'#fff':'var(--text-muted)'};font-size:13px;font-weight:500;cursor:pointer" onclick="state._calcFieldDraft.strategy='${v}';renderCalcFieldBody()">${v}</button>`).join('')}
+      </div>
+      <div class="hint" style="margin-top:8px">${d.strategy === 'Process via Rule Chains' ? 'The output will be published as telemetry/attribute updates and processed through the device profile rule chains.' : 'The output is written directly to storage without going through rule chains. Faster, but rule-chain triggers won&apos;t fire.'}</div>
+    </div>
+
+    <div style="padding:14px;border-radius:10px;background:var(--primary-soft);border:1px solid var(--primary)33;display:flex;gap:10px;align-items:flex-start">
+      <div style="color:var(--primary);flex-shrink:0;margin-top:1px">${li('info')}</div>
+      <div style="font-size:12.5px;color:var(--text);line-height:1.6">
+        <strong>${(d.title || 'This field').trim() || 'This field'}</strong> will compute <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-family:ui-monospace,Menlo,monospace">${_kvEscape((d.expression||'…').trim())}</code> using ${(d.args||[]).length || 0} input${(d.args||[]).length === 1 ? '' : 's'} and save the result as ${d.outputType === 'Attribute' ? 'an attribute' : 'a time series'} <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-family:ui-monospace,Menlo,monospace">${_kvEscape((d.outputKey||'…').trim())}</code> on every device using this profile.
       </div>
     </div>
   `;
