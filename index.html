@@ -6622,6 +6622,24 @@ function _renderProfileAlarmsTab(p) {
 function _renderProfileProvisionTab(p) {
   const strat = p.provisionStrategy || 'Disabled';
   const enabled = strat !== 'Disabled';
+  const isKeyStrat = strat === 'Allow to create new devices' || strat === 'Check for pre-provisioned devices';
+  const isX509 = strat === 'X.509 Certificates Chain';
+  let extra = '';
+  if (isKeyStrat) {
+    extra = `
+      <div class="info-row-cell"><div class="info-row-label">Provision device key</div><div class="info-row-value mono">${_kvEscape(p.provisionDeviceKey || '—')}</div></div>
+      <div class="info-row-cell"><div class="info-row-label">Provision device secret</div><div class="info-row-value mono">${_kvEscape(p.provisionDeviceSecret || '—')}</div></div>`;
+  } else if (isX509) {
+    const cert = p.provisionX509Cert || '';
+    const lines = cert.split('\n');
+    const preview = cert ? lines.slice(0, 4).join('\n') + (lines.length > 4 ? '\n…' : '') : '';
+    extra = `
+      <div class="info-row-cell"><div class="info-row-label">CN regex variable</div><div class="info-row-value mono">${_kvEscape(p.provisionX509CnRegex || '(.*)')}</div></div>
+      <div class="info-row-cell" style="grid-column:1 / -1">
+        <div class="info-row-label">Certificate (PEM)</div>
+        <div class="info-row-value">${cert ? `<pre style="margin:0;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-family:ui-monospace,Menlo,monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;max-height:160px;overflow:auto">${_kvEscape(preview)}</pre>` : '<span style="color:var(--text-muted)">— Not provided —</span>'}</div>
+      </div>`;
+  }
   return `
     <div class="info-section">
       <div class="info-section-head">
@@ -6634,8 +6652,7 @@ function _renderProfileProvisionTab(p) {
       <div class="info-rows">
         <div class="info-row-cell"><div class="info-row-label">Strategy</div><div class="info-row-value">${_kvEscape(strat)}</div></div>
         <div class="info-row-cell"><div class="info-row-label">State</div><div class="info-row-value">${enabled ? '<span class="chip chip-active"><span class="dot"></span>Active</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Inactive</span>'}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Provision device key</div><div class="info-row-value ${enabled ? 'mono' : 'muted'}">${enabled ? 'PRV-' + (p.id || '').toUpperCase() + '-KEY' : '—'}</div></div>
-        <div class="info-row-cell"><div class="info-row-label">Provision device secret</div><div class="info-row-value ${enabled ? 'mono' : 'muted'}">${enabled ? '••••••••••••' : '—'}</div></div>
+        ${extra}
       </div>
     </div>
   `;
@@ -6754,7 +6771,8 @@ const TRANSPORT_TYPES     = [
 const PROVISION_STRATEGIES = [
   { value: 'Disabled',                 desc: 'Provisioning is disabled for devices of this profile' },
   { value: 'Allow to create new devices', desc: 'New devices will be created on first message with provision key/secret' },
-  { value: 'Check for pre-provisioned devices', desc: 'Only existing devices with matching provision key/secret are accepted' }
+  { value: 'Check for pre-provisioned devices', desc: 'Only existing devices with matching provision key/secret are accepted' },
+  { value: 'X.509 Certificates Chain', desc: 'X.509 certificates strategy is used to provision devices by client certificates in two-way TLS communication.' }
 ];
 
 const PROTO_DEFAULTS = {
@@ -6784,6 +6802,13 @@ function _renderProtoSchemas(d) {
   `;
 }
 
+function _genProvToken() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let s = '';
+  for (let i = 0; i < 20; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
+
 function addDeviceProfile(existing) {
   closeDeviceProfileDrawer();
   const editing = !!existing;
@@ -6797,6 +6822,10 @@ function addDeviceProfile(existing) {
     description:       existing && existing.description       || '',
     transportType:     existing && existing.transportType     || 'Default',
     provisionStrategy: existing && existing.provisionStrategy || 'Disabled',
+    provisionDeviceKey:    (existing && existing.provisionDeviceKey)    || _genProvToken(),
+    provisionDeviceSecret: (existing && existing.provisionDeviceSecret) || _genProvToken(),
+    provisionX509Cert:     (existing && existing.provisionX509Cert)     || '',
+    provisionX509CnRegex:  (existing && existing.provisionX509CnRegex)  || '(.*)',
     mqttSparkplugEoN:  existing && existing.mqttSparkplugEoN  || false,
     mqttTelemetryTopic:(existing && existing.mqttTelemetryTopic) || 'v1/devices/me/telemetry',
     mqttAttrsPubTopic: (existing && existing.mqttAttrsPubTopic)  || 'v1/devices/me/attributes',
@@ -7142,30 +7171,46 @@ function renderDeviceProfileStep() {
       </div>
     `;
   } else if (step === 3) {
+    const ps = d.provisionStrategy;
+    const keySecretBlock = `
+      <div class="field">
+        <label class="label">Provision device key</label>
+        <input class="input" value="${_kvEscape(d.provisionDeviceKey || '')}" oninput="state._dpDraft.provisionDeviceKey=this.value" />
+      </div>
+      <div class="field">
+        <label class="label">Provision device secret</label>
+        <input class="input" value="${_kvEscape(d.provisionDeviceSecret || '')}" oninput="state._dpDraft.provisionDeviceSecret=this.value" />
+      </div>`;
     body.innerHTML = `
       <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
         <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('shield-check')}</span>Device provisioning</div>
         <div class="field">
           <label class="label">Provision strategy</label>
           <select class="select" onchange="state._dpDraft.provisionStrategy=this.value;renderDeviceProfileStep()">
-            ${PROVISION_STRATEGIES.map(s => `<option value="${s.value}" ${d.provisionStrategy===s.value?'selected':''}>${s.value}</option>`).join('')}
+            ${PROVISION_STRATEGIES.map(s => `<option value="${s.value}" ${ps===s.value?'selected':''}>${s.value}</option>`).join('')}
           </select>
-          <div class="hint">${(PROVISION_STRATEGIES.find(s => s.value === d.provisionStrategy) || PROVISION_STRATEGIES[0]).desc}</div>
+          <div class="hint">${(PROVISION_STRATEGIES.find(s => s.value === ps) || PROVISION_STRATEGIES[0]).desc}</div>
         </div>
-        ${d.provisionStrategy !== 'Disabled' ? `
-          <div class="field">
-            <label class="label">Provision device key</label>
-            <input class="input" placeholder="Auto-generated on save" readonly />
+        ${ps === 'Allow to create new devices' || ps === 'Check for pre-provisioned devices' ? keySecretBlock : ''}
+        ${ps === 'X.509 Certificates Chain' ? `
+          <div style="margin-top:8px;padding:14px;border-radius:6px;background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--text-muted);line-height:1.55">
+            If selected new devices will be created and client certificate will be used as device credentials.
+          </div>
+          <div class="field" style="margin-top:14px">
+            <label class="label">Certificate in PEM format <span class="req">*</span></label>
+            <textarea class="textarea" rows="6" style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px" placeholder="-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----" oninput="state._dpDraft.provisionX509Cert=this.value">${_kvEscape(d.provisionX509Cert || '')}</textarea>
           </div>
           <div class="field">
-            <label class="label">Provision device secret</label>
-            <input class="input" placeholder="Auto-generated on save" readonly />
+            <label class="label">CN Regular Expression variable</label>
+            <input class="input" value="${_kvEscape(d.provisionX509CnRegex || '(.*)')}" oninput="state._dpDraft.provisionX509CnRegex=this.value" />
+            <div class="hint">Required to fetch device name from device's X509 certificate's common name.</div>
           </div>
-        ` : `
+        ` : ''}
+        ${ps === 'Disabled' ? `
           <div style="margin-top:8px;padding:14px;border-radius:6px;background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--text-muted);line-height:1.55">
             Provisioning is currently <strong>disabled</strong>. Devices for this profile must be created manually before they can connect.
           </div>
-        `}
+        ` : ''}
       </div>
     `;
   }
@@ -7229,6 +7274,10 @@ function submitDeviceProfile() {
       image: d.image,
       transportType: d.transportType,
       provisionStrategy: d.provisionStrategy,
+      provisionDeviceKey: d.provisionDeviceKey,
+      provisionDeviceSecret: d.provisionDeviceSecret,
+      provisionX509Cert: d.provisionX509Cert,
+      provisionX509CnRegex: d.provisionX509CnRegex,
       mqttSparkplugEoN: d.mqttSparkplugEoN,
       mqttTelemetryTopic: d.mqttTelemetryTopic,
       mqttAttrsPubTopic: d.mqttAttrsPubTopic,
@@ -7277,6 +7326,10 @@ function submitDeviceProfile() {
       queue: d.queue || '',
       edgeRuleChain: d.edgeRuleChain || '',
       provisionStrategy: d.provisionStrategy || 'Disabled',
+      provisionDeviceKey: d.provisionDeviceKey || '',
+      provisionDeviceSecret: d.provisionDeviceSecret || '',
+      provisionX509Cert: d.provisionX509Cert || '',
+      provisionX509CnRegex: d.provisionX509CnRegex || '(.*)',
       mqttSparkplugEoN: !!d.mqttSparkplugEoN,
       mqttTelemetryTopic: d.mqttTelemetryTopic || 'v1/devices/me/telemetry',
       mqttAttrsPubTopic: d.mqttAttrsPubTopic || 'v1/devices/me/attributes',
