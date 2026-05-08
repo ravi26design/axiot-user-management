@@ -6693,22 +6693,35 @@ function renderCalcFieldBody() {
         <span title="Define the inputs your expression will reference. Each argument can be a current-entity attribute or telemetry value." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
       </div>
       ${(d.args || []).length ? `
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
-          ${d.args.map((a, i) => `
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
-              <div style="min-width:0;flex:1">
-                <div style="font-size:14px;font-weight:500;color:var(--text)">${_kvEscape(a.name || '(unnamed)')}</div>
-                <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">${_kvEscape(a.argType || '')} &middot; ${_kvEscape(a.tsKey || '—')}${a.defaultValue ? ' · default: ' + _kvEscape(a.defaultValue) : ''}</div>
-              </div>
-              <div style="display:flex;gap:2px">
-                <button class="icon-btn" title="Edit" onclick="openCalcArgDialog(${i})">${li('pencil')}</button>
-                <button class="icon-btn" title="Remove" style="color:var(--danger)" onclick="removeCalcArg(${i})">${li('trash-2')}</button>
-              </div>
-            </div>
-          `).join('')}
+        <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr>
+                <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Name</th>
+                <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Argument type</th>
+                <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Key</th>
+                <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Default</th>
+                <th style="text-align:right;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border);width:84px">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${d.args.map((a, i) => `
+                <tr>
+                  <td style="padding:12px 14px;font-size:13.5px;color:var(--text);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'};font-weight:500">${_kvEscape(a.name || '(unnamed)')}</td>
+                  <td style="padding:12px 14px;font-size:13px;color:var(--text-muted);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'}">${_kvEscape(a.argType || '—')}</td>
+                  <td style="padding:12px 14px;font-size:13px;color:var(--text-muted);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'};font-family:ui-monospace,Menlo,monospace">${_kvEscape(a.tsKey || '—')}</td>
+                  <td style="padding:12px 14px;font-size:13px;color:var(--text-muted);border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'}">${a.defaultValue ? _kvEscape(a.defaultValue) : '<span style="color:var(--text-subtle)">—</span>'}</td>
+                  <td style="padding:8px 12px;text-align:right;border-bottom:${i < d.args.length - 1 ? '1px solid var(--border)' : 'none'}">
+                    <button class="icon-btn" title="Edit" onclick="openCalcArgDialog(${i})" style="width:30px;height:30px">${li('pencil')}</button>
+                    <button class="icon-btn" title="Remove" style="width:30px;height:30px;color:var(--danger)" onclick="removeCalcArg(${i})">${li('trash-2')}</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
         </div>
       ` : `
-        <div style="text-align:center;color:var(--danger);font-size:13px;padding:14px 0">At least one argument is required.</div>
+        <div style="text-align:center;color:var(--danger);font-size:13px;padding:14px 0;border:1px dashed var(--border);border-radius:8px;margin-bottom:12px">At least one argument is required.</div>
       `}
       <button class="btn btn-secondary btn-sm" onclick="openCalcArgDialog()">${li('plus')} Add argument</button>
     </div>
