@@ -6504,6 +6504,11 @@ function _renderProfileTransportTab(p) {
           <div class="info-row-cell"><div class="info-row-label">CoAP device type</div><div class="info-row-value">${_kvEscape(p.coapDeviceType || 'Default')}</div></div>
           ${p.coapDeviceType !== 'Efento NB-IoT' ? `<div class="info-row-cell"><div class="info-row-label">Payload format</div><div class="info-row-value">${_kvEscape(p.coapPayload || 'JSON')}</div></div>` : ''}
           <div class="info-row-cell"><div class="info-row-label">Power saving mode</div><div class="info-row-value">${_kvEscape(p.coapPsm || 'Power Saving Mode (PSM)')}</div></div>
+          ${p.coapPsm === 'Power Saving Mode (PSM)' ? `<div class="info-row-cell"><div class="info-row-label">PSM activity timer</div><div class="info-row-value">${p.coapPsmActivity || 10} ${_kvEscape(p.coapPsmActivityUnit || 'Seconds')}</div></div>` : ''}
+          ${p.coapPsm === 'Extended Discontinuous Reception (eDRX)' ? `
+            <div class="info-row-cell"><div class="info-row-label">eDRX cycle</div><div class="info-row-value">${p.coapEdrxCycle || 81} ${_kvEscape(p.coapEdrxCycleUnit || 'Seconds')}</div></div>
+            <div class="info-row-cell"><div class="info-row-label">Paging transmission window</div><div class="info-row-value">${p.coapPagingWindow || 10} ${_kvEscape(p.coapPagingWindowUnit || 'Seconds')}</div></div>
+          ` : ''}
         </div>
       </div>`;
   } else if (t === 'LWM2M') {
@@ -6801,6 +6806,12 @@ function addDeviceProfile(existing) {
     coapDeviceType:    (existing && existing.coapDeviceType)    || 'Default',
     coapPayload:       (existing && existing.coapPayload)       || 'JSON',
     coapPsm:           (existing && existing.coapPsm)           || 'Power Saving Mode (PSM)',
+    coapPsmActivity:   (existing && existing.coapPsmActivity)   || 10,
+    coapPsmActivityUnit:(existing && existing.coapPsmActivityUnit) || 'Seconds',
+    coapEdrxCycle:     (existing && existing.coapEdrxCycle)     || 81,
+    coapEdrxCycleUnit: (existing && existing.coapEdrxCycleUnit) || 'Seconds',
+    coapPagingWindow:  (existing && existing.coapPagingWindow)  || 10,
+    coapPagingWindowUnit: (existing && existing.coapPagingWindowUnit) || 'Seconds',
     telemetryProtoSchema:   (existing && existing.telemetryProtoSchema)   || PROTO_DEFAULTS.telemetry,
     attributesProtoSchema:  (existing && existing.attributesProtoSchema)  || PROTO_DEFAULTS.attributes,
     rpcRequestProtoSchema:  (existing && existing.rpcRequestProtoSchema)  || PROTO_DEFAULTS.rpcRequest,
@@ -7021,11 +7032,27 @@ function renderDeviceProfileStep() {
           <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
             <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Power saving mode</div>
             <div class="field">
-              <select class="select" onchange="state._dpDraft.coapPsm=this.value">
+              <select class="select" onchange="state._dpDraft.coapPsm=this.value;renderDeviceProfileStep()">
                 ${['Power Saving Mode (PSM)','Discontinuous Reception (DRX)','Extended Discontinuous Reception (eDRX)'].map(v => `<option value="${v}" ${d.coapPsm===v?'selected':''}>${v}</option>`).join('')}
               </select>
               <div class="hint">Network-side power saving strategy advertised to the device. Choose the mode supported by your NB-IoT or LTE-M operator.</div>
             </div>
+            ${d.coapPsm === 'Power Saving Mode (PSM)' ? `
+              <div class="field-row" style="grid-template-columns:1fr 1fr">
+                <div class="field"><label class="label">PSM Activity Timer <span class="req">*</span></label><input class="input" type="number" value="${d.coapPsmActivity}" oninput="state._dpDraft.coapPsmActivity=parseInt(this.value)||0" /></div>
+                <div class="field"><label class="label">Time unit</label><select class="select" onchange="state._dpDraft.coapPsmActivityUnit=this.value">${['Seconds','Minutes','Hours'].map(u => `<option value="${u}" ${d.coapPsmActivityUnit===u?'selected':''}>${u}</option>`).join('')}</select></div>
+              </div>
+            ` : ''}
+            ${d.coapPsm === 'Extended Discontinuous Reception (eDRX)' ? `
+              <div class="field-row" style="grid-template-columns:1fr 1fr">
+                <div class="field"><label class="label">eDRX cycle <span class="req">*</span></label><input class="input" type="number" value="${d.coapEdrxCycle}" oninput="state._dpDraft.coapEdrxCycle=parseInt(this.value)||0" /></div>
+                <div class="field"><label class="label">Time unit</label><select class="select" onchange="state._dpDraft.coapEdrxCycleUnit=this.value">${['Seconds','Minutes','Hours'].map(u => `<option value="${u}" ${d.coapEdrxCycleUnit===u?'selected':''}>${u}</option>`).join('')}</select></div>
+              </div>
+              <div class="field-row" style="grid-template-columns:1fr 1fr">
+                <div class="field"><label class="label">Paging Transmission Window <span class="req">*</span></label><input class="input" type="number" value="${d.coapPagingWindow}" oninput="state._dpDraft.coapPagingWindow=parseInt(this.value)||0" /></div>
+                <div class="field"><label class="label">Time unit</label><select class="select" onchange="state._dpDraft.coapPagingWindowUnit=this.value">${['Seconds','Minutes','Hours'].map(u => `<option value="${u}" ${d.coapPagingWindowUnit===u?'selected':''}>${u}</option>`).join('')}</select></div>
+              </div>
+            ` : ''}
           </div>
         ` : tt === 'LWM2M' ? (() => {
           const subtab = d.lwm2mTab || 'model';
@@ -7211,6 +7238,12 @@ function submitDeviceProfile() {
       coapDeviceType: d.coapDeviceType,
       coapPayload: d.coapPayload,
       coapPsm: d.coapPsm,
+      coapPsmActivity: d.coapPsmActivity,
+      coapPsmActivityUnit: d.coapPsmActivityUnit,
+      coapEdrxCycle: d.coapEdrxCycle,
+      coapEdrxCycleUnit: d.coapEdrxCycleUnit,
+      coapPagingWindow: d.coapPagingWindow,
+      coapPagingWindowUnit: d.coapPagingWindowUnit,
       telemetryProtoSchema: d.telemetryProtoSchema,
       attributesProtoSchema: d.attributesProtoSchema,
       rpcRequestProtoSchema: d.rpcRequestProtoSchema,
@@ -7253,6 +7286,12 @@ function submitDeviceProfile() {
       coapDeviceType: d.coapDeviceType || 'Default',
       coapPayload: d.coapPayload || 'JSON',
       coapPsm: d.coapPsm || 'Power Saving Mode (PSM)',
+      coapPsmActivity: d.coapPsmActivity || 10,
+      coapPsmActivityUnit: d.coapPsmActivityUnit || 'Seconds',
+      coapEdrxCycle: d.coapEdrxCycle || 81,
+      coapEdrxCycleUnit: d.coapEdrxCycleUnit || 'Seconds',
+      coapPagingWindow: d.coapPagingWindow || 10,
+      coapPagingWindowUnit: d.coapPagingWindowUnit || 'Seconds',
       telemetryProtoSchema: d.telemetryProtoSchema || PROTO_DEFAULTS.telemetry,
       attributesProtoSchema: d.attributesProtoSchema || PROTO_DEFAULTS.attributes,
       rpcRequestProtoSchema: d.rpcRequestProtoSchema || PROTO_DEFAULTS.rpcRequest,
