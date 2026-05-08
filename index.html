@@ -7206,7 +7206,6 @@ function renderDeviceProfileStep() {
         ${ps === 'Disabled' ? banner('<strong>Provisioning is disabled.</strong> Devices for this profile must be added manually from the Devices screen before they can connect to the platform.', 'warn') : ''}
         ${ps === 'Allow to create new devices' ? banner('Any device that presents the matching key and secret will be created automatically on its first message.', 'info') : ''}
         ${ps === 'Check for pre-provisioned devices' ? banner('Only devices already present on the platform will be accepted, and only when the request matches the key and secret below.', 'info') : ''}
-        ${ps === 'X.509 Certificates Chain' ? banner('Devices authenticate using a client certificate in two-way TLS. The certificate becomes the device credential.', 'info') : ''}
         ${ps === 'Allow to create new devices' || ps === 'Check for pre-provisioned devices' ? keySecretBlock : ''}
         ${ps === 'X.509 Certificates Chain' ? `
           <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
