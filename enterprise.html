@@ -6483,7 +6483,53 @@ function _renderProfileDetailsTab(p) {
 
 function _renderProfileTransportTab(p) {
   const t = p.transportType || 'Default';
-  const isMqtt = t === 'MQTT';
+  let advanced = '';
+  if (t === 'MQTT') {
+    advanced = `
+      <div class="info-section">
+        <div class="info-section-head"><div class="ico-box">${li('radio')}</div><div><div class="info-section-title">Advanced MQTT settings</div><div class="info-section-sub">Topic filters, payload format, validation behaviour</div></div></div>
+        <div class="info-rows">
+          <div class="info-row-cell"><div class="info-row-label">Sparkplug B (EoN node)</div><div class="info-row-value">${p.mqttSparkplugEoN ? '<span class="chip chip-active"><span class="dot"></span>Enabled</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Disabled</span>'}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Payload format</div><div class="info-row-value">${_kvEscape(p.mqttPayload || 'JSON')}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">PUBACK on validation failure</div><div class="info-row-value">${p.mqttPubackOnFailure ? '<span class="chip chip-active"><span class="dot"></span>Send PUBACK</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Close session</span>'}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Telemetry topic filter</div><div class="info-row-value mono">${_kvEscape(p.mqttTelemetryTopic || 'v1/devices/me/telemetry')}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Attributes publish topic filter</div><div class="info-row-value mono">${_kvEscape(p.mqttAttrsPubTopic || 'v1/devices/me/attributes')}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Attributes subscribe topic filter</div><div class="info-row-value mono">${_kvEscape(p.mqttAttrsSubTopic || 'v1/devices/me/attributes')}</div></div>
+        </div>
+      </div>`;
+  } else if (t === 'CoAP') {
+    advanced = `
+      <div class="info-section">
+        <div class="info-section-head"><div class="ico-box">${li('radio')}</div><div><div class="info-section-title">Advanced CoAP settings</div><div class="info-section-sub">Device type and payload format</div></div></div>
+        <div class="info-rows">
+          <div class="info-row-cell"><div class="info-row-label">CoAP device type</div><div class="info-row-value">${_kvEscape(p.coapDeviceType || 'Default')}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Payload format</div><div class="info-row-value">${_kvEscape(p.coapPayload || 'JSON')}</div></div>
+        </div>
+      </div>`;
+  } else if (t === 'LWM2M') {
+    advanced = `
+      <div class="info-section">
+        <div class="info-section-head"><div class="ico-box">${li('radio')}</div><div><div class="info-section-title">LWM2M settings</div><div class="info-section-sub">Object model, observe strategy, bootstrap</div></div></div>
+        <div class="info-rows">
+          <div class="info-row-cell"><div class="info-row-label">Object list</div><div class="info-row-value ${p.lwm2mObjectList ? 'mono' : 'muted'}">${p.lwm2mObjectList ? _kvEscape(p.lwm2mObjectList) : '—'}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Initialize via Observe</div><div class="info-row-value">${p.lwm2mObserveInit ? '<span class="chip chip-active"><span class="dot"></span>Enabled</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Disabled</span>'}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Observe strategy</div><div class="info-row-value">${_kvEscape(p.lwm2mObserveStrategy || 'Single')}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Bootstrap server</div><div class="info-row-value ${p.lwm2mBootstrapServer ? 'mono' : 'muted'}">${p.lwm2mBootstrapServer ? _kvEscape(p.lwm2mBootstrapServer) : '—'}</div></div>
+        </div>
+      </div>`;
+  } else if (t === 'SNMP') {
+    const comms = p.snmpComms || [];
+    advanced = `
+      <div class="info-section">
+        <div class="info-section-head"><div class="ico-box">${li('radio')}</div><div><div class="info-section-title">SNMP settings</div><div class="info-section-sub">Timing and communication configs</div></div></div>
+        <div class="info-rows">
+          <div class="info-row-cell"><div class="info-row-label">Timeout (ms)</div><div class="info-row-value mono">${p.snmpTimeout || 500}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Retries</div><div class="info-row-value mono">${typeof p.snmpRetries === 'number' ? p.snmpRetries : 0}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Communication configs</div><div class="info-row-value">${comms.length} ${comms.length === 1 ? 'config' : 'configs'}</div></div>
+          <div class="info-row-cell"><div class="info-row-label">Total mappings</div><div class="info-row-value">${comms.reduce((n, c) => n + (c.mappings || []).length, 0)}</div></div>
+        </div>
+      </div>`;
+  }
   return `
     <div class="info-section">
       <div class="info-section-head">
@@ -6496,33 +6542,12 @@ function _renderProfileTransportTab(p) {
       <div class="info-rows">
         <div class="info-row-cell"><div class="info-row-label">Transport type</div><div class="info-row-value">${_kvEscape(t)}</div></div>
         <div class="info-row-cell"><div class="info-row-label">Protocol</div><div class="info-row-value">${_kvEscape(_transportDesc(t) || '—')}</div></div>
-        ${!isMqtt ? `
-          <div class="info-row-cell"><div class="info-row-label">QoS / retries</div><div class="info-row-value muted">Default</div></div>
-          <div class="info-row-cell"><div class="info-row-label">Max payload size</div><div class="info-row-value muted">256 KB</div></div>
-        ` : ''}
       </div>
     </div>
-    ${isMqtt ? `
-      <div class="info-section">
-        <div class="info-section-head">
-          <div class="ico-box">${li('radio')}</div>
-          <div>
-            <div class="info-section-title">Advanced MQTT settings</div>
-            <div class="info-section-sub">Topic filters, payload format, validation behaviour</div>
-          </div>
-        </div>
-        <div class="info-rows">
-          <div class="info-row-cell"><div class="info-row-label">Sparkplug B (EoN node)</div><div class="info-row-value">${p.mqttSparkplugEoN ? '<span class="chip chip-active"><span class="dot"></span>Enabled</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Disabled</span>'}</div></div>
-          <div class="info-row-cell"><div class="info-row-label">Payload format</div><div class="info-row-value">${_kvEscape(p.mqttPayload || 'JSON')}</div></div>
-          <div class="info-row-cell"><div class="info-row-label">PUBACK on validation failure</div><div class="info-row-value">${p.mqttPubackOnFailure ? '<span class="chip chip-active"><span class="dot"></span>Send PUBACK</span>' : '<span class="chip chip-inactive"><span class="dot"></span>Close session</span>'}</div></div>
-          <div class="info-row-cell"><div class="info-row-label">Telemetry topic filter</div><div class="info-row-value mono">${_kvEscape(p.mqttTelemetryTopic || 'v1/devices/me/telemetry')}</div></div>
-          <div class="info-row-cell"><div class="info-row-label">Attributes publish topic filter</div><div class="info-row-value mono">${_kvEscape(p.mqttAttrsPubTopic || 'v1/devices/me/attributes')}</div></div>
-          <div class="info-row-cell"><div class="info-row-label">Attributes subscribe topic filter</div><div class="info-row-value mono">${_kvEscape(p.mqttAttrsSubTopic || 'v1/devices/me/attributes')}</div></div>
-        </div>
-      </div>
-    ` : ''}
+    ${advanced}
   `;
 }
+
 
 function _renderProfileCalculatedTab(p) {
   const rows = [
@@ -6716,10 +6741,10 @@ const QUEUES              = ['Main', 'HighPriority', 'SequentialByOriginator'];
 const EDGE_RULE_CHAINS    = ['Edge Root Rule Chain', 'Thermostat Edge Rule Chain'];
 const TRANSPORT_TYPES     = [
   { value: 'Default',     desc: 'Supports basic MQTT, HTTP and CoAP transport' },
-  { value: 'MQTT',        desc: 'Supports MQTT-based device communication' },
-  { value: 'CoAP',        desc: 'Supports CoAP-based device communication' },
-  { value: 'LWM2M',       desc: 'Supports LwM2M devices' },
-  { value: 'SNMP',        desc: 'Supports SNMP-based device communication' }
+  { value: 'MQTT',        desc: 'Enables advanced MQTT transport settings' },
+  { value: 'CoAP',        desc: 'Enables advanced CoAP transport settings' },
+  { value: 'LWM2M',       desc: 'LWM2M transport type' },
+  { value: 'SNMP',        desc: 'Specify SNMP transport configuration' }
 ];
 const PROVISION_STRATEGIES = [
   { value: 'Disabled',                 desc: 'Provisioning is disabled for devices of this profile' },
@@ -6745,7 +6770,21 @@ function addDeviceProfile(existing) {
     mqttAttrsPubTopic: (existing && existing.mqttAttrsPubTopic)  || 'v1/devices/me/attributes',
     mqttAttrsSubTopic: (existing && existing.mqttAttrsSubTopic)  || 'v1/devices/me/attributes',
     mqttPayload:       (existing && existing.mqttPayload)        || 'JSON',
-    mqttPubackOnFailure: existing && existing.mqttPubackOnFailure || false
+    mqttPubackOnFailure: existing && existing.mqttPubackOnFailure || false,
+    coapDeviceType:    (existing && existing.coapDeviceType)    || 'Default',
+    coapPayload:       (existing && existing.coapPayload)       || 'JSON',
+    lwm2mTab:          (existing && existing.lwm2mTab)          || 'model',
+    lwm2mObjectList:   (existing && existing.lwm2mObjectList)   || '',
+    lwm2mObserveInit:  (existing && existing.lwm2mObserveInit)  || false,
+    lwm2mObserveStrategy: (existing && existing.lwm2mObserveStrategy) || 'Single',
+    lwm2mBootstrapServer: (existing && existing.lwm2mBootstrapServer) || '',
+    lwm2mBootstrapShortId:(existing && existing.lwm2mBootstrapShortId) || '',
+    lwm2mOtherClient:  (existing && existing.lwm2mOtherClient)  || '',
+    lwm2mJsonConfig:   (existing && existing.lwm2mJsonConfig)   || '',
+    snmpTimeout:       (existing && existing.snmpTimeout)       || 500,
+    snmpRetries:       (typeof (existing && existing.snmpRetries) === 'number') ? existing.snmpRetries : 0,
+    snmpComms:         (existing && existing.snmpComms) ? JSON.parse(JSON.stringify(existing.snmpComms))
+                       : [{ scope: 'Client attributes (SNMP GET)', queryFreq: 5000, mappings: [{ dataType: 'String', dataKey: '', oid: '' }] }]
   };
   state._dpStep = 1;
 
@@ -6876,9 +6915,8 @@ function renderDeviceProfileStep() {
       </div>
     `;
   } else if (step === 2) {
-    const isMqtt = d.transportType === 'MQTT';
-    const hint = isMqtt ? 'Enables advanced MQTT transport settings'
-      : ((TRANSPORT_TYPES.find(t => t.value === d.transportType) || TRANSPORT_TYPES[0]).desc);
+    const tt = d.transportType;
+    const hint = (TRANSPORT_TYPES.find(t => t.value === tt) || TRANSPORT_TYPES[0]).desc;
     body.innerHTML = `
       <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
         <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('radio-tower')}</span>Transport configuration</div>
@@ -6889,7 +6927,7 @@ function renderDeviceProfileStep() {
           </select>
           <div class="hint">${hint}</div>
         </div>
-        ${isMqtt ? `
+        ${tt === 'MQTT' ? `
           <div class="field" style="margin-top:14px">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
               <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer" ${d.mqttSparkplugEoN ? 'checked' : ''} onchange="state._dpDraft.mqttSparkplugEoN=this.checked" />
@@ -6926,6 +6964,96 @@ function renderDeviceProfileStep() {
               <span>Send PUBACK on PUBLISH message validation failure</span>
             </label>
             <div class="hint" style="margin-top:6px;margin-left:26px">By default, the platform will close the MQTT session on message validation failure. When enabled, the platform will send publish acknowledgment instead of closing the session.</div>
+          </div>
+        ` : tt === 'CoAP' ? `
+          <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">CoAP device type</div>
+            <div class="field">
+              <select class="select" onchange="state._dpDraft.coapDeviceType=this.value">
+                ${['Default','Efento NB-IoT'].map(v => `<option value="${v}" ${d.coapDeviceType===v?'selected':''}>${v}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">CoAP device payload</div>
+            <div class="field">
+              <select class="select" onchange="state._dpDraft.coapPayload=this.value">
+                ${['JSON','Protobuf','CBOR'].map(v => `<option value="${v}" ${d.coapPayload===v?'selected':''}>${v}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+        ` : tt === 'LWM2M' ? (() => {
+          const subtab = d.lwm2mTab || 'model';
+          const sub = (k, label) => `<div class="dd-tab ${subtab===k?'active':''}" style="padding:10px 14px" onclick="state._dpDraft.lwm2mTab='${k}';renderDeviceProfileStep()">${label}</div>`;
+          let body2 = '';
+          if (subtab === 'model') {
+            body2 = `
+              <div class="field">
+                <label class="label">Object list</label>
+                <input class="input" value="${_kvEscape(d.lwm2mObjectList)}" oninput="state._dpDraft.lwm2mObjectList=this.value" placeholder="e.g. /3/0,/3303/0/5700" />
+              </div>
+              <div class="field" style="margin-top:6px">
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px">
+                  <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer" ${d.lwm2mObserveInit?'checked':''} onchange="state._dpDraft.lwm2mObserveInit=this.checked;renderDeviceProfileStep()" />
+                  <span>Initialize attributes and telemetry using Observe strategy</span>
+                  <span title="When enabled, the platform issues an Observe request to the device on start so attributes and telemetry are seeded immediately." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
+                </label>
+              </div>
+              <div class="field" style="margin-top:10px">
+                <label class="label">Observe strategy</label>
+                <select class="select" ${d.lwm2mObserveInit?'':'disabled'} onchange="state._dpDraft.lwm2mObserveStrategy=this.value">
+                  ${['Single','Composite all','Composite by object'].map(v => `<option value="${v}" ${d.lwm2mObserveStrategy===v?'selected':''}>${v}</option>`).join('')}
+                </select>
+              </div>`;
+          } else if (subtab === 'bootstrap') {
+            body2 = `
+              <div class="field"><label class="label">Bootstrap server URI</label><input class="input" value="${_kvEscape(d.lwm2mBootstrapServer)}" oninput="state._dpDraft.lwm2mBootstrapServer=this.value" placeholder="coaps://bootstrap.example:5684" /></div>
+              <div class="field"><label class="label">Short server ID</label><input class="input" value="${_kvEscape(d.lwm2mBootstrapShortId)}" oninput="state._dpDraft.lwm2mBootstrapShortId=this.value" placeholder="e.g. 123" /></div>`;
+          } else if (subtab === 'other') {
+            body2 = `
+              <div class="field"><label class="label">Default client lifetime (s)</label><input class="input" value="${_kvEscape(d.lwm2mOtherClient)}" oninput="state._dpDraft.lwm2mOtherClient=this.value" placeholder="300" /></div>`;
+          } else {
+            body2 = `
+              <div class="field"><label class="label">JSON config</label><textarea class="textarea" rows="6" oninput="state._dpDraft.lwm2mJsonConfig=this.value" placeholder='{ "objects": [] }'>${_kvEscape(d.lwm2mJsonConfig)}</textarea></div>`;
+          }
+          return `
+            <div style="margin-top:18px">
+              <div class="dd-tabs-wrap"><div class="dd-tabs">${sub('model','LWM2M Model')}${sub('bootstrap','Bootstrap')}${sub('other','Other settings')}${sub('json','Json Config Profile Device')}</div></div>
+              ${body2}
+            </div>
+          `;
+        })() : tt === 'SNMP' ? `
+          <div class="field-row" style="grid-template-columns:1fr 1fr;margin-top:14px">
+            <div class="field"><label class="label">Timeout, ms <span class="req">*</span></label><input class="input" type="number" value="${d.snmpTimeout}" oninput="state._dpDraft.snmpTimeout=parseInt(this.value)||0" /></div>
+            <div class="field"><label class="label">Retries <span class="req">*</span></label><input class="input" type="number" value="${d.snmpRetries}" oninput="state._dpDraft.snmpRetries=parseInt(this.value)||0" /></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:18px">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Communication configs</div>
+            ${(d.snmpComms||[]).map((cc, ci) => `
+              <div style="border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:12px;position:relative">
+                <button type="button" class="icon-btn" title="Remove config" style="position:absolute;top:8px;right:8px;color:var(--text-muted)" onclick="removeSnmpComm(${ci})">${li('trash-2')}</button>
+                <div class="field">
+                  <label class="label">Scope</label>
+                  <select class="select" onchange="state._dpDraft.snmpComms[${ci}].scope=this.value">
+                    ${['Client attributes (SNMP GET)','Shared attributes (SNMP SET)','Telemetry (SNMP GET)','Telemetry (TRAP)'].map(v => `<option value="${v}" ${cc.scope===v?'selected':''}>${v}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="label">Querying frequency, ms <span class="req">*</span></label>
+                  <input class="input" type="number" value="${cc.queryFreq}" oninput="state._dpDraft.snmpComms[${ci}].queryFreq=parseInt(this.value)||0" />
+                </div>
+                ${(cc.mappings||[]).map((mp, mi) => `
+                  <div class="field-row" style="grid-template-columns:140px 1fr 1fr 36px;align-items:end;gap:8px;margin-top:10px">
+                    <div class="field" style="margin-bottom:0"><label class="label">Data type</label><select class="select" onchange="state._dpDraft.snmpComms[${ci}].mappings[${mi}].dataType=this.value">${['String','Long','Double','Boolean'].map(v => `<option value="${v}" ${mp.dataType===v?'selected':''}>${v}</option>`).join('')}</select></div>
+                    <div class="field" style="margin-bottom:0"><label class="label">Data key <span class="req">*</span></label><input class="input" value="${_kvEscape(mp.dataKey)}" oninput="state._dpDraft.snmpComms[${ci}].mappings[${mi}].dataKey=this.value" /></div>
+                    <div class="field" style="margin-bottom:0"><label class="label">OID <span class="req">*</span></label><input class="input" value="${_kvEscape(mp.oid)}" oninput="state._dpDraft.snmpComms[${ci}].mappings[${mi}].oid=this.value" /></div>
+                    <button type="button" class="icon-btn" title="Remove mapping" style="color:var(--text-muted);width:32px;height:32px;align-self:end;margin-bottom:2px" onclick="removeSnmpMapping(${ci}, ${mi})">${li('plus')}</button>
+                  </div>
+                `).join('')}
+                <button type="button" class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="addSnmpMapping(${ci})">${li('plus')} Add mapping</button>
+              </div>
+            `).join('')}
+            <button type="button" class="btn btn-secondary btn-sm" onclick="addSnmpComm()">${li('plus')} Add communication config</button>
           </div>
         ` : `
           <div style="margin-top:8px;padding:14px;border-radius:6px;background:var(--bg);border:1px solid var(--border)">
@@ -7034,7 +7162,19 @@ function submitDeviceProfile() {
       mqttAttrsPubTopic: d.mqttAttrsPubTopic,
       mqttAttrsSubTopic: d.mqttAttrsSubTopic,
       mqttPayload: d.mqttPayload,
-      mqttPubackOnFailure: d.mqttPubackOnFailure
+      mqttPubackOnFailure: d.mqttPubackOnFailure,
+      coapDeviceType: d.coapDeviceType,
+      coapPayload: d.coapPayload,
+      lwm2mObjectList: d.lwm2mObjectList,
+      lwm2mObserveInit: d.lwm2mObserveInit,
+      lwm2mObserveStrategy: d.lwm2mObserveStrategy,
+      lwm2mBootstrapServer: d.lwm2mBootstrapServer,
+      lwm2mBootstrapShortId: d.lwm2mBootstrapShortId,
+      lwm2mOtherClient: d.lwm2mOtherClient,
+      lwm2mJsonConfig: d.lwm2mJsonConfig,
+      snmpTimeout: d.snmpTimeout,
+      snmpRetries: d.snmpRetries,
+      snmpComms: JSON.parse(JSON.stringify(d.snmpComms || []))
     });
     toast('Device profile updated', 'success');
   } else {
@@ -7059,12 +7199,47 @@ function submitDeviceProfile() {
       mqttAttrsPubTopic: d.mqttAttrsPubTopic || 'v1/devices/me/attributes',
       mqttAttrsSubTopic: d.mqttAttrsSubTopic || 'v1/devices/me/attributes',
       mqttPayload: d.mqttPayload || 'JSON',
-      mqttPubackOnFailure: !!d.mqttPubackOnFailure
+      mqttPubackOnFailure: !!d.mqttPubackOnFailure,
+      coapDeviceType: d.coapDeviceType || 'Default',
+      coapPayload: d.coapPayload || 'JSON',
+      lwm2mObjectList: d.lwm2mObjectList || '',
+      lwm2mObserveInit: !!d.lwm2mObserveInit,
+      lwm2mObserveStrategy: d.lwm2mObserveStrategy || 'Single',
+      lwm2mBootstrapServer: d.lwm2mBootstrapServer || '',
+      lwm2mBootstrapShortId: d.lwm2mBootstrapShortId || '',
+      lwm2mOtherClient: d.lwm2mOtherClient || '',
+      lwm2mJsonConfig: d.lwm2mJsonConfig || '',
+      snmpTimeout: d.snmpTimeout || 500,
+      snmpRetries: typeof d.snmpRetries === 'number' ? d.snmpRetries : 0,
+      snmpComms: JSON.parse(JSON.stringify(d.snmpComms || []))
     });
     toast(`Device profile "${d.name.trim()}" created`, 'success');
   }
   closeDeviceProfileDrawer();
   renderDeviceProfilesPage();
+}
+
+function addSnmpComm() {
+  if (!state._dpDraft) return;
+  state._dpDraft.snmpComms = state._dpDraft.snmpComms || [];
+  state._dpDraft.snmpComms.push({ scope: 'Client attributes (SNMP GET)', queryFreq: 5000, mappings: [{ dataType: 'String', dataKey: '', oid: '' }] });
+  renderDeviceProfileStep();
+}
+function removeSnmpComm(i) {
+  if (!state._dpDraft || !state._dpDraft.snmpComms) return;
+  state._dpDraft.snmpComms.splice(i, 1);
+  renderDeviceProfileStep();
+}
+function addSnmpMapping(ci) {
+  if (!state._dpDraft || !state._dpDraft.snmpComms || !state._dpDraft.snmpComms[ci]) return;
+  state._dpDraft.snmpComms[ci].mappings = state._dpDraft.snmpComms[ci].mappings || [];
+  state._dpDraft.snmpComms[ci].mappings.push({ dataType: 'String', dataKey: '', oid: '' });
+  renderDeviceProfileStep();
+}
+function removeSnmpMapping(ci, mi) {
+  if (!state._dpDraft || !state._dpDraft.snmpComms || !state._dpDraft.snmpComms[ci]) return;
+  state._dpDraft.snmpComms[ci].mappings.splice(mi, 1);
+  renderDeviceProfileStep();
 }
 
 function closeDeviceProfileDrawer() {
