@@ -6571,7 +6571,7 @@ function _renderProfileCalculatedTab(p) {
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border)">
         <div style="font-size:18px;font-weight:600;color:var(--text)">Calculated fields</div>
         <div style="display:flex;gap:2px">
-          <button class="icon-btn" title="Add calculated field" onclick="toast('Add calculated field — coming soon')" style="width:34px;height:34px">${li('plus')}</button>
+          <button class="icon-btn" title="Add calculated field" onclick="openCalcFieldDrawer('${p.id}')" style="width:34px;height:34px">${li('plus')}</button>
         </div>
       </div>
       <table style="width:100%;border-collapse:collapse">
@@ -6598,6 +6598,321 @@ function _renderProfileCalculatedTab(p) {
       </table>
     </div>
   `;
+}
+
+function openCalcFieldDrawer(profileId, existing) {
+  closeCalcFieldDrawer();
+  state._calcDraftProfile = profileId;
+  state._calcFieldDraft = existing ? Object.assign({}, existing) : {
+    id: null,
+    title: '',
+    type: 'Simple',
+    args: [],
+    expression: '(temperature - 32) / 1.8',
+    outputType: 'Time series',
+    outputKey: '',
+    decimals: '',
+    useLatestTimestamp: false,
+    strategy: 'Process right away'
+  };
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'drawer-backdrop';
+  backdrop.id = 'calcFieldBackdrop';
+  backdrop.onclick = closeCalcFieldDrawer;
+
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+  drawer.id = 'calcFieldDrawer';
+  drawer.style.width = '640px';
+  drawer.innerHTML = `
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">${existing ? 'Edit' : 'Add'} calculated field</div>
+        <div class="drawer-sub">Derived value computed from this profile's telemetry and attributes.</div>
+      </div>
+      <button class="icon-btn" title="Close" onclick="closeCalcFieldDrawer()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="calcFieldBody"></div>
+    <div class="drawer-foot">
+      <button class="btn btn-ghost" onclick="closeCalcFieldDrawer()">Cancel</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-primary" id="calcFieldSubmit" onclick="submitCalcField()">${existing ? 'Save changes' : 'Add'}</button>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+  requestAnimationFrame(() => { backdrop.classList.add('open'); drawer.classList.add('open'); });
+  renderCalcFieldBody();
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function closeCalcFieldDrawer() {
+  const bg = document.getElementById('calcFieldBackdrop');
+  const dr = document.getElementById('calcFieldDrawer');
+  if (!bg && !dr) return;
+  if (bg) bg.classList.remove('open');
+  if (dr) dr.classList.remove('open');
+  setTimeout(() => {
+    const b = document.getElementById('calcFieldBackdrop');
+    const d = document.getElementById('calcFieldDrawer');
+    if (b) b.remove();
+    if (d) d.remove();
+  }, 260);
+}
+
+function renderCalcFieldBody() {
+  const body = document.getElementById('calcFieldBody');
+  if (!body) return;
+  const d = state._calcFieldDraft;
+  const argsValid = d.args && d.args.length > 0;
+  body.innerHTML = `
+    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;background:var(--surface)">
+      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:14px">General</div>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div class="field" style="flex:1;margin-bottom:0">
+          <input class="input" id="calcTitle" placeholder="Title *" value="${_kvEscape(d.title || '')}" oninput="state._calcFieldDraft.title=this.value;_calcValidate()" />
+        </div>
+        <button type="button" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:500;border:1px solid var(--primary);border-radius:999px;background:#fff;color:var(--primary);cursor:pointer;white-space:nowrap" title="Set debug duration" onclick="toast('Debug — 15 minutes default')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>
+          15 min
+        </button>
+      </div>
+      <div class="field" style="margin-top:12px;margin-bottom:0">
+        <label class="label">Type</label>
+        <select class="select" onchange="state._calcFieldDraft.type=this.value">
+          ${['Simple','Aggregated'].map(v => `<option value="${v}" ${d.type===v?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;background:var(--surface)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+        <div style="font-size:16px;font-weight:600;color:var(--text)">Arguments <span style="color:var(--danger)">*</span></div>
+        <span title="Define the inputs your expression will reference. Each argument can be a current-entity attribute or telemetry value." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
+      </div>
+      ${(d.args || []).length ? `
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+          ${d.args.map((a, i) => `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+              <div style="min-width:0;flex:1">
+                <div style="font-size:14px;font-weight:500;color:var(--text)">${_kvEscape(a.name || '(unnamed)')}</div>
+                <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">${_kvEscape(a.argType || '')} &middot; ${_kvEscape(a.tsKey || '—')}${a.defaultValue ? ' · default: ' + _kvEscape(a.defaultValue) : ''}</div>
+              </div>
+              <div style="display:flex;gap:2px">
+                <button class="icon-btn" title="Edit" onclick="openCalcArgDialog(${i})">${li('pencil')}</button>
+                <button class="icon-btn" title="Remove" style="color:var(--danger)" onclick="removeCalcArg(${i})">${li('trash-2')}</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : `
+        <div style="text-align:center;color:var(--danger);font-size:13px;padding:14px 0">At least one argument is required.</div>
+      `}
+      <button class="btn btn-secondary btn-sm" onclick="openCalcArgDialog()">${li('plus')} Add argument</button>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;background:var(--surface)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+        <div style="font-size:16px;font-weight:600;color:var(--text)">Expression <span style="color:var(--danger)">*</span></div>
+        <span title="JavaScript-style expression that references your arguments by name." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
+      </div>
+      <div class="field" style="margin-bottom:6px;position:relative">
+        <input class="input" style="font-family:ui-monospace,Menlo,monospace;padding-right:38px" placeholder="(temperature - 32) / 1.8" value="${_kvEscape(d.expression || '')}" oninput="state._calcFieldDraft.expression=this.value;_calcValidate()" />
+        <span title="Use argument names directly. Operators + - * / and parentheses are supported." style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--primary);display:inline-flex">${li('circle-help')}</span>
+      </div>
+      <div class="hint">Default expression demonstrates how to transform a temperature from Fahrenheit to Celsius.</div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;background:var(--surface)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+        <div style="font-size:16px;font-weight:600;color:var(--text)">Output</div>
+        <span title="Where the calculated value will be written on each device." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
+      </div>
+      <div class="field">
+        <label class="label">Output type</label>
+        <select class="select" onchange="state._calcFieldDraft.outputType=this.value">
+          ${['Time series','Attribute'].map(v => `<option value="${v}" ${d.outputType===v?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-row" style="grid-template-columns:1fr 1fr">
+        <div class="field"><input class="input" placeholder="Time series key *" value="${_kvEscape(d.outputKey || '')}" oninput="state._calcFieldDraft.outputKey=this.value;_calcValidate()" /></div>
+        <div class="field"><input class="input" placeholder="Decimals by default" value="${_kvEscape(d.decimals || '')}" oninput="state._calcFieldDraft.decimals=this.value" /></div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px">
+          <span class="switch ${d.useLatestTimestamp ? 'on' : ''}" onclick="event.preventDefault();state._calcFieldDraft.useLatestTimestamp=!state._calcFieldDraft.useLatestTimestamp;renderCalcFieldBody()" style="flex-shrink:0"></span>
+          <span>Use latest timestamp</span>
+          <span title="When enabled, the output value carries the timestamp of the most recent argument value rather than the evaluation time." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
+        </label>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;padding:18px;background:var(--surface)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="font-size:16px;font-weight:600;color:var(--text)">Strategy</div>
+          <span title="Choose whether the platform writes the calculated value directly or routes it through rule chains." style="display:inline-flex;color:var(--text-subtle)">${li('info')}</span>
+        </div>
+        <div style="display:inline-flex;padding:4px;background:var(--bg);border:1px solid var(--border);border-radius:999px">
+          ${['Process right away','Process via Rule Chains'].map(v => `<button type="button" style="padding:6px 14px;border-radius:999px;border:none;background:${d.strategy===v?'var(--primary)':'transparent'};color:${d.strategy===v?'#fff':'var(--text-muted)'};font-size:13px;font-weight:500;cursor:pointer" onclick="state._calcFieldDraft.strategy='${v}';renderCalcFieldBody()">${v}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  if (window.lucide) window.lucide.createIcons();
+  _calcValidate();
+}
+
+function _calcValidate() {
+  const d = state._calcFieldDraft;
+  const ok = !!(d && (d.title||'').trim() && (d.expression||'').trim() && (d.outputKey||'').trim() && (d.args||[]).length > 0);
+  const btn = document.getElementById('calcFieldSubmit');
+  if (btn) btn.disabled = !ok;
+}
+
+function openCalcArgDialog(idx) {
+  const editing = typeof idx === 'number';
+  const arr = state._calcFieldDraft.args || [];
+  state._calcArgDraft = editing ? Object.assign({}, arr[idx]) : {
+    entityType: 'Current entity',
+    argType: 'Latest telemetry',
+    tsKey: '',
+    name: '',
+    defaultValue: ''
+  };
+  state._calcArgEditingIdx = editing ? idx : null;
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.id = 'calcArgBackdrop';
+  backdrop.style.display = 'flex';
+  backdrop.style.alignItems = 'center';
+  backdrop.style.justifyContent = 'center';
+  backdrop.style.background = 'rgba(15,23,42,.5)';
+  backdrop.style.zIndex = '200';
+  backdrop.onclick = (e) => { if (e.target === backdrop) closeCalcArgDialog(); };
+
+  const modal = document.createElement('div');
+  modal.style.cssText = 'background:var(--surface);border-radius:12px;width:560px;max-width:92vw;max-height:90vh;overflow:auto;box-shadow:0 24px 64px rgba(15,23,42,.25)';
+  modal.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)">
+      <div style="font-size:16px;font-weight:600;color:var(--text)">Argument settings</div>
+      <button class="icon-btn" onclick="closeCalcArgDialog()" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="padding:18px 22px" id="calcArgBody"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:14px 22px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" onclick="closeCalcArgDialog()">Cancel</button>
+      <button class="btn btn-primary" id="calcArgAdd" onclick="submitCalcArg()">${editing ? 'Save' : 'Add'}</button>
+    </div>
+  `;
+  backdrop.appendChild(modal);
+  document.body.appendChild(backdrop);
+  renderCalcArgBody();
+}
+
+function closeCalcArgDialog() {
+  const b = document.getElementById('calcArgBackdrop');
+  if (b) b.remove();
+}
+
+function renderCalcArgBody() {
+  const c = document.getElementById('calcArgBody');
+  if (!c) return;
+  const a = state._calcArgDraft;
+  c.innerHTML = `
+    <div class="field-row" style="grid-template-columns:160px 1fr;align-items:center">
+      <div style="font-size:14px;color:var(--text)">Entity type</div>
+      <select class="select" onchange="state._calcArgDraft.entityType=this.value">
+        ${['Current entity','Asset','Tenant','Customer'].map(v => `<option value="${v}" ${a.entityType===v?'selected':''}>${v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-row" style="grid-template-columns:160px 1fr;align-items:center;margin-top:10px">
+      <div style="font-size:14px;color:var(--text)">Argument type <span style="color:var(--danger)">*</span></div>
+      <select class="select" onchange="state._calcArgDraft.argType=this.value">
+        ${['Latest telemetry','Time series rolling','Attribute (server)','Attribute (shared)','Attribute (client)'].map(v => `<option value="${v}" ${a.argType===v?'selected':''}>${v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-row" style="grid-template-columns:160px 1fr;align-items:center;margin-top:10px">
+      <div style="font-size:14px;color:var(--text)">Time series key <span style="color:var(--danger)">*</span></div>
+      <input class="input" placeholder="Set" value="${_kvEscape(a.tsKey || '')}" oninput="state._calcArgDraft.tsKey=this.value;_calcArgValidate()" />
+    </div>
+    <div class="field-row" style="grid-template-columns:160px 1fr;align-items:center;margin-top:10px">
+      <div style="font-size:14px;color:var(--text)">Argument name <span style="color:var(--danger)">*</span></div>
+      <input class="input" placeholder="Set" value="${_kvEscape(a.name || '')}" oninput="state._calcArgDraft.name=this.value;_calcArgValidate()" />
+    </div>
+    <div class="field-row" style="grid-template-columns:160px 1fr;align-items:center;margin-top:10px">
+      <div style="font-size:14px;color:var(--text)">Default value</div>
+      <input class="input" placeholder="Set" value="${_kvEscape(a.defaultValue || '')}" oninput="state._calcArgDraft.defaultValue=this.value" />
+    </div>
+  `;
+  _calcArgValidate();
+}
+
+function _calcArgValidate() {
+  const a = state._calcArgDraft || {};
+  const ok = !!((a.tsKey||'').trim() && (a.name||'').trim() && (a.argType||'').trim());
+  const btn = document.getElementById('calcArgAdd');
+  if (btn) btn.disabled = !ok;
+}
+
+function submitCalcArg() {
+  const a = state._calcArgDraft;
+  if (!a || !(a.tsKey||'').trim() || !(a.name||'').trim()) return;
+  state._calcFieldDraft.args = state._calcFieldDraft.args || [];
+  if (state._calcArgEditingIdx != null) {
+    state._calcFieldDraft.args[state._calcArgEditingIdx] = Object.assign({}, a);
+  } else {
+    state._calcFieldDraft.args.push(Object.assign({}, a));
+  }
+  closeCalcArgDialog();
+  renderCalcFieldBody();
+}
+
+function removeCalcArg(i) {
+  if (!state._calcFieldDraft || !state._calcFieldDraft.args) return;
+  state._calcFieldDraft.args.splice(i, 1);
+  renderCalcFieldBody();
+}
+
+function submitCalcField() {
+  const d = state._calcFieldDraft;
+  const profileId = state._calcDraftProfile;
+  if (!d || !(d.title||'').trim()) { toast('Title is required', 'danger'); return; }
+  if (!(d.args||[]).length)         { toast('At least one argument is required', 'danger'); return; }
+  if (!(d.expression||'').trim())   { toast('Expression is required', 'danger'); return; }
+  if (!(d.outputKey||'').trim())    { toast('Time series key is required', 'danger'); return; }
+  state._profileCalcFields = state._profileCalcFields || {};
+  state._profileCalcFields[profileId] = state._profileCalcFields[profileId] || [];
+  const pad = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  if (d.id) {
+    const idx = state._profileCalcFields[profileId].findIndex(r => r.id === d.id);
+    if (idx >= 0) Object.assign(state._profileCalcFields[profileId][idx], d, { time: state._profileCalcFields[profileId][idx].time, name: d.title });
+    toast('Calculated field updated', 'success');
+  } else {
+    state._profileCalcFields[profileId].unshift({
+      id: 'cf-' + Date.now(),
+      time: fmt,
+      name: d.title,
+      type: d.type === 'Aggregated' ? 'Aggregated' : 'Simple',
+      args: d.args,
+      expression: d.expression,
+      outputType: d.outputType,
+      outputKey: d.outputKey,
+      decimals: d.decimals,
+      useLatestTimestamp: d.useLatestTimestamp,
+      strategy: d.strategy
+    });
+    toast(`Calculated field "${d.title}" added`, 'success');
+  }
+  closeCalcFieldDrawer();
+  renderDeviceProfileDetails();
 }
 
 function _renderProfileAlarmsTab(p) {
