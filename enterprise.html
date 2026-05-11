@@ -6565,9 +6565,12 @@ function _renderProfileCalculatedTab(p) {
   const rows = state._profileCalcFields[p.id];
   return `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border)">
-        <div style="font-size:18px;font-weight:600;color:var(--text)">Calculated fields</div>
-        <div style="display:flex;gap:2px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:16px 22px;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:18px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('activity')}</span>Calculated fields</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Derived values applied to every device of this profile.</div>
+        </div>
+        <div style="display:flex;gap:2px;flex-shrink:0">
           <button class="icon-btn" title="Add calculated field" onclick="openCalcFieldDrawer('${p.id}')" style="width:34px;height:34px">${li('plus')}</button>
         </div>
       </div>
