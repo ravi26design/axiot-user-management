@@ -6950,38 +6950,231 @@ function submitCalcField() {
 }
 
 function _renderProfileAlarmsTab(p) {
-  const rules = [
-    { name: 'High temperature',   severity: 'Critical', condition: 'temperature > 80 for 5m',  enabled: true },
-    { name: 'Battery low',        severity: 'Warning',  condition: 'battery < 15',             enabled: true },
-    { name: 'Connectivity loss',  severity: 'Major',    condition: 'lastSeen older than 10m',  enabled: false }
+  if (!state._profileAlarms) state._profileAlarms = {};
+  if (!state._profileAlarms[p.id]) state._profileAlarms[p.id] = [
+    { id: 'ar-' + p.id + '-1', time: '2026-05-06 09:14:22', type: 'High temperature',     severities: ['Critical'],          clearCondition: 'temperature < 70 for 2m',          create: 'temperature > 80 for 5m' },
+    { id: 'ar-' + p.id + '-2', time: '2026-05-03 17:48:55', type: 'Battery low',          severities: ['Warning'],           clearCondition: 'battery >= 25',                    create: 'battery < 15' },
+    { id: 'ar-' + p.id + '-3', time: '2026-04-29 11:02:30', type: 'Connectivity loss',    severities: ['Major'],             clearCondition: 'lastSeen newer than 5m',           create: 'lastSeen older than 10m' },
+    { id: 'ar-' + p.id + '-4', time: '2026-04-25 08:21:04', type: 'Pressure threshold',   severities: ['Major','Warning'],   clearCondition: 'pressure < 4.0 for 1m',            create: 'pressure > 4.5 for 30s' },
+    { id: 'ar-' + p.id + '-5', time: '2026-04-20 14:39:17', type: 'Vibration anomaly',    severities: ['Minor'],             clearCondition: 'vibration_rms < 1.2',              create: 'vibration_rms > 1.8 for 1m' }
   ];
-  const sevColor = (s) => s === 'Critical' ? 'var(--danger)' : s === 'Major' ? '#C2410C' : 'var(--warn)';
+  const rows = state._profileAlarms[p.id];
+  const sevColor = (s) => s === 'Critical' ? 'var(--danger)' : s === 'Major' ? '#C2410C' : s === 'Minor' ? '#7C3AED' : s === 'Indeterminate' ? '#6B7280' : 'var(--warn)';
   return `
-    <div class="info-section">
-      <div class="info-section-head">
-        <div class="ico-box">${li('triangle-alert')}</div>
-        <div>
-          <div class="info-section-title">Alarm rules</div>
-          <div class="info-section-sub">Triggers that produce alarms for any device using this profile</div>
-        </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border)">
+        <div style="font-size:18px;font-weight:600;color:var(--text)">Alarm rules</div>
+        <button class="icon-btn" title="Add alarm rule" onclick="openAlarmRuleDrawer('${p.id}')" style="width:34px;height:34px">${li('plus')}</button>
       </div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
-        ${rules.map(r => `
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface)">
-            <div style="display:flex;align-items:center;gap:12px;min-width:0">
-              <span class="chip" style="background:${sevColor(r.severity)}1a;color:${sevColor(r.severity)};border:1px solid ${sevColor(r.severity)}40"><span class="dot" style="background:${sevColor(r.severity)}"></span>${r.severity}</span>
-              <div style="min-width:0">
-                <div style="font-size:14px;font-weight:500;color:var(--text)">${_kvEscape(r.name)}</div>
-                <div style="font-size:12.5px;color:var(--text-muted);font-family:ui-monospace,Menlo,monospace;margin-top:2px">${_kvEscape(r.condition)}</div>
-              </div>
-            </div>
-            <span class="chip ${r.enabled ? 'chip-active' : 'chip-inactive'}"><span class="dot"></span>${r.enabled ? 'Enabled' : 'Disabled'}</span>
-          </div>
-        `).join('')}
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);width:48px"><input type="checkbox" style="accent-color:var(--primary);width:16px;height:16px;cursor:pointer;vertical-align:middle" /></th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);width:200px;white-space:nowrap">Created time <span style="color:var(--text);margin-left:4px">↓</span></th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Alarm type</th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);width:220px">Severities</th>
+            <th style="text-align:left;padding:14px 22px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">Clear condition</th>
+            <th style="width:90px;border-bottom:1px solid var(--border)"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.length ? rows.map((r, i) => {
+            const last = i === rows.length - 1;
+            const td = `padding:14px 22px;border-bottom:${last?'none':'1px solid var(--border)'};font-size:14px`;
+            return `
+              <tr>
+                <td style="${td}"><input type="checkbox" style="accent-color:var(--primary);width:16px;height:16px;cursor:pointer;vertical-align:middle" /></td>
+                <td style="${td}">${r.time}</td>
+                <td style="${td};font-weight:500">${_kvEscape(r.type)}</td>
+                <td style="${td}">
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    ${r.severities.map(s => `<span class="chip" style="background:${sevColor(s)}1a;color:${sevColor(s)};border:1px solid ${sevColor(s)}40"><span class="dot" style="background:${sevColor(s)}"></span>${s}</span>`).join('')}
+                  </div>
+                </td>
+                <td style="${td};color:var(--text-muted);font-family:ui-monospace,Menlo,monospace;font-size:12.5px">${_kvEscape(r.clearCondition)}</td>
+                <td style="padding:8px 16px;text-align:right;border-bottom:${last?'none':'1px solid var(--border)'};white-space:nowrap">
+                  <div style="display:inline-flex;align-items:center;gap:2px">
+                    <button class="icon-btn" title="Edit" onclick="openAlarmRuleDrawer('${p.id}','${r.id}')" style="width:30px;height:30px">${li('pencil')}</button>
+                    <button class="icon-btn" title="Remove" style="width:30px;height:30px;color:var(--danger)" onclick="deleteAlarmRule('${p.id}','${r.id}')">${li('trash-2')}</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('') : `
+            <tr><td colspan="6" style="padding:80px 22px;text-align:center;color:var(--text-muted);font-size:14px">No alarm rules found</td></tr>
+          `}
+        </tbody>
+      </table>
+      <div class="tbl-footer" style="border-top:1px solid var(--border)">
+        <div>${rows.length === 0 ? '0 of 0' : `1 – ${rows.length} of ${rows.length}`}</div>
+        <div class="pager">
+          <button disabled style="opacity:.4;cursor:default">‹</button>
+          <button class="active">1</button>
+          <button disabled style="opacity:.4;cursor:default">›</button>
+        </div>
+        <div>
+          <select class="select-sm">
+            ${[10,25,50,100].map(n => `<option value="${n}">${n} per page</option>`).join('')}
+          </select>
+        </div>
       </div>
     </div>
   `;
 }
+
+const ALARM_SEVERITIES = ['Critical','Major','Minor','Warning','Indeterminate'];
+
+function openAlarmRuleDrawer(profileId, ruleId) {
+  closeAlarmRuleDrawer();
+  state._alarmDraftProfile = profileId;
+  state._profileAlarms = state._profileAlarms || {};
+  state._profileAlarms[profileId] = state._profileAlarms[profileId] || [];
+  const existing = ruleId ? state._profileAlarms[profileId].find(r => r.id === ruleId) : null;
+  state._alarmDraft = existing ? Object.assign({}, existing, { severities: existing.severities.slice() }) : {
+    id: null,
+    type: '',
+    severities: ['Critical'],
+    create: '',
+    clearCondition: ''
+  };
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'drawer-backdrop';
+  backdrop.id = 'alarmRuleBackdrop';
+  backdrop.onclick = closeAlarmRuleDrawer;
+
+  const drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+  drawer.id = 'alarmRuleDrawer';
+  drawer.style.width = '560px';
+  drawer.innerHTML = `
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title">${existing ? 'Edit' : 'Add'} alarm rule</div>
+        <div class="drawer-sub">Trigger an alarm for every device of this profile when the create condition matches.</div>
+      </div>
+      <button class="icon-btn" title="Close" onclick="closeAlarmRuleDrawer()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="alarmRuleBody"></div>
+    <div class="drawer-foot">
+      <button class="btn btn-ghost" onclick="closeAlarmRuleDrawer()">Cancel</button>
+      <button class="btn btn-primary" id="alarmRuleSubmit" onclick="submitAlarmRule()">${existing ? 'Save changes' : 'Add'}</button>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+  document.body.appendChild(drawer);
+  requestAnimationFrame(() => { backdrop.classList.add('open'); drawer.classList.add('open'); });
+  renderAlarmRuleBody();
+  setTimeout(() => { const n = document.getElementById('alarmType'); if (n) n.focus(); }, 280);
+}
+
+function renderAlarmRuleBody() {
+  const body = document.getElementById('alarmRuleBody');
+  if (!body) return;
+  const d = state._alarmDraft;
+  const sevColor = (s) => s === 'Critical' ? 'var(--danger)' : s === 'Major' ? '#C2410C' : s === 'Minor' ? '#7C3AED' : s === 'Indeterminate' ? '#6B7280' : 'var(--warn)';
+  const sectionTitle = (t) => `<div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">${t}</div>`;
+  body.innerHTML = `
+    <div class="form-section">
+      ${sectionTitle('General')}
+      <div class="field">
+        <label class="label">Alarm type <span class="req">*</span></label>
+        <input class="input" id="alarmType" placeholder="e.g. High temperature" value="${_kvEscape(d.type || '')}" oninput="state._alarmDraft.type=this.value;_alarmValidate()" />
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label class="label">Severities <span class="req">*</span></label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${ALARM_SEVERITIES.map(s => {
+            const on = (d.severities||[]).includes(s);
+            return `<button type="button" onclick="(function(){var arr=state._alarmDraft.severities||[];var i=arr.indexOf('${s}');if(i>=0)arr.splice(i,1);else arr.push('${s}');state._alarmDraft.severities=arr;renderAlarmRuleBody();_alarmValidate();})()" style="padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid ${on?sevColor(s):'var(--border-strong)'};background:${on?sevColor(s)+'1a':'transparent'};color:${on?sevColor(s):'var(--text-muted)'}">${s}</button>`;
+          }).join('')}
+        </div>
+        <div class="hint">Select one or more severities the rule can raise.</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      ${sectionTitle('Create condition <span style="color:var(--danger);text-transform:none">*</span>')}
+      <div class="field" style="margin-bottom:0">
+        <textarea class="textarea" rows="3" style="font-family:ui-monospace,Menlo,monospace;font-size:13px" placeholder="e.g. temperature > 80 for 5m" oninput="state._alarmDraft.create=this.value;_alarmValidate()">${_kvEscape(d.create || '')}</textarea>
+        <div class="hint">Predicate that raises the alarm. Reference telemetry or attribute keys directly.</div>
+      </div>
+    </div>
+
+    <div class="form-section" style="border-bottom:none;padding-bottom:0;margin-bottom:0">
+      ${sectionTitle('Clear condition')}
+      <div class="field" style="margin-bottom:0">
+        <textarea class="textarea" rows="3" style="font-family:ui-monospace,Menlo,monospace;font-size:13px" placeholder="e.g. temperature < 70 for 2m" oninput="state._alarmDraft.clearCondition=this.value">${_kvEscape(d.clearCondition || '')}</textarea>
+        <div class="hint">Optional — when this matches, the alarm clears automatically.</div>
+      </div>
+    </div>
+  `;
+  _alarmValidate();
+}
+
+function _alarmValidate() {
+  const d = state._alarmDraft;
+  const ok = !!(d && (d.type||'').trim() && (d.severities||[]).length > 0 && (d.create||'').trim());
+  const btn = document.getElementById('alarmRuleSubmit');
+  if (btn) btn.disabled = !ok;
+}
+
+function submitAlarmRule() {
+  const d = state._alarmDraft;
+  if (!d || !(d.type||'').trim() || !(d.severities||[]).length || !(d.create||'').trim()) return;
+  const pid = state._alarmDraftProfile;
+  state._profileAlarms = state._profileAlarms || {};
+  state._profileAlarms[pid] = state._profileAlarms[pid] || [];
+  const pad = n => String(n).padStart(2,'0');
+  const now = new Date();
+  const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  if (d.id) {
+    const ex = state._profileAlarms[pid].find(r => r.id === d.id);
+    if (ex) Object.assign(ex, { type: d.type.trim(), severities: d.severities.slice(), create: d.create.trim(), clearCondition: (d.clearCondition||'').trim() });
+    toast('Alarm rule updated', 'success');
+  } else {
+    state._profileAlarms[pid].unshift({
+      id: 'ar-' + pid + '-' + Date.now(),
+      time: fmt,
+      type: d.type.trim(),
+      severities: d.severities.slice(),
+      create: d.create.trim(),
+      clearCondition: (d.clearCondition||'').trim()
+    });
+    toast('Alarm rule added', 'success');
+  }
+  closeAlarmRuleDrawer();
+  renderDeviceProfileDetails();
+}
+
+function deleteAlarmRule(pid, id) {
+  state._profileAlarms = state._profileAlarms || {};
+  const list = state._profileAlarms[pid] || [];
+  const rule = list.find(r => r.id === id);
+  if (!rule) return;
+  confirmDialog(`Delete alarm rule "${rule.type}"?`, 'This permanently removes the rule from this device profile.', () => {
+    const i = list.findIndex(r => r.id === id);
+    if (i >= 0) list.splice(i, 1);
+    renderDeviceProfileDetails();
+    toast('Alarm rule deleted', 'danger');
+  });
+}
+
+function closeAlarmRuleDrawer() {
+  const b = document.getElementById('alarmRuleBackdrop');
+  const d = document.getElementById('alarmRuleDrawer');
+  if (b) b.classList.remove('open');
+  if (d) d.classList.remove('open');
+  setTimeout(() => {
+    const b2 = document.getElementById('alarmRuleBackdrop');
+    const d2 = document.getElementById('alarmRuleDrawer');
+    if (b2) b2.remove();
+    if (d2) d2.remove();
+  }, 240);
+}
+
 
 function _renderProfileProvisionTab(p) {
   const strat = p.provisionStrategy || 'Disabled';
