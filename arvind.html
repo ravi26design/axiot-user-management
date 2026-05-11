@@ -2870,17 +2870,17 @@ const SVG = {
 
 const NAV = [
   { section: 'Administration' },
-  { key: 'customers',   label: 'Clients',            ico: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>', screen: 'customers', hideInClientView: true },
+  { key: 'customers',   label: 'Clients',            ico: li('user-round'), screen: 'customers', hideInClientView: true },
   { key: 'users',       label: 'Users',                ico: SVG.users,      screen: 'users' },
   { key: 'roles',       label: 'Roles & permissions',  ico: SVG.roles,      screen: 'roles' },
   { key: 'industries',  label: 'Industries',           ico: SVG.industries, screen: 'industries' },
   {
-    key: 'entities', label: 'Entities', ico: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/></svg>', group: true,
+    key: 'entities', label: 'Entities', ico: li('shapes'), group: true,
     children: [
       { key: 'devices',        label: 'Devices',         ico: SVG.devices,        screen: 'devices' },
-      { key: 'deviceProfiles', label: 'Device profiles', ico: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.91a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>',       screen: 'deviceProfiles' },
-      { key: 'entityViews',    label: 'Entity views',    ico: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>',  comingSoon: true },
-      { key: 'gateways',       label: 'Gateways',        ico: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>',      screen: 'gateways' }
+      { key: 'deviceProfiles', label: 'Device profiles', ico: li('layers'),       screen: 'deviceProfiles' },
+      { key: 'entityViews',    label: 'Entity views',    ico: li('layout-grid'),  comingSoon: true },
+      { key: 'gateways',       label: 'Gateways',        ico: li('share-2'),      screen: 'gateways' }
     ]
   }
 ];
@@ -3141,7 +3141,7 @@ function renderSidebar(activeScreen) {
           return `<a class="nav-item nav-sub ${cActive ? 'active' : ''}" ${cClick} title="${c.label}"><span class="ico">${c.ico}</span><span class="nav-label">${c.label}</span></a>`;
         }).join('');
         return `<div class="nav-group ${isExpanded ? 'expanded' : ''}">
-          <a class="nav-item nav-group-head" onclick="toggleNavGroup('${item.key}')" title="${item.label}"><span class="ico">${item.ico}</span><span class="nav-label">${item.label}</span><span class="nav-chevron"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></a>
+          <a class="nav-item nav-group-head" onclick="toggleNavGroup('${item.key}')" title="${item.label}"><span class="ico">${item.ico}</span><span class="nav-label">${item.label}</span><span class="nav-chevron">${li('chevron-down')}</span></a>
           <div class="nav-group-children">${childrenHtml}</div>
         </div>`;
       }
@@ -6194,326 +6194,8 @@ function copyProfileId(id) {
   }
 }
 
-/* ----- Add device profile wizard ----- */
-const RULE_CHAINS         = ['Root Rule Chain', 'Thermostat Rule Chain', 'Edge Root Rule Chain'];
-const MOBILE_DASHBOARDS   = ['Default Mobile Dashboard', 'Thermostat Mobile Dashboard'];
-const QUEUES              = ['Main', 'HighPriority', 'SequentialByOriginator'];
-const EDGE_RULE_CHAINS    = ['Edge Root Rule Chain', 'Thermostat Edge Rule Chain'];
-const TRANSPORT_TYPES     = [
-  { value: 'Default',     desc: 'Supports basic MQTT, HTTP and CoAP transport' },
-  { value: 'MQTT',        desc: 'Supports MQTT-based device communication' },
-  { value: 'CoAP',        desc: 'Supports CoAP-based device communication' },
-  { value: 'LWM2M',       desc: 'Supports LwM2M devices' },
-  { value: 'SNMP',        desc: 'Supports SNMP-based device communication' }
-];
-const PROVISION_STRATEGIES = [
-  { value: 'Disabled',                 desc: 'Provisioning is disabled for devices of this profile' },
-  { value: 'Allow to create new devices', desc: 'New devices will be created on first message with provision key/secret' },
-  { value: 'Check for pre-provisioned devices', desc: 'Only existing devices with matching provision key/secret are accepted' }
-];
-
-function addDeviceProfile(existing) {
-  closeDeviceProfileDrawer();
-  const editing = !!existing;
-  state._dpDraft = {
-    id:                editing ? existing.id : null,
-    name:              existing && existing.name              || '',
-    defaultRuleChain:  existing && existing.defaultRuleChain  || '',
-    mobileDashboard:   existing && existing.mobileDashboard   || '',
-    queue:             existing && existing.queue             || '',
-    edgeRuleChain:     existing && existing.edgeRuleChain     || '',
-    image:             existing && existing.image             || '',
-    description:       existing && existing.description       || '',
-    transportType:     existing && existing.transportType     || 'Default',
-    provisionStrategy: existing && existing.provisionStrategy || 'Disabled'
-  };
-  state._dpStep = 1;
-
-  const backdrop = document.createElement('div');
-  backdrop.className = 'drawer-backdrop';
-  backdrop.id = 'dpDrawerBackdrop';
-  backdrop.onclick = closeDeviceProfileDrawer;
-
-  const drawer = document.createElement('aside');
-  drawer.className = 'drawer';
-  drawer.id = 'dpDrawer';
-  drawer.style.width = '600px';
-
-  drawer.innerHTML = `
-    <div class="drawer-head">
-      <div>
-        <div class="drawer-title">${editing ? 'Edit' : 'Add'} device profile</div>
-        <div class="drawer-sub">Profiles define how devices connect, send data and are processed.</div>
-      </div>
-      <button class="icon-btn" title="Close" onclick="closeDeviceProfileDrawer()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
-    </div>
-    <div id="dpStepper" style="display:flex;gap:0;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--bg)"></div>
-    <div class="drawer-body" id="dpBody"></div>
-    <div class="drawer-foot" id="dpFoot"></div>
-  `;
-
-  document.body.appendChild(backdrop);
-  document.body.appendChild(drawer);
-  requestAnimationFrame(() => {
-    backdrop.classList.add('open');
-    drawer.classList.add('open');
-  });
-  renderDeviceProfileStep();
-  if (window.lucide) window.lucide.createIcons();
-}
-
-function renderDeviceProfileStep() {
-  const d    = state._dpDraft;
-  const step = state._dpStep || 1;
-  const stepper = document.getElementById('dpStepper');
-  const body    = document.getElementById('dpBody');
-  const foot    = document.getElementById('dpFoot');
-  if (!stepper || !body || !foot) return;
-
-  const steps = [
-    { n: 1, t: 'Device profile details',  opt: false },
-    { n: 2, t: 'Transport configuration', opt: true  },
-    { n: 3, t: 'Device provisioning',     opt: true  }
-  ];
-
-  stepper.innerHTML = steps.map((s, i) => {
-    const isActive = s.n === step;
-    const isDone   = s.n < step;
-    const circleBg = isActive ? 'var(--primary)' : (isDone ? 'var(--primary)' : 'var(--surface)');
-    const circleColor = (isActive || isDone) ? '#fff' : 'var(--text-muted)';
-    const circleBorder = (isActive || isDone) ? 'var(--primary)' : 'var(--border-strong)';
-    const titleColor = isActive ? 'var(--text)' : 'var(--text-muted)';
-    return `
-      <div style="display:flex;align-items:center;flex:1;min-width:0;cursor:pointer" onclick="gotoDeviceProfileStep(${s.n})">
-        <div style="width:26px;height:26px;border-radius:50%;background:${circleBg};color:${circleColor};border:1.5px solid ${circleBorder};display:grid;place-items:center;font-size:12px;font-weight:600;flex-shrink:0">${isDone ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : s.n}</div>
-        <div style="margin-left:8px;min-width:0;overflow:hidden">
-          <div style="font-size:12.5px;font-weight:${isActive ? '600' : '500'};color:${titleColor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.t}</div>
-          ${s.opt ? '<div style="font-size:11px;color:var(--text-subtle)">Optional</div>' : ''}
-        </div>
-        ${i < steps.length - 1 ? `<div style="flex:1;height:1px;background:${isDone ? 'var(--primary)' : 'var(--border)'};margin:0 10px;min-width:14px"></div>` : ''}
-      </div>
-    `;
-  }).join('');
-
-  if (step === 1) {
-    body.innerHTML = `
-      <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
-        <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('layers')}</span>Device profile details</div>
-        <div class="field">
-          <label class="label">Name <span class="req">*</span></label>
-          <input class="input" id="dpName" placeholder="e.g. Pump" value="${_kvEscape(d.name)}" oninput="state._dpDraft.name=this.value;validateDeviceProfileForm()" />
-        </div>
-        <div class="field">
-          <label class="label">Default rule chain</label>
-          <select class="select" onchange="state._dpDraft.defaultRuleChain=this.value">
-            <option value="">Select rule chain…</option>
-            ${RULE_CHAINS.map(rc => `<option value="${_kvEscape(rc)}" ${d.defaultRuleChain===rc?'selected':''}>${_kvEscape(rc)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field">
-          <label class="label">Mobile dashboard</label>
-          <select class="select" onchange="state._dpDraft.mobileDashboard=this.value">
-            <option value="">Select dashboard…</option>
-            ${MOBILE_DASHBOARDS.map(m => `<option value="${_kvEscape(m)}" ${d.mobileDashboard===m?'selected':''}>${_kvEscape(m)}</option>`).join('')}
-          </select>
-          <div class="hint">Used by mobile application as a device details dashboard</div>
-        </div>
-        <div class="field">
-          <label class="label">Queue</label>
-          <select class="select" onchange="state._dpDraft.queue=this.value">
-            <option value="">Select queue…</option>
-            ${QUEUES.map(q => `<option value="${_kvEscape(q)}" ${d.queue===q?'selected':''}>${_kvEscape(q)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field">
-          <label class="label">Default edge rule chain</label>
-          <select class="select" onchange="state._dpDraft.edgeRuleChain=this.value">
-            <option value="">Select edge rule chain…</option>
-            ${EDGE_RULE_CHAINS.map(rc => `<option value="${_kvEscape(rc)}" ${d.edgeRuleChain===rc?'selected':''}>${_kvEscape(rc)}</option>`).join('')}
-          </select>
-          <div class="hint">Used on edge as rule chain to process incoming data for devices of this device profile</div>
-        </div>
-        <div class="field">
-          <label class="label">Device profile image</label>
-          <div id="dpImageBox" style="display:flex;align-items:center;gap:14px;padding:12px;border:1px dashed var(--border-strong);border-radius:6px;background:var(--bg)">
-            ${d.image ? `
-              <div style="width:54px;height:54px;border-radius:8px;background:#E0F0FF;display:grid;place-items:center;font-size:24px;flex-shrink:0">⚙️</div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:13.5px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_kvEscape(d.image)}</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Image attached</div>
-              </div>
-              <button class="btn btn-ghost btn-sm" onclick="state._dpDraft.image='';renderDeviceProfileStep()">Remove</button>
-            ` : `
-              <div style="width:40px;height:40px;border-radius:6px;background:var(--bg-hover);display:grid;place-items:center;color:var(--text-muted);flex-shrink:0">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
-              </div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:13.5px;color:var(--text-muted)">No image selected</div>
-                <div style="font-size:11.5px;color:var(--text-subtle);margin-top:2px">Optional — shown on the profile details screen</div>
-              </div>
-              <button class="btn btn-secondary btn-sm" onclick="state._dpDraft.image='profile-image.png';renderDeviceProfileStep()">Upload image</button>
-            `}
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Description</label>
-          <textarea class="textarea" rows="3" placeholder="Add a short description…" oninput="state._dpDraft.description=this.value">${_kvEscape(d.description)}</textarea>
-        </div>
-      </div>
-    `;
-  } else if (step === 2) {
-    body.innerHTML = `
-      <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
-        <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('radio-tower')}</span>Transport configuration</div>
-        <div class="field">
-          <label class="label">Transport type</label>
-          <select class="select" id="dpTransportType" onchange="state._dpDraft.transportType=this.value;renderDeviceProfileStep()">
-            ${TRANSPORT_TYPES.map(t => `<option value="${t.value}" ${d.transportType===t.value?'selected':''}>${t.value}</option>`).join('')}
-          </select>
-          <div class="hint">${(TRANSPORT_TYPES.find(t => t.value === d.transportType) || TRANSPORT_TYPES[0]).desc}</div>
-        </div>
-        <div style="margin-top:8px;padding:14px;border-radius:6px;background:var(--bg);border:1px solid var(--border)">
-          <div style="display:flex;gap:10px;align-items:flex-start">
-            <div style="color:var(--primary);flex-shrink:0;margin-top:1px">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-            </div>
-            <div style="font-size:12.5px;color:var(--text-muted);line-height:1.55">
-              The transport type controls which protocol devices of this profile use to talk to the platform. Leave at <strong>Default</strong> if devices use the standard MQTT, HTTP or CoAP endpoints.
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  } else if (step === 3) {
-    body.innerHTML = `
-      <div class="form-section" style="border:none;padding-bottom:0;margin-bottom:0">
-        <div class="form-section-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('shield-check')}</span>Device provisioning</div>
-        <div class="field">
-          <label class="label">Provision strategy</label>
-          <select class="select" onchange="state._dpDraft.provisionStrategy=this.value;renderDeviceProfileStep()">
-            ${PROVISION_STRATEGIES.map(s => `<option value="${s.value}" ${d.provisionStrategy===s.value?'selected':''}>${s.value}</option>`).join('')}
-          </select>
-          <div class="hint">${(PROVISION_STRATEGIES.find(s => s.value === d.provisionStrategy) || PROVISION_STRATEGIES[0]).desc}</div>
-        </div>
-        ${d.provisionStrategy !== 'Disabled' ? `
-          <div class="field">
-            <label class="label">Provision device key</label>
-            <input class="input" placeholder="Auto-generated on save" readonly />
-          </div>
-          <div class="field">
-            <label class="label">Provision device secret</label>
-            <input class="input" placeholder="Auto-generated on save" readonly />
-          </div>
-        ` : `
-          <div style="margin-top:8px;padding:14px;border-radius:6px;background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--text-muted);line-height:1.55">
-            Provisioning is currently <strong>disabled</strong>. Devices for this profile must be created manually before they can connect.
-          </div>
-        `}
-      </div>
-    `;
-  }
-
-  const isLast = step === 3;
-  foot.innerHTML = `
-    <button class="btn btn-ghost" onclick="closeDeviceProfileDrawer()">Cancel</button>
-    <div style="flex:1"></div>
-    ${step > 1 ? '<button class="btn btn-secondary" onclick="gotoDeviceProfileStep(' + (step - 1) + ')">Back</button>' : ''}
-    ${!isLast ? '<button class="btn btn-secondary" onclick="gotoDeviceProfileStep(' + (step + 1) + ')">Skip</button>' : ''}
-    ${isLast
-      ? `<button class="btn btn-primary" id="dpSubmitBtn" onclick="submitDeviceProfile()">${state._dpDraft.id ? 'Save changes' : 'Add'}</button>`
-      : `<button class="btn btn-primary" id="dpNextBtn" onclick="gotoDeviceProfileStep(${step + 1})">Next</button>`}
-  `;
-
-  validateDeviceProfileForm();
-  if (step === 1) setTimeout(() => { const n = document.getElementById('dpName'); if (n) n.focus(); }, 60);
-  if (window.lucide) window.lucide.createIcons();
-}
-
-function gotoDeviceProfileStep(n) {
-  if (n < 1 || n > 3) return;
-  if (n > 1 && (!state._dpDraft || !state._dpDraft.name || !state._dpDraft.name.trim())) {
-    toast('Enter a profile name to continue', 'danger');
-    state._dpStep = 1;
-    renderDeviceProfileStep();
-    const n2 = document.getElementById('dpName'); if (n2) n2.focus();
-    return;
-  }
-  state._dpStep = n;
-  renderDeviceProfileStep();
-}
-
-function validateDeviceProfileForm() {
-  const d = state._dpDraft;
-  const valid = !!(d && d.name && d.name.trim());
-  const next = document.getElementById('dpNextBtn');
-  const submit = document.getElementById('dpSubmitBtn');
-  if (next)   next.disabled   = !valid;
-  if (submit) submit.disabled = !valid;
-}
-
-function submitDeviceProfile() {
-  const d = state._dpDraft;
-  if (!d || !d.name.trim()) { toast('Profile name is required', 'danger'); return; }
-  if (DEVICE_PROFILES.some(p => p.name.toLowerCase() === d.name.trim().toLowerCase() && p.id !== d.id)) {
-    toast('A profile with that name already exists', 'danger'); return;
-  }
-  const pad = n => String(n).padStart(2, '0');
-  const now = new Date();
-  const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-
-  if (d.id) {
-    const ex = DEVICE_PROFILES.find(p => p.id === d.id);
-    if (ex) Object.assign(ex, {
-      name: d.name.trim(),
-      description: d.description,
-      defaultRuleChain: d.defaultRuleChain,
-      mobileDashboard: d.mobileDashboard,
-      queue: d.queue,
-      edgeRuleChain: d.edgeRuleChain,
-      image: d.image,
-      transportType: d.transportType,
-      provisionStrategy: d.provisionStrategy
-    });
-    toast('Device profile updated', 'success');
-  } else {
-    const newId = 'dp-' + (state._dpSeq = (state._dpSeq || DEVICE_PROFILES.length) + 1);
-    DEVICE_PROFILES.unshift({
-      id: newId,
-      name: d.name.trim(),
-      createdTime: fmt,
-      profileType: 'Default',
-      transportType: d.transportType || 'Default',
-      description: d.description || '',
-      isDefault: false,
-      image: d.image || '',
-      imageSize: '',
-      imageDim: '',
-      defaultRuleChain: d.defaultRuleChain || '',
-      mobileDashboard: d.mobileDashboard || '',
-      queue: d.queue || '',
-      edgeRuleChain: d.edgeRuleChain || '',
-      provisionStrategy: d.provisionStrategy || 'Disabled'
-    });
-    toast(`Device profile "${d.name.trim()}" created`, 'success');
-  }
-  closeDeviceProfileDrawer();
-  renderDeviceProfilesPage();
-}
-
-function closeDeviceProfileDrawer() {
-  const backdrop = document.getElementById('dpDrawerBackdrop');
-  const drawer   = document.getElementById('dpDrawer');
-  if (!backdrop && !drawer) return;
-  if (backdrop) backdrop.classList.remove('open');
-  if (drawer)   drawer.classList.remove('open');
-  setTimeout(() => {
-    const b  = document.getElementById('dpDrawerBackdrop');
-    const dr = document.getElementById('dpDrawer');
-    if (b)  b.remove();
-    if (dr) dr.remove();
-  }, 260);
+function addDeviceProfile() {
+  toast('Add device profile — drawer coming soon');
 }
 
 /* ============================================================
@@ -7877,25 +7559,6 @@ renderCustomersPage();
 renderDeviceProfilesPage();
 renderGatewaysPage();
 if (window.lucide) window.lucide.createIcons();
-
-/* Lucide CDN may load late on previewers (e.g. htmlpreview.github.io).
-   Poll briefly, then re-run createIcons + renders so nav/page icons appear. */
-(function ensureLucide() {
-  let tries = 0;
-  const tick = () => {
-    if (window.lucide && typeof window.lucide.createIcons === 'function') {
-      try { window.lucide.createIcons(); } catch (e) {}
-      try { renderSidebar(state.currentScreen); renderTopbar(); } catch (e) {}
-      try { window.lucide.createIcons(); } catch (e) {}
-      return;
-    }
-    if (++tries < 40) setTimeout(tick, 100);
-  };
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tick);
-  } else { tick(); }
-  window.addEventListener('load', tick);
-})();
 
 /* Hover tooltip activation: convert titleâdata-tip on icon-only controls
    so the custom CSS tooltip shows instead of the slow native browser tip.
