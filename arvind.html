@@ -7030,13 +7030,28 @@ function openAlarmRuleDrawer(profileId, ruleId) {
   state._profileAlarms = state._profileAlarms || {};
   state._profileAlarms[profileId] = state._profileAlarms[profileId] || [];
   const existing = ruleId ? state._profileAlarms[profileId].find(r => r.id === ruleId) : null;
-  state._alarmDraft = existing ? Object.assign({}, existing, { severities: existing.severities.slice() }) : {
+  const fresh = () => ({
     id: null,
     type: '',
-    severities: ['Critical'],
-    create: '',
-    clearCondition: ''
-  };
+    args: [],
+    triggers: [{ severity: 'Critical', condition: '', schedule: 'Active all the time', additionalInfo: '' }],
+    clear: null,
+    propagateRelated: false,
+    propagateRelatedTypes: '',
+    propagateOwner: false,
+    propagateTenant: false,
+    advancedOpen: true
+  });
+  if (existing) {
+    state._alarmDraft = JSON.parse(JSON.stringify(existing));
+    // Back-fill for older saved rules
+    if (!state._alarmDraft.triggers) state._alarmDraft.triggers = [{ severity: (existing.severities||['Critical'])[0], condition: existing.create || '', schedule: 'Active all the time', additionalInfo: '' }];
+    if (!('clear' in state._alarmDraft)) state._alarmDraft.clear = existing.clearCondition ? { condition: existing.clearCondition, schedule: 'Active all the time', additionalInfo: '' } : null;
+    if (!state._alarmDraft.args) state._alarmDraft.args = [];
+    if (typeof state._alarmDraft.advancedOpen === 'undefined') state._alarmDraft.advancedOpen = true;
+  } else {
+    state._alarmDraft = fresh();
+  }
 
   const backdrop = document.createElement('div');
   backdrop.className = 'drawer-backdrop';
@@ -7046,12 +7061,12 @@ function openAlarmRuleDrawer(profileId, ruleId) {
   const drawer = document.createElement('aside');
   drawer.className = 'drawer';
   drawer.id = 'alarmRuleDrawer';
-  drawer.style.width = '560px';
+  drawer.style.width = '680px';
   drawer.innerHTML = `
     <div class="drawer-head">
       <div>
         <div class="drawer-title">${existing ? 'Edit' : 'Add'} alarm rule</div>
-        <div class="drawer-sub">Trigger an alarm for every device of this profile when the create condition matches.</div>
+        <div class="drawer-sub">Configure when the platform raises an alarm for any device of this profile.</div>
       </div>
       <button class="icon-btn" title="Close" onclick="closeAlarmRuleDrawer()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -7076,40 +7091,155 @@ function renderAlarmRuleBody() {
   const d = state._alarmDraft;
   const sevColor = (s) => s === 'Critical' ? 'var(--danger)' : s === 'Major' ? '#C2410C' : s === 'Minor' ? '#7C3AED' : s === 'Indeterminate' ? '#6B7280' : 'var(--warn)';
   const sectionTitle = (t) => `<div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">${t}</div>`;
+
+  const renderArgs = () => {
+    if (!(d.args || []).length) {
+      return `<div style="font-size:13px;color:var(--text-muted);padding:14px;border:1px dashed var(--border-strong);border-radius:6px;margin-bottom:12px;text-align:center">No arguments yet. Add inputs the conditions can reference.</div>`;
+    }
+    return `
+      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Name</th>
+              <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Entity type</th>
+              <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Type</th>
+              <th style="text-align:left;padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--text);background:var(--bg);border-bottom:1px solid var(--border)">Key</th>
+              <th style="width:74px;background:var(--bg);border-bottom:1px solid var(--border)"></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${d.args.map((a, i) => {
+              const last = i === d.args.length - 1;
+              const td = `padding:11px 14px;font-size:13px;border-bottom:${last?'none':'1px solid var(--border)'};color:var(--text)`;
+              return `
+                <tr>
+                  <td style="${td};font-family:ui-monospace,Menlo,monospace;font-weight:500">${_kvEscape(a.name || '(unnamed)')}</td>
+                  <td style="${td};color:var(--text-muted)">${_kvEscape(a.entityType || 'Current entity')}</td>
+                  <td style="${td};color:var(--text-muted)">${_kvEscape(a.argType || 'Latest telemetry')}</td>
+                  <td style="${td};color:var(--text-muted);font-family:ui-monospace,Menlo,monospace">${_kvEscape(a.tsKey || '—')}</td>
+                  <td style="padding:6px 10px;border-bottom:${last?'none':'1px solid var(--border)'};white-space:nowrap">
+                    <div style="display:inline-flex;align-items:center;gap:2px;justify-content:flex-end">
+                      <button class="icon-btn" title="Edit" onclick="openAlarmArgDialog(${i})" style="width:28px;height:28px;flex-shrink:0">${li('pencil')}</button>
+                      <button class="icon-btn" title="Remove" style="width:28px;height:28px;flex-shrink:0;color:var(--danger)" onclick="removeAlarmArg(${i})">${li('trash-2')}</button>
+                    </div>
+                  </td>
+                </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  };
+
+  const triggerCard = (t, i) => {
+    const last = (d.triggers || []).length === 1;
+    return `
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">
+        <div style="flex:1;min-width:0;border:1px solid var(--border);border-left:4px solid ${sevColor(t.severity)};border-radius:8px;padding:14px 14px 4px 14px;background:var(--surface)">
+          <div class="field">
+            <label class="label">Severity</label>
+            <select class="select" onchange="state._alarmDraft.triggers[${i}].severity=this.value;renderAlarmRuleBody()">
+              ${ALARM_SEVERITIES.map(s => `<option value="${s}" ${t.severity===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label class="label">Condition <span class="req">*</span></label>
+            <textarea class="textarea" rows="2" style="font-family:ui-monospace,Menlo,monospace;font-size:13px" placeholder="e.g. temperature > 80 for 5m" oninput="state._alarmDraft.triggers[${i}].condition=this.value;_alarmValidate()">${_kvEscape(t.condition || '')}</textarea>
+          </div>
+          <div class="field">
+            <label class="label">Schedule</label>
+            <select class="select" onchange="state._alarmDraft.triggers[${i}].schedule=this.value">
+              ${['Active all the time','Custom (business hours)','Custom (weekends)'].map(v => `<option value="${v}" ${t.schedule===v?'selected':''}>${v}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:8px">
+            <label class="label">Additional info</label>
+            <input class="input" placeholder="Set (e.g. dashboard URL or note)" value="${_kvEscape(t.additionalInfo || '')}" oninput="state._alarmDraft.triggers[${i}].additionalInfo=this.value" />
+          </div>
+        </div>
+        <button class="icon-btn" title="Remove trigger" ${last?'disabled style="opacity:.4;cursor:not-allowed"':''} style="color:var(--danger);margin-top:18px;flex-shrink:0" onclick="${last?'':'removeAlarmTrigger('+i+')'}">${li('trash-2')}</button>
+      </div>
+    `;
+  };
+
+  const clearCard = () => {
+    if (!d.clear) {
+      return `<button class="btn btn-secondary btn-sm" onclick="state._alarmDraft.clear={condition:'',schedule:'Active all the time',additionalInfo:''};renderAlarmRuleBody()">${li('plus')} Add clear condition</button>`;
+    }
+    return `
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="flex:1;min-width:0;border:1px solid var(--border);border-left:4px solid var(--success, #16A34A);border-radius:8px;padding:14px 14px 4px 14px;background:var(--surface)">
+          <div class="field">
+            <label class="label">Condition</label>
+            <textarea class="textarea" rows="2" style="font-family:ui-monospace,Menlo,monospace;font-size:13px" placeholder="e.g. temperature < 70 for 2m" oninput="state._alarmDraft.clear.condition=this.value">${_kvEscape(d.clear.condition || '')}</textarea>
+          </div>
+          <div class="field">
+            <label class="label">Schedule</label>
+            <select class="select" onchange="state._alarmDraft.clear.schedule=this.value">
+              ${['Active all the time','Custom (business hours)','Custom (weekends)'].map(v => `<option value="${v}" ${d.clear.schedule===v?'selected':''}>${v}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:8px">
+            <label class="label">Additional info</label>
+            <input class="input" placeholder="Set" value="${_kvEscape(d.clear.additionalInfo || '')}" oninput="state._alarmDraft.clear.additionalInfo=this.value" />
+          </div>
+        </div>
+        <button class="icon-btn" title="Remove clear condition" style="color:var(--danger);margin-top:18px;flex-shrink:0" onclick="state._alarmDraft.clear=null;renderAlarmRuleBody()">${li('trash-2')}</button>
+      </div>
+    `;
+  };
+
+  const toggleRow = (key, label, helper) => `
+    <div style="padding:14px 16px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:var(--surface)">
+      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px">
+        <span class="switch ${d[key] ? 'on' : ''}" onclick="event.preventDefault();state._alarmDraft.${key}=!state._alarmDraft.${key};renderAlarmRuleBody()" style="flex-shrink:0"></span>
+        <span style="flex:1">${label}</span>
+      </label>
+      ${helper || ''}
+    </div>
+  `;
+
   body.innerHTML = `
     <div class="form-section">
       ${sectionTitle('General')}
-      <div class="field">
+      <div class="field" style="margin-bottom:0">
         <label class="label">Alarm type <span class="req">*</span></label>
         <input class="input" id="alarmType" placeholder="e.g. High temperature" value="${_kvEscape(d.type || '')}" oninput="state._alarmDraft.type=this.value;_alarmValidate()" />
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label class="label">Severity <span class="req">*</span></label>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">
-          ${ALARM_SEVERITIES.map(s => {
-            const on = (d.severities||[])[0] === s;
-            const c = sevColor(s);
-            return `<button type="button" onclick="state._alarmDraft.severities=['${s}'];renderAlarmRuleBody();_alarmValidate()" style="padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid ${c};background:${on?c:c+'1a'};color:${on?'#fff':c}">${s}</button>`;
-          }).join('')}
-        </div>
-        <div class="hint">Pick the severity this rule raises.</div>
       </div>
     </div>
 
     <div class="form-section">
-      ${sectionTitle('Create condition <span style="color:var(--danger);text-transform:none">*</span>')}
-      <div class="field" style="margin-bottom:0">
-        <textarea class="textarea" rows="3" style="font-family:ui-monospace,Menlo,monospace;font-size:13px" placeholder="e.g. temperature > 80 for 5m" oninput="state._alarmDraft.create=this.value;_alarmValidate()">${_kvEscape(d.create || '')}</textarea>
-        <div class="hint">Predicate that raises the alarm. Reference telemetry or attribute keys directly.</div>
-      </div>
+      ${sectionTitle('Arguments')}
+      ${renderArgs()}
+      <button class="btn btn-secondary btn-sm" onclick="openAlarmArgDialog()">${li('plus')} Add argument</button>
+    </div>
+
+    <div class="form-section">
+      ${sectionTitle('Trigger conditions <span style="color:var(--danger);text-transform:none">*</span>')}
+      ${(d.triggers || []).map((t, i) => triggerCard(t, i)).join('')}
+      <button class="btn btn-secondary btn-sm" onclick="state._alarmDraft.triggers.push({severity:'Critical',condition:'',schedule:'Active all the time',additionalInfo:''});renderAlarmRuleBody()">${li('plus')} Add trigger condition</button>
+    </div>
+
+    <div class="form-section">
+      ${sectionTitle('Clear condition')}
+      ${clearCard()}
     </div>
 
     <div class="form-section" style="border-bottom:none;padding-bottom:0;margin-bottom:0">
-      ${sectionTitle('Clear condition')}
-      <div class="field" style="margin-bottom:0">
-        <textarea class="textarea" rows="3" style="font-family:ui-monospace,Menlo,monospace;font-size:13px" placeholder="e.g. temperature < 70 for 2m" oninput="state._alarmDraft.clearCondition=this.value">${_kvEscape(d.clearCondition || '')}</textarea>
-        <div class="hint">Optional — when this matches, the alarm clears automatically.</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:${d.advancedOpen ? '12px' : '0'}" onclick="state._alarmDraft.advancedOpen=!state._alarmDraft.advancedOpen;renderAlarmRuleBody()">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">Advanced settings</div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);transform:${d.advancedOpen ? 'none' : 'rotate(180deg)'};transition:transform .15s"><path d="m18 15-6-6-6 6"/></svg>
       </div>
+      ${d.advancedOpen ? `
+        ${toggleRow('propagateRelated', 'Propagate alarm to related entities', d.propagateRelated ? `
+          <div class="field" style="margin-top:12px;margin-bottom:0">
+            <input class="input" placeholder="Relation types" value="${_kvEscape(d.propagateRelatedTypes || '')}" oninput="state._alarmDraft.propagateRelatedTypes=this.value" />
+            <div class="hint">Defines relation types to filter the related entities. If not set, the alarm will be propagated to all related entities.</div>
+          </div>` : '')}
+        ${toggleRow('propagateOwner', 'Propagate alarm to entity owner (Customer or Tenant)')}
+        ${toggleRow('propagateTenant', 'Propagate alarm to Tenant')}
+      ` : ''}
     </div>
   `;
   _alarmValidate();
@@ -7117,33 +7247,127 @@ function renderAlarmRuleBody() {
 
 function _alarmValidate() {
   const d = state._alarmDraft;
-  const ok = !!(d && (d.type||'').trim() && (d.severities||[]).length > 0 && (d.create||'').trim());
+  const triggersOk = (d?.triggers || []).length > 0 && d.triggers.every(t => (t.condition||'').trim() && t.severity);
+  const ok = !!(d && (d.type||'').trim() && triggersOk);
   const btn = document.getElementById('alarmRuleSubmit');
   if (btn) btn.disabled = !ok;
 }
 
+function removeAlarmTrigger(i) {
+  if (!state._alarmDraft || !state._alarmDraft.triggers) return;
+  if (state._alarmDraft.triggers.length <= 1) return;
+  state._alarmDraft.triggers.splice(i, 1);
+  renderAlarmRuleBody();
+}
+
+function openAlarmArgDialog(idx) {
+  const editing = typeof idx === 'number';
+  state._alarmArgIdx = editing ? idx : null;
+  state._alarmArgDraft = editing
+    ? Object.assign({}, state._alarmDraft.args[idx])
+    : { entityType: 'Current entity', argType: 'Latest telemetry', tsKey: '', name: '', defaultValue: '' };
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop open';
+  backdrop.id = 'alarmArgBackdrop';
+  backdrop.style.zIndex = '210';
+  backdrop.onclick = closeAlarmArgDialog;
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.id = 'alarmArgModal';
+  modal.style.width = '460px';
+  modal.onclick = e => e.stopPropagation();
+  modal.innerHTML = `
+    <div class="modal-head" style="display:flex;justify-content:space-between;align-items:center">
+      <div class="modal-title">Argument settings</div>
+      <button class="icon-btn" title="Close" onclick="closeAlarmArgDialog()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="alarmArgBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeAlarmArgDialog()">Cancel</button>
+      <button class="btn btn-primary" id="alarmArgSave" onclick="submitAlarmArg()">${editing ? 'Save' : 'Add'}</button>
+    </div>
+  `;
+  backdrop.appendChild(modal);
+  document.body.appendChild(backdrop);
+  renderAlarmArgBody();
+  setTimeout(() => { const n = document.getElementById('alarmArgName'); if (n) n.focus(); }, 100);
+}
+
+function renderAlarmArgBody() {
+  const body = document.getElementById('alarmArgBody');
+  if (!body) return;
+  const a = state._alarmArgDraft;
+  body.innerHTML = `
+    <div class="field"><label class="label">Entity type</label><select class="select" onchange="state._alarmArgDraft.entityType=this.value">${['Current entity','Related entity','Tenant'].map(v => `<option value="${v}" ${a.entityType===v?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="field"><label class="label">Argument type <span class="req">*</span></label><select class="select" onchange="state._alarmArgDraft.argType=this.value">${['Latest telemetry','Attribute (server)','Attribute (shared)','Attribute (client)'].map(v => `<option value="${v}" ${a.argType===v?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="field"><label class="label">Time series key <span class="req">*</span></label><input class="input" placeholder="Set" value="${_kvEscape(a.tsKey || '')}" oninput="state._alarmArgDraft.tsKey=this.value;_alarmArgValidate()" /></div>
+    <div class="field"><label class="label">Argument name <span class="req">*</span></label><input class="input" id="alarmArgName" placeholder="Set" value="${_kvEscape(a.name || '')}" oninput="state._alarmArgDraft.name=this.value;_alarmArgValidate()" /></div>
+    <div class="field" style="margin-bottom:0"><label class="label">Default value</label><input class="input" placeholder="Set" value="${_kvEscape(a.defaultValue || '')}" oninput="state._alarmArgDraft.defaultValue=this.value" /></div>
+  `;
+  _alarmArgValidate();
+}
+
+function _alarmArgValidate() {
+  const a = state._alarmArgDraft;
+  const ok = !!(a && (a.name||'').trim() && (a.tsKey||'').trim() && (a.argType||'').trim());
+  const btn = document.getElementById('alarmArgSave');
+  if (btn) btn.disabled = !ok;
+}
+
+function submitAlarmArg() {
+  const a = state._alarmArgDraft;
+  if (!a || !(a.name||'').trim() || !(a.tsKey||'').trim()) return;
+  state._alarmDraft.args = state._alarmDraft.args || [];
+  if (state._alarmArgIdx != null) state._alarmDraft.args[state._alarmArgIdx] = a;
+  else state._alarmDraft.args.push(a);
+  closeAlarmArgDialog();
+  renderAlarmRuleBody();
+}
+
+function removeAlarmArg(i) {
+  if (!state._alarmDraft || !state._alarmDraft.args) return;
+  state._alarmDraft.args.splice(i, 1);
+  renderAlarmRuleBody();
+}
+
+function closeAlarmArgDialog() {
+  const el = document.getElementById('alarmArgBackdrop');
+  if (el) el.remove();
+}
+
 function submitAlarmRule() {
   const d = state._alarmDraft;
-  if (!d || !(d.type||'').trim() || !(d.severities||[]).length || !(d.create||'').trim()) return;
+  if (!d || !(d.type||'').trim() || !(d.triggers||[]).length || !d.triggers.every(t => (t.condition||'').trim())) return;
   const pid = state._alarmDraftProfile;
   state._profileAlarms = state._profileAlarms || {};
   state._profileAlarms[pid] = state._profileAlarms[pid] || [];
   const pad = n => String(n).padStart(2,'0');
   const now = new Date();
   const fmt = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const sevSet = Array.from(new Set(d.triggers.map(t => t.severity)));
+  const record = {
+    id: d.id || ('ar-' + pid + '-' + Date.now()),
+    time: (d.id ? state._profileAlarms[pid].find(r => r.id === d.id)?.time : fmt) || fmt,
+    type: d.type.trim(),
+    severities: sevSet,
+    triggers: JSON.parse(JSON.stringify(d.triggers)),
+    args: JSON.parse(JSON.stringify(d.args || [])),
+    clear: d.clear ? JSON.parse(JSON.stringify(d.clear)) : null,
+    clearCondition: d.clear ? d.clear.condition : '',
+    create: d.triggers.map(t => t.condition).join(' OR '),
+    propagateRelated: !!d.propagateRelated,
+    propagateRelatedTypes: d.propagateRelatedTypes || '',
+    propagateOwner: !!d.propagateOwner,
+    propagateTenant: !!d.propagateTenant
+  };
   if (d.id) {
     const ex = state._profileAlarms[pid].find(r => r.id === d.id);
-    if (ex) Object.assign(ex, { type: d.type.trim(), severities: d.severities.slice(), create: d.create.trim(), clearCondition: (d.clearCondition||'').trim() });
+    if (ex) Object.assign(ex, record);
     toast('Alarm rule updated', 'success');
   } else {
-    state._profileAlarms[pid].unshift({
-      id: 'ar-' + pid + '-' + Date.now(),
-      time: fmt,
-      type: d.type.trim(),
-      severities: d.severities.slice(),
-      create: d.create.trim(),
-      clearCondition: (d.clearCondition||'').trim()
-    });
+    state._profileAlarms[pid].unshift(record);
     toast('Alarm rule added', 'success');
   }
   closeAlarmRuleDrawer();
