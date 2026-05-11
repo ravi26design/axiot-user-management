@@ -247,6 +247,35 @@
   }
   .foot a { color: var(--primary); font-weight: var(--fw-med); }
 </style>
+<script>
+(function() {
+  function _navResolve(path) {
+    var href = location.href;
+    var qIdx = href.indexOf('?');
+    if (href.indexOf('htmlpreview.github.io') >= 0 && qIdx >= 0) {
+      var proxyPrefix = href.substring(0, qIdx + 1);
+      var srcRaw = href.substring(qIdx + 1);
+      var srcBase = srcRaw.split('?')[0];
+      var dirSlash = srcBase.lastIndexOf('/');
+      var newSrc = srcBase.substring(0, dirSlash + 1) + path.split('?')[0];
+      return proxyPrefix + newSrc;
+    }
+    return path;
+  }
+  window._navTo = function(path) { location.href = _navResolve(path); };
+  function rewriteLinks(root) {
+    (root || document).querySelectorAll('a[href]').forEach(function(a) {
+      var h = a.getAttribute('href');
+      if (h && /\.html(\?|$)/.test(h) && !/^(https?:)?\/\//.test(h)) {
+        a.setAttribute('href', _navResolve(h));
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ rewriteLinks(); });
+  } else { rewriteLinks(); }
+})();
+</script>
 </head>
 <body>
 
@@ -440,7 +469,7 @@ function verifyCode(evt) {
     }));
   } catch (e) {}
 
-  setTimeout(() => { window.location.href = next; }, 900);
+  setTimeout(() => { _navTo(next); }, 900);
 }
 
 // ---- Resend countdown ----
