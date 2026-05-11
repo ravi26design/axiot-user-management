@@ -6987,7 +6987,7 @@ function _renderProfileAlarmsTab(p) {
                 <td style="${td};font-weight:500">${_kvEscape(r.type)}</td>
                 <td style="${td}">
                   <div style="display:flex;gap:6px;flex-wrap:wrap">
-                    ${r.severities.map(s => `<span class="chip" style="background:${sevColor(s)}1a;color:${sevColor(s)};border:1px solid ${sevColor(s)};padding:4px 11px;border-radius:999px;font-weight:500"><span class="dot" style="background:${sevColor(s)}"></span>${s}</span>`).join('')}
+                    ${r.severities.map(s => `<span style="display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500;background:${sevColor(s)};color:#fff;border:1px solid ${sevColor(s)}">${s}</span>`).join('')}
                   </div>
                 </td>
                 <td style="${td};color:var(--text-muted);font-family:ui-monospace,Menlo,monospace;font-size:12.5px">${_kvEscape(r.clearCondition)}</td>
