@@ -7086,7 +7086,7 @@ function renderAlarmRuleBody() {
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           ${ALARM_SEVERITIES.map(s => {
             const on = (d.severities||[])[0] === s;
-            return `<button type="button" onclick="state._alarmDraft.severities=['${s}'];renderAlarmRuleBody();_alarmValidate()" style="padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid ${on?sevColor(s):'var(--border-strong)'};background:${on?sevColor(s)+'1a':'transparent'};color:${on?sevColor(s):'var(--text-muted)'}">${s}</button>`;
+            return `<button type="button" onclick="state._alarmDraft.severities=['${s}'];renderAlarmRuleBody();_alarmValidate()" style="padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid ${on?'var(--primary)':'var(--border-strong)'};background:${on?'var(--primary)':'transparent'};color:${on?'#fff':'var(--text-muted)'}">${s}</button>`;
           }).join('')}
         </div>
         <div class="hint">Pick the severity this rule raises.</div>
