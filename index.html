@@ -3315,7 +3315,7 @@ function profileAction(kind) {
   if (kind === 'signout') {
     confirmDialog('Sign out of AXIoT?', 'You will be returned to the sign-in page.', () => {
       try { localStorage.removeItem('axiot-login'); } catch (e) {}
-      window.location.href = 'login.html';
+      _navTo('login.html');
     });
     return;
   }
