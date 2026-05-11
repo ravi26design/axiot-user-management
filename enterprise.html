@@ -3618,27 +3618,28 @@ function renderDeviceTimelineTab(d) {
   }
 
   return `
-    <div class="tl-head">
-      <div>
-        <h3>Recent activity</h3>
-        <div class="sub">${totalEvents} events across the last 7 days</div>
-      </div>
-      <span class="tl-period">${li('calendar')} Last 7 days <span style="color:var(--text-subtle);font-size:10px">▾</span></span>
-    </div>
-
-    <div class="tl-feed">
-      <div class="tl-rail"></div>
-      ${days.map(day => `
-        <div class="tl-day">
-          <div class="tl-day-marker"></div>
-          <div class="tl-day-text">
-            <span class="label">${day.label}</span>
-            <span class="date">${day.date}</span>
-            <span class="count">${day.events.length}</span>
-          </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:14px">
+      <div class="tl-head" style="padding:16px 22px;border-bottom:1px solid var(--border);margin:0">
+        <div>
+          <h3 style="margin:0;font-size:18px;font-weight:600;color:var(--text)">Recent activity</h3>
+          <div class="sub" style="margin-top:4px">${totalEvents} events across the last 7 days</div>
         </div>
-        ${day.events.map(renderEvent).join('')}
-      `).join('')}
+        <span class="tl-period">${li('calendar')} Last 7 days</span>
+      </div>
+      <div class="tl-feed" style="padding:18px 22px">
+        <div class="tl-rail"></div>
+        ${days.map(day => `
+          <div class="tl-day">
+            <div class="tl-day-marker"></div>
+            <div class="tl-day-text">
+              <span class="label">${day.label}</span>
+              <span class="date">${day.date}</span>
+              <span class="count">${day.events.length}</span>
+            </div>
+          </div>
+          ${day.events.map(renderEvent).join('')}
+        `).join('')}
+      </div>
     </div>
   `;
 }
@@ -3710,15 +3711,13 @@ function renderDeviceTelemetryTab(d) {
       .tel-pager .pg-icon:disabled { opacity:.4;cursor:default }
       .tel-pager .pg-icon [data-lucide] { width:18px;height:18px }
     </style>
-    <div class="dd-tab-section-head" style="margin-top:18px;margin-bottom:6px">
-      <div style="font-size:18px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px">
-        <span style="display:inline-flex;color:var(--primary)">${li('line-chart')}</span>Latest telemetry
-      </div>
-      <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Most recent values reported by this device per key.</div>
-    </div>
-    <div class="tel-card">
-      <div class="tel-head">
-        <div class="tel-actions" style="margin-left:auto">
+    <div class="tel-card" style="margin-top:14px">
+      <div class="tel-head" style="justify-content:space-between">
+        <div>
+          <div class="tel-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('line-chart')}</span>Latest telemetry</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Most recent values reported by this device per key.</div>
+        </div>
+        <div class="tel-actions">
           <button class="icon-btn" title="Add telemetry" onclick="addTelemetryRow()">${li('plus')}</button>
         </div>
       </div>
@@ -4283,15 +4282,13 @@ function renderDeviceCalculatedTab(d) {
       .row-edit:hover { background:var(--bg);color:var(--primary) }
       .row-edit [data-lucide] { width:16px;height:16px }
     </style>
-    <div class="dd-tab-section-head" style="margin-top:18px;margin-bottom:6px">
-      <div style="font-size:18px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px">
-        <span style="display:inline-flex;color:var(--primary)">${li('activity')}</span>Calculated fields
-      </div>
-      <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Derived values computed from this device\'s telemetry and attributes.</div>
-    </div>
-    <div class="tel-card">
-      <div class="tel-head">
-        <div class="tel-actions" style="margin-left:auto">
+    <div class="tel-card" style="margin-top:14px">
+      <div class="tel-head" style="justify-content:space-between">
+        <div>
+          <div class="tel-title" style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;color:var(--primary)">${li('activity')}</span>Calculated fields</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:4px">Derived values computed from this device\'s telemetry and attributes.</div>
+        </div>
+        <div class="tel-actions">
           <button class="icon-btn" title="Add calculated field" onclick="addCalculatedField()">${li('plus')}</button>
         </div>
       </div>
