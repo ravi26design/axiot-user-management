@@ -2838,8 +2838,15 @@ const VIEW_CLIENT = (() => {
   try {
     const q = new URLSearchParams(window.location.search).get('client');
     if (q) return q.charAt(0).toUpperCase() + q.slice(1).toLowerCase();
-    const path = window.location.pathname;
-    const file = (path.split('/').pop() || '').replace('.html', '').toLowerCase();
+    // Try to extract the file name from either the current pathname OR
+    // the htmlpreview source URL embedded in location.search (e.g.
+    // https://htmlpreview.github.io/?https://github.com/.../arvind.html).
+    let file = (window.location.pathname.split('/').pop() || '').replace('.html', '').toLowerCase();
+    if (!file || file === '' || file === 'index.html') {
+      const href = window.location.href;
+      const m = href.match(/([^/?#]+)\.html(?:[?#].*)?$/);
+      if (m) file = m[1].toLowerCase();
+    }
     const byFile = { arvind: 'Arvind' };
     if (byFile[file]) return byFile[file];
     return null;
@@ -3301,7 +3308,7 @@ function openProfile(evt) {
       <button onclick="profileAction('sessions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>My sessions</button>
       <button onclick="profileAction('prefs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.66.88 1.09 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Preferences</button>
       <div class="sep"></div>
-      <button onclick="profileAction('client')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>Switch client</button>
+      ${VIEW_CLIENT ? '' : `<button onclick="profileAction('client')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>Switch client</button>`}
       <button onclick="profileAction('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>Help & documentation</button>
       <div class="sep"></div>
       <button class="danger" onclick="profileAction('signout')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Sign out<span class="prof-kbd">⇧⌘Q</span></button>
