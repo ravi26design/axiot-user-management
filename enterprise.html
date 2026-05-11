@@ -3313,25 +3313,24 @@ function openProfile(evt) {
 function profileAction(kind) {
   closeAllPopovers();
   if (kind === 'signout') {
-    confirmDialog('Sign out of AXIoT?', 'You will be returned to the sign-in page.', () => {
-      try { localStorage.removeItem('axiot-login'); } catch (e) {}
-      try { sessionStorage.clear(); } catch (e) {}
-      if (typeof _navTo === 'function') {
-        _navTo('login.html');
-      } else {
-        // Fallback: resolve against current path
-        var here = window.location.href;
-        var qIdx = here.indexOf('?');
-        if (here.indexOf('htmlpreview.github.io') >= 0 && qIdx >= 0) {
-          var prefix = here.substring(0, qIdx + 1);
-          var srcBase = here.substring(qIdx + 1).split('?')[0];
-          var dirSlash = srcBase.lastIndexOf('/');
-          window.location.href = prefix + srcBase.substring(0, dirSlash + 1) + 'login.html';
-        } else {
-          window.location.href = 'login.html';
-        }
-      }
-    });
+    try { localStorage.removeItem('axiot-login'); } catch (e) {}
+    try { sessionStorage.clear(); } catch (e) {}
+    var here = window.location.href;
+    var qIdx = here.indexOf('?');
+    var dest;
+    if (here.indexOf('htmlpreview.github.io') >= 0 && qIdx >= 0) {
+      var prefix = here.substring(0, qIdx + 1);
+      var srcBase = here.substring(qIdx + 1).split('?')[0];
+      var dirSlash = srcBase.lastIndexOf('/');
+      dest = prefix + srcBase.substring(0, dirSlash + 1) + 'login.html';
+    } else if (here.indexOf('github.com/') >= 0 && here.indexOf('/blob/') >= 0) {
+      var baseGh = here.split('?')[0];
+      var dirSlash2 = baseGh.lastIndexOf('/');
+      dest = 'https://htmlpreview.github.io/?' + baseGh.substring(0, dirSlash2 + 1) + 'login.html';
+    } else {
+      dest = 'login.html';
+    }
+    window.location.replace(dest);
     return;
   }
   const labels = { profile: 'My profile', sessions: 'My sessions', prefs: 'Preferences', client: 'Switch client', help: 'Help & documentation' };
