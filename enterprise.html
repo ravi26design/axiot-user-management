@@ -7164,13 +7164,12 @@ function deleteAlarmRule(pid, id) {
 function closeAlarmRuleDrawer() {
   const b = document.getElementById('alarmRuleBackdrop');
   const d = document.getElementById('alarmRuleDrawer');
-  if (b) b.classList.remove('open');
-  if (d) d.classList.remove('open');
+  if (!b && !d) return;
+  if (b) { b.classList.remove('open'); b.id = ''; }
+  if (d) { d.classList.remove('open'); d.id = ''; }
   setTimeout(() => {
-    const b2 = document.getElementById('alarmRuleBackdrop');
-    const d2 = document.getElementById('alarmRuleDrawer');
-    if (b2) b2.remove();
-    if (d2) d2.remove();
+    if (b) b.remove();
+    if (d) d.remove();
   }, 240);
 }
 
