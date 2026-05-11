@@ -3315,7 +3315,22 @@ function profileAction(kind) {
   if (kind === 'signout') {
     confirmDialog('Sign out of AXIoT?', 'You will be returned to the sign-in page.', () => {
       try { localStorage.removeItem('axiot-login'); } catch (e) {}
-      _navTo('login.html');
+      try { sessionStorage.clear(); } catch (e) {}
+      if (typeof _navTo === 'function') {
+        _navTo('login.html');
+      } else {
+        // Fallback: resolve against current path
+        var here = window.location.href;
+        var qIdx = here.indexOf('?');
+        if (here.indexOf('htmlpreview.github.io') >= 0 && qIdx >= 0) {
+          var prefix = here.substring(0, qIdx + 1);
+          var srcBase = here.substring(qIdx + 1).split('?')[0];
+          var dirSlash = srcBase.lastIndexOf('/');
+          window.location.href = prefix + srcBase.substring(0, dirSlash + 1) + 'login.html';
+        } else {
+          window.location.href = 'login.html';
+        }
+      }
     });
     return;
   }
