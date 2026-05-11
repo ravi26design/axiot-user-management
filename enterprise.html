@@ -7083,14 +7083,14 @@ function renderAlarmRuleBody() {
         <input class="input" id="alarmType" placeholder="e.g. High temperature" value="${_kvEscape(d.type || '')}" oninput="state._alarmDraft.type=this.value;_alarmValidate()" />
       </div>
       <div class="field" style="margin-bottom:0">
-        <label class="label">Severities <span class="req">*</span></label>
+        <label class="label">Severity <span class="req">*</span></label>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           ${ALARM_SEVERITIES.map(s => {
-            const on = (d.severities||[]).includes(s);
-            return `<button type="button" onclick="(function(){var arr=state._alarmDraft.severities||[];var i=arr.indexOf('${s}');if(i>=0)arr.splice(i,1);else arr.push('${s}');state._alarmDraft.severities=arr;renderAlarmRuleBody();_alarmValidate();})()" style="padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid ${on?sevColor(s):'var(--border-strong)'};background:${on?sevColor(s)+'1a':'transparent'};color:${on?sevColor(s):'var(--text-muted)'}">${s}</button>`;
+            const on = (d.severities||[])[0] === s;
+            return `<button type="button" onclick="state._alarmDraft.severities=['${s}'];renderAlarmRuleBody();_alarmValidate()" style="padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid ${on?sevColor(s):'var(--border-strong)'};background:${on?sevColor(s)+'1a':'transparent'};color:${on?sevColor(s):'var(--text-muted)'}">${s}</button>`;
           }).join('')}
         </div>
-        <div class="hint">Select one or more severities the rule can raise.</div>
+        <div class="hint">Pick the severity this rule raises.</div>
       </div>
     </div>
 
