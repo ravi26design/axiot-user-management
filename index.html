@@ -8462,9 +8462,46 @@ function renderGatewayDetails() {
   if (!g) { switchScreen('gateways'); return; }
   const c = document.getElementById('gatewayDetailsContent');
   if (!c) return;
-  const activeChip = g.status === 'Active'
+
+  if (!state._gwDevices) state._gwDevices = {};
+  if (!state._gwDevices[g.id]) {
+    const allActive = g.status === 'Active';
+    state._gwDevices[g.id] = [
+      { name: 'Modbus PLC #1',  type: 'PLC',          status: allActive ? 'Active' : 'Inactive', connectorName: 'modbus-main',  connectorType: 'Modbus' },
+      { name: 'Pump-A01',       type: 'Pump',         status: 'Active',                          connectorName: 'modbus-main',  connectorType: 'Modbus' },
+      { name: 'Pump-A02',       type: 'Pump',         status: 'Inactive',                        connectorName: 'modbus-main',  connectorType: 'Modbus' },
+      { name: 'Flow Meter F12', type: 'Flow meter',   status: 'Active',                          connectorName: 'opcua-line-2', connectorType: 'OPC UA' },
+      { name: 'Pressure-PT01',  type: 'Sensor',       status: 'Active',                          connectorName: 'mqtt-bridge',  connectorType: 'MQTT' },
+      { name: 'Camera-CCTV-3',  type: 'Camera',       status: 'Inactive',                        connectorName: 'rtsp-feed',    connectorType: 'RTSP' }
+    ];
+  }
+  const devices = state._gwDevices[g.id];
+  const devActive = devices.filter(d => d.status === 'Active').length;
+  const devInactive = devices.length - devActive;
+
+  if (!state._gwAlarms) state._gwAlarms = {};
+  if (!state._gwAlarms[g.id]) {
+    state._gwAlarms[g.id] = [
+      { time: '2026-05-06 09:14:22', type: 'High temperature',  severity: 'Critical', details: 'temperature = 84.3°C',  status: 'Active' },
+      { time: '2026-05-05 17:22:48', type: 'Connector down',    severity: 'Major',    details: 'opcua-line-2 unreachable', status: 'Cleared' },
+      { time: '2026-05-04 11:05:09', type: 'Pump vibration',    severity: 'Warning',  details: 'vibration_rms = 2.1',   status: 'Active' },
+      { time: '2026-04-30 08:41:33', type: 'Pressure threshold',severity: 'Minor',    details: 'pressure_pt01 = 4.6',   status: 'Acknowledged' },
+      { time: '2026-04-27 14:18:55', type: 'Battery low',       severity: 'Warning',  details: 'battery = 12%',         status: 'Cleared' }
+    ];
+  }
+  const alarms = state._gwAlarms[g.id];
+
+  const sevColor = (s) => s === 'Critical' ? 'var(--danger)' : s === 'Major' ? '#C2410C' : s === 'Minor' ? '#7C3AED' : s === 'Indeterminate' ? '#6B7280' : 'var(--warn)';
+  const sevPill = (s) => `<span style="display:inline-flex;align-items:center;justify-content:center;padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:500;background:${sevColor(s)};color:#fff;border:1px solid ${sevColor(s)};white-space:nowrap">${s}</span>`;
+  const statusChip = (st) => {
+    const color = st === 'Active' ? 'var(--success)' : st === 'Cleared' ? '#6B7280' : st === 'Acknowledged' ? '#0EA5E9' : 'var(--danger)';
+    const bg    = st === 'Active' ? 'var(--success-soft)' : st === 'Cleared' ? 'var(--bg-hover)' : st === 'Acknowledged' ? '#E0F2FE' : 'var(--danger-soft, #FDECEA)';
+    return `<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:500;background:${bg};color:${color};border:1px solid ${color}33">${st}</span>`;
+  };
+  const devStatusChip = (st) => st === 'Active'
     ? '<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:500;background:var(--success-soft);color:var(--success);border:1px solid var(--success)33">Active</span>'
-    : '<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:500;background:var(--danger-soft, #FDECEA);color:var(--danger);border:1px solid var(--danger)33">Inactive</span>';
+    : '<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:500;background:var(--bg-hover);color:var(--text-muted);border:1px solid var(--border-strong)">Inactive</span>';
+
   const statCell = (label, value, accent) => `
     <div style="flex:1;min-width:0;padding:14px 18px;border-left:4px solid ${accent};display:flex;flex-direction:column;gap:4px">
       <div style="font-size:12.5px;color:var(--text-muted)">${label}</div>
@@ -8476,14 +8513,13 @@ function renderGatewayDetails() {
   };
 
   c.innerHTML = `
-    <!-- top stat strip + side actions in a 2-col layout -->
     <div style="display:grid;grid-template-columns:1fr 180px;gap:14px;align-items:start;margin-top:14px">
       <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-wrap:wrap">
           ${statCell('Status', g.status === 'Active' ? '<span style="color:var(--success)">Active</span>' : '<span style="color:var(--danger)">Inactive</span>', g.status === 'Active' ? 'var(--success)' : 'var(--danger)')}
           ${statCell('Gateway name', _kvEscape(g.name), 'var(--primary)')}
           ${statCell('Gateway type', _kvEscape(g.deviceProfile || 'Default'), 'var(--primary)')}
-          ${statCell('Devices (Active | Inactive)', '0 | 0', 'var(--primary)')}
+          ${statCell('Devices (Active | Inactive)', `${devActive} | ${devInactive}`, 'var(--primary)')}
           ${statCell('Connectors (Enabled | Disabled)', `${g.connectors || 0} | 0`, 'var(--primary)')}
         </div>
 
@@ -8511,13 +8547,24 @@ function renderGatewayDetails() {
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="5" style="padding:50px 22px;text-align:center;color:var(--text-muted);font-size:14px">No entities found</td></tr>
+              ${devices.map((d, i) => {
+                const last = i === devices.length - 1;
+                const td = `padding:12px 22px;font-size:14px;border-bottom:${last?'none':'1px solid var(--border)'}`;
+                return `
+                  <tr>
+                    <td style="${td};font-weight:500">${_kvEscape(d.name)}</td>
+                    <td style="${td};color:var(--text-muted)">${_kvEscape(d.type)}</td>
+                    <td style="${td}">${devStatusChip(d.status)}</td>
+                    <td style="${td};color:var(--text-muted);font-family:ui-monospace,Menlo,monospace">${_kvEscape(d.connectorName)}</td>
+                    <td style="${td};color:var(--text-muted)">${_kvEscape(d.connectorType)}</td>
+                  </tr>`;
+              }).join('')}
             </tbody>
           </table>
           <div class="tbl-footer" style="border-top:1px solid var(--border)">
             <div style="font-size:13px;color:var(--text-muted)">Items per page:</div>
             <select class="select-sm"><option>10</option><option>25</option><option>50</option></select>
-            <div style="font-size:13px;color:var(--text-muted);margin-left:auto">1 – 0 of 0</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-left:auto">1 – ${devices.length} of ${devices.length}</div>
             <div class="pager"><button disabled style="opacity:.4">|‹</button><button disabled style="opacity:.4">‹</button><button disabled style="opacity:.4">›</button><button disabled style="opacity:.4">›|</button></div>
           </div>
         </div>
@@ -8542,13 +8589,25 @@ function renderGatewayDetails() {
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="6" style="padding:50px 22px;text-align:center;color:var(--text-muted);font-size:14px">No alarms found</td></tr>
+              ${alarms.map((a, i) => {
+                const last = i === alarms.length - 1;
+                const td = `padding:12px 22px;font-size:14px;border-bottom:${last?'none':'1px solid var(--border)'}`;
+                return `
+                  <tr>
+                    <td style="${td}"><input type="checkbox" style="accent-color:var(--primary)"/></td>
+                    <td style="${td}">${a.time}</td>
+                    <td style="${td};font-weight:500">${_kvEscape(a.type)}</td>
+                    <td style="${td}">${sevPill(a.severity)}</td>
+                    <td style="${td};color:var(--text-muted);font-family:ui-monospace,Menlo,monospace;font-size:12.5px">${_kvEscape(a.details)}</td>
+                    <td style="${td}">${statusChip(a.status)}</td>
+                  </tr>`;
+              }).join('')}
             </tbody>
           </table>
           <div class="tbl-footer" style="border-top:1px solid var(--border)">
             <div style="font-size:13px;color:var(--text-muted)">Items per page:</div>
             <select class="select-sm"><option>10</option><option>25</option><option>50</option></select>
-            <div style="font-size:13px;color:var(--text-muted);margin-left:auto">1 – 0 of 0</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-left:auto">1 – ${alarms.length} of ${alarms.length}</div>
             <div class="pager"><button disabled style="opacity:.4">|‹</button><button disabled style="opacity:.4">‹</button><button disabled style="opacity:.4">›</button><button disabled style="opacity:.4">›|</button></div>
           </div>
         </div>
@@ -8567,6 +8626,7 @@ function renderGatewayDetails() {
   `;
   if (window.lucide) window.lucide.createIcons();
 }
+
 
 function deleteGateway(id) {
   const g = GATEWAYS.find(x => x.id === id);
